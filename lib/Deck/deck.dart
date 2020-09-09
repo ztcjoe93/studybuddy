@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Providers/DeckProvider.dart';
-import 'objects.dart';
+import '../Providers/DecksState.dart';
+import '../objects.dart';
 
 class DeckManagement extends StatefulWidget {
   @override
@@ -100,7 +100,8 @@ class _AddDeckState extends State<AddDeck> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        onTap: () => FocusManager.instance.primaryFocus.unfocus(),
+        // FocusScope.of(context).requestFocus(FocusNode()), <-- deprecated
         // FocusScope.of(context).unfocus() causes keyboard focus glitch
         child: Scaffold(
           body: Column(
@@ -150,7 +151,7 @@ class _AddDeckState extends State<AddDeck> {
                         Deck(
                          textController.text,
                          tagController.text,
-                         [FlashCard("front", "back")],
+                          [],
                         )
                       );
                       Navigator.of(context).pop("${textController.text}");

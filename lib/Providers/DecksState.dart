@@ -3,7 +3,8 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:memory_cards/CardsManagement.dart';
+import 'package:memory_cards/Deck/CardsManagement.dart';
+import 'package:memory_cards/Deck/ModifyCard.dart';
 import 'package:memory_cards/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -38,13 +39,54 @@ class DecksState extends ChangeNotifier{
     }
   }
 
+  void updateCard(BuildContext context, Deck deck, int index) async {
+    final result = await Navigator.of(context).push(
+      PageRouteBuilder(
+        pageBuilder: (_, __, ___) => ModifyCard(deck.cards[index]),
+        transitionDuration: Duration(seconds: 0),
+      ),
+    );
+
+    if (result != null){
+      deck.cards[index] = result;
+      Provider.of<DecksState>(context, listen: false).update(deck);
+    }
+  }
+
   Widget cardManagementView(BuildContext context, Deck deck){
     return ListView.separated(
       itemCount: deck.cards.length,
       itemBuilder: (BuildContext context, int index) => Card(
         child: ListTile(
+          onTap: () => updateCard(context, deck, index),
           title: Text("${deck.cards[index].front}"),
           subtitle: Text("${deck.cards[index].back}"),
+          trailing: IconButton(
+            icon: Icon(Icons.delete),
+            onPressed: (){
+              showDialog(
+                context: context,
+                builder: (BuildContext context) => AlertDialog(
+                  content: Text("Are you sure you wish to delete this card?"),
+                  actions: [
+                    FlatButton(
+                      child: Text("Yes"),
+                      onPressed: (){
+                        deck.cards.removeAt(index);
+                        writeToFile(deck);
+                        notifyListeners();
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    FlatButton(
+                      child: Text("No"),
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                  ],
+                )
+              );
+            },
+          ),
         ),
       ),
       separatorBuilder: (BuildContext context, int index) => Divider(),
@@ -74,7 +116,15 @@ class DecksState extends ChangeNotifier{
     print("I/O operations complete.");
   }
 
-  int get deckCount => _decks.length;
+  void update(Deck deck){
+    for (var _deck in _decks){
+      if (_deck.name == deck.name){
+        _deck = deck;
+        writeToFile(deck);
+        notifyListeners();
+      }
+    }
+  }
 
   void add(Deck deck){
     _decks.add(deck);
