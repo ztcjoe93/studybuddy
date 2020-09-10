@@ -32,3 +32,41 @@ class FlashCard {
   String toString() => "FlashCard($front, $back)";
   Map<String, dynamic> toJson() => {"front": front, "back": back};
 }
+
+
+class Result {
+  String isoTimestamp;
+  String deckName;
+  List<CardResult> results = [];
+
+  Result(this.isoTimestamp, this.deckName, this.results);
+  Result.fromJson(Map<String, dynamic> json){
+    isoTimestamp = json['date'];
+    deckName = json['name'];
+    json['results'].forEach((e) => results.add(CardResult.fromJson(e)));
+  }
+
+  @override
+  String toString() => "Result($isoTimestamp, $deckName, $results)";
+  Map<String, dynamic> toJson() => {
+    "date": isoTimestamp,
+    "name": deckName,
+    "results": results.map((e) => e.toJson()).toList(),
+  };
+}
+
+
+class CardResult {
+  FlashCard card;
+  bool score;
+
+  CardResult(this.card, this.score);
+  CardResult.fromJson(Map<String, dynamic> json){
+    card = FlashCard.fromJson(json['card']);
+    score = json['score'];
+  }
+
+  @override
+  String toString() => "CardResult($card, $score)";
+  Map<String, dynamic> toJson() => {"card": card.toJson(), "score": score};
+}
