@@ -117,7 +117,7 @@ class DecksState extends ChangeNotifier{
   );
 
   List<DropdownMenuItem> get tagFilters{
-    List<String> tags = ["All"];
+    List<String> tags = [];
     for (var deck in _decks){
       if(!tags.contains(deck.tag)){
         tags.add(deck.tag);
