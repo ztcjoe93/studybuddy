@@ -17,7 +17,7 @@ class DecksState extends ChangeNotifier{
     itemCount: _decks.length,
     itemBuilder: (BuildContext context, int index) => ListTile(
       onTap: (){
-        manageCards(context, index);
+        manageCards(context, _decks, index);
       },
       title: Text("${_decks[index].name}"),
       subtitle: Text("${_decks[index].tag}"),
@@ -25,10 +25,24 @@ class DecksState extends ChangeNotifier{
     separatorBuilder: (BuildContext context, int index) => Divider(),
   );
 
-  void manageCards(BuildContext context, int index) async {
+  Widget deckManagementViewFiltered(String tag){
+    List<Deck> filtered = _decks.where((deck) => deck.tag == tag).toList();
+    print(filtered);
+    return ListView.separated(
+      itemBuilder: (BuildContext context, int index) => ListTile(
+        onTap: () => manageCards(context, filtered, index),
+        title: Text("${filtered[index].name}"),
+        subtitle: Text("${filtered[index].tag}"),
+      ),
+      separatorBuilder: (_, __) => Divider(),
+      itemCount: filtered.length,
+    );
+  }
+
+  void manageCards(BuildContext context, List<Deck> decks, int index) async {
     final result = await Navigator.of(context).push(
       PageRouteBuilder(
-        pageBuilder: (_, __, ___) => CardsManagement(_decks[index]),
+        pageBuilder: (_, __, ___) => CardsManagement(decks[index]),
         transitionDuration: Duration(seconds: 0),
       ),
     );
@@ -101,6 +115,22 @@ class DecksState extends ChangeNotifier{
       subtitle: Text("${_decks[index].tag}"),
     ),
   );
+
+  List<DropdownMenuItem> get tagFilters{
+    List<String> tags = ["All"];
+    for (var deck in _decks){
+      if(!tags.contains(deck.tag)){
+        tags.add(deck.tag);
+      }
+    }
+
+    return tags.map<DropdownMenuItem<String>>(
+        (String value) => DropdownMenuItem(
+          value: value,
+          child: Text(value),
+        )
+    ).toList();
+  }
 
   void writeToFile(Deck deck) async{
     final directory = await getApplicationDocumentsDirectory();
