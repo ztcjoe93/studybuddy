@@ -1,6 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import 'Providers/DeckProvider.dart';
+import 'Providers/DecksState.dart';
 
 class Revision extends StatefulWidget {
   @override

@@ -6,9 +6,9 @@ import 'package:memory_cards/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
-import 'deck.dart';
+import 'Deck/DeckManagement.dart';
 import 'Revision.dart';
-import 'Providers/DeckProvider.dart';
+import 'Providers/DecksState.dart';
 
 void main(){
   runApp(

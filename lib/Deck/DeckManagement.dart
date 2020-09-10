@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import 'Providers/DeckProvider.dart';
-import 'objects.dart';
+import '../Providers/DecksState.dart';
+import '../objects.dart';
 
 class DeckManagement extends StatefulWidget {
   @override
@@ -10,6 +10,8 @@ class DeckManagement extends StatefulWidget {
 }
 
 class _DeckManagementState extends State<DeckManagement> {
+  String _filter = "All";
+
   @override
   void initState() {
     super.initState();
@@ -36,7 +38,6 @@ class _DeckManagementState extends State<DeckManagement> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -49,11 +50,27 @@ class _DeckManagementState extends State<DeckManagement> {
             ),
           ),
           Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               RaisedButton(
                 onPressed: () => addDeck(context),
                 child: Text("Add"),
                 color: Color.fromRGBO(255, 255, 255, 0.9),
+              ),
+              Consumer<DecksState>(
+                builder: (context, deckState, child){
+                  return DropdownButton(
+                    value: _filter,
+                    icon: Icon(Icons.arrow_drop_down),
+                    underline: SizedBox(),
+                    onChanged: (val){
+                      setState(() {
+                        _filter = val;
+                      });
+                    },
+                    items: deckState.tagFilters,
+                  );
+                },
               ),
             ],
           ),
@@ -69,7 +86,9 @@ class _DeckManagementState extends State<DeckManagement> {
               ),
               child: Consumer<DecksState>(
                 builder: (context, decks, child) {
-                  return decks.deckManagementView;
+                  return _filter == "All"
+                      ? decks.deckManagementView
+                      : decks.deckManagementViewFiltered(_filter);
                 }
               ),
             ),
@@ -100,7 +119,8 @@ class _AddDeckState extends State<AddDeck> {
   Widget build(BuildContext context) {
     return SafeArea(
       child: GestureDetector(
-        onTap: () => FocusScope.of(context).requestFocus(FocusNode()),
+        onTap: () => FocusManager.instance.primaryFocus.unfocus(),
+        // FocusScope.of(context).requestFocus(FocusNode()), <-- deprecated
         // FocusScope.of(context).unfocus() causes keyboard focus glitch
         child: Scaffold(
           body: Column(
@@ -150,7 +170,7 @@ class _AddDeckState extends State<AddDeck> {
                         Deck(
                          textController.text,
                          tagController.text,
-                         [FlashCard("front", "back")],
+                          [],
                         )
                       );
                       Navigator.of(context).pop("${textController.text}");
