@@ -127,13 +127,12 @@ class _CardsManagementState extends State<CardsManagement> {
                     ),
                     ConstrainedBox(
                       constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * 0.65,
                         maxHeight: MediaQuery.of(context).size.height * 0.65,
                       ),
-                      child: Scrollbar(
-                        child: Consumer<DecksState>(
-                            builder: (context, decks, child) =>
-                                decks.cardManagementView(context, widget.deck)
-                        ),
+                      child: Consumer<DecksState>(
+                          builder: (context, decks, child) =>
+                              decks.cardManagementView(context, widget.deck)
                       ),
                     ),
                   ],

@@ -37,20 +37,23 @@ class FlashCard {
 class Result {
   String isoTimestamp;
   String deckName;
+  String deckTag;
   List<CardResult> results = [];
 
-  Result(this.isoTimestamp, this.deckName, this.results);
+  Result(this.isoTimestamp, this.deckName, this.deckTag, this.results);
   Result.fromJson(Map<String, dynamic> json){
     isoTimestamp = json['date'];
     deckName = json['name'];
+    deckTag = json['tag'];
     json['results'].forEach((e) => results.add(CardResult.fromJson(e)));
   }
 
   @override
-  String toString() => "Result($isoTimestamp, $deckName, $results)";
+  String toString() => "Result($isoTimestamp, $deckName, $deckTag, $results)";
   Map<String, dynamic> toJson() => {
     "date": isoTimestamp,
     "name": deckName,
+    "tag": deckTag,
     "results": results.map((e) => e.toJson()).toList(),
   };
 }

@@ -9,6 +9,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl: ^0.16.1
   path_provider: ^1.6.14
   provider: ^4.3.2+2
   cupertino_icons: ^0.1.3

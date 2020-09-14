@@ -10,7 +10,7 @@ class DeckManagement extends StatefulWidget {
 }
 
 class _DeckManagementState extends State<DeckManagement> {
-  String _filter = "None";
+  String _filter = "All";
 
   @override
   void initState() {
@@ -69,9 +69,13 @@ class _DeckManagementState extends State<DeckManagement> {
                       });
                     },
                     items: [DropdownMenuItem(
+                      value: "All",
+                      child: Text("All"),
+                    ), ...deckState.tagFilters,
+                    DropdownMenuItem(
                       value: "None",
-                      child: Text("None"),
-                    ), ...deckState.tagFilters],
+                      child: Text("None")
+                    )],
                   );
                 },
               ),
@@ -89,9 +93,10 @@ class _DeckManagementState extends State<DeckManagement> {
               ),
               child: Consumer<DecksState>(
                 builder: (context, decks, child) {
-                  return _filter == "None"
+                  return _filter == "All"
                       ? decks.deckManagementView
-                      : decks.deckManagementViewFiltered(_filter);
+                      : decks.deckManagementViewFiltered(
+                      _filter == "None" ? "" : _filter);
                 }
               ),
             ),
