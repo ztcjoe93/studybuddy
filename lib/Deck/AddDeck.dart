@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/DecksState.dart';
-import '../objects.dart';
+import '../Objects/objects.dart';
 
 
 class AddDeck extends StatefulWidget {

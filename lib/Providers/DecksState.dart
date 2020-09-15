@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:memory_cards/Deck/CardsManagement.dart';
 import 'package:memory_cards/Deck/ModifyCard.dart';
 import 'package:memory_cards/Revision/RevisionSession.dart';
-import 'package:memory_cards/objects.dart';
+import 'package:memory_cards/Objects/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 

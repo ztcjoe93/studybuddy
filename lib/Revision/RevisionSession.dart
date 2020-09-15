@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:memory_cards/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
 
-import '../objects.dart';
+import '../Objects/objects.dart';
 
 class RevisionSession extends StatefulWidget {
   @required Deck deck;

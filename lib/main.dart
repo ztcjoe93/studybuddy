@@ -3,12 +3,13 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:memory_cards/Providers/ResultsState.dart';
-import 'package:memory_cards/objects.dart';
+import 'package:memory_cards/Objects/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'Deck/DeckManagement.dart';
 import 'Revision/Revision.dart';
+import 'Stats/Stats.dart';
 import 'Providers/DecksState.dart';
 
 void main(){
@@ -44,7 +45,7 @@ class _MainAppState extends State<MainApp> {
     Text('Home'),
     DeckManagement(),
     Revision(),
-    Text('Stats'),
+    Stats(),
     Text('Options'),
   ];
 
@@ -68,12 +69,20 @@ class _MainAppState extends State<MainApp> {
           );
     });
 
+    print("Checking /results/...");
     Directory('${directory.path}/results')
         .list(recursive: true)
         .listen((e){
+          for (var result in jsonDecode(File(e.path).readAsStringSync())){
+            Provider.of<ResultsState>(context, listen: false).loadFromFile(
+              Result.fromJson(result)
+            );
+          }
+          /*
       Provider.of<ResultsState>(context, listen: false).loadFromFile(
           Result.fromJson(jsonDecode(File(e.path).readAsStringSync()))
       );
+           */
     });
   }
 
@@ -81,7 +90,7 @@ class _MainAppState extends State<MainApp> {
   void initState() {
     super.initState();
     initializeAll();
-    _selectedIdx = 2; //debugging purposes
+    _selectedIdx = 3; //debugging purposes
   }
 
   @override

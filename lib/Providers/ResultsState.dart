@@ -2,12 +2,84 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:memory_cards/Charts/CardPerformance.dart';
 import 'package:path_provider/path_provider.dart';
 
-import '../objects.dart';
+import '../Objects/objects.dart';
 
 class ResultsState extends ChangeNotifier {
   List<Result> results = [];
+  String _selectedDeck;
+  int _selected;
+
+
+  int get deckIndex => _selected;
+
+  Widget get generateChart => CardPerformance(
+    results.where((d) => d.deckName == _selectedDeck).toList(),
+    "chart",
+  );
+
+  Widget generateTable(BuildContext context){
+    return CardPerformance(
+      results.where((d) => d.deckName == _selectedDeck).toList(),
+      "list",
+    );
+  }
+
+  selectedText(BuildContext context){
+    if(_selected != null){
+      _selectedDeck = results[_selected].deckName;
+      return Center(
+        child: Text(
+          "${results[_selected].deckName} is selected.",
+          style: Theme.of(context).textTheme.headline5,
+        ),
+      );
+    } else {
+      return Center(
+        child: Text(
+          "No deck is selected.",
+          style: Theme.of(context).textTheme.headline5,
+        ),
+      );
+    }
+  }
+
+  Widget selection(){
+    if(results.length == 0){
+      return Text("Empty");
+    } else {
+      // get only unique deck names
+      List<String> deckNames = [];
+
+      for (var result in results){
+        if(!deckNames.contains(result.deckName)){
+          deckNames.add(result.deckName);
+        }
+      }
+
+      return Expanded(
+        child: ListView.builder(
+          itemCount: deckNames.length,
+          itemBuilder: (BuildContext context, int index) => Container(
+            decoration: BoxDecoration(
+              color: _selected == index ? Colors.red : Colors.transparent,
+            ),
+            child: ListTile(
+              onTap: (){
+                _selected = _selected == null
+                    ? index
+                    : _selected == index ? null : index;
+                notifyListeners();
+              },
+              title: Text(deckNames[index]),
+            ),
+          ),
+        ),
+      );
+    }
+  }
 
   void loadFromFile(Result result){
     results.add(result);
@@ -20,6 +92,7 @@ class ResultsState extends ChangeNotifier {
     for (var result in results){
       modified.add(result.toJson());
     }
+
     final directory = await getApplicationDocumentsDirectory();
     final file = File("${directory.path}/results/data");
     file.writeAsString(jsonEncode(modified));
@@ -27,6 +100,7 @@ class ResultsState extends ChangeNotifier {
 
   void add(Result result){
     results.add(result);
+    print(results);
     writeToFile(results);
     notifyListeners();
   }
