@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../Providers/DecksState.dart';
-import '../objects.dart';
+import '../Objects/objects.dart';
 import 'AddCard.dart';
 
 class CardsManagement extends StatefulWidget {
@@ -95,7 +95,20 @@ class _CardsManagementState extends State<CardsManagement> {
                                     context: context,
                                     builder: (BuildContext context) =>
                                         AlertDialog(
-                                          content: Text("Do you wish to delete this deck?"),
+                                          content: RichText(
+                                              text: TextSpan(
+                                                text: "Do you wish to delete this deck?\n",
+                                                style: TextStyle(color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text: "* Note that all related results will be removed as well",
+                                                    style: TextStyle(
+                                                      fontStyle: FontStyle.italic,
+                                                    ),
+                                                  ),
+                                                ]
+                                              )
+                                          ),
                                           actions: [
                                             FlatButton(
                                                 child: Text("Yes"),
@@ -127,13 +140,12 @@ class _CardsManagementState extends State<CardsManagement> {
                     ),
                     ConstrainedBox(
                       constraints: BoxConstraints(
+                        minHeight: MediaQuery.of(context).size.height * 0.65,
                         maxHeight: MediaQuery.of(context).size.height * 0.65,
                       ),
-                      child: Scrollbar(
-                        child: Consumer<DecksState>(
-                            builder: (context, decks, child) =>
-                                decks.cardManagementView(context, widget.deck)
-                        ),
+                      child: Consumer<DecksState>(
+                          builder: (context, decks, child) =>
+                              decks.cardManagementView(context, widget.deck)
                       ),
                     ),
                   ],

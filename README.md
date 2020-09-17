@@ -13,3 +13,5 @@ and the following packages are required (can be found under `pubspec.yaml`):
 
 - path_provider ^1.6.14 (for file I/O)
 - provider ^4.3.2+2 (state management)
+- intl ^0.16.1 (date/time formatting and parsing)
+- charts_flutter ^0.9.0 (native Dart-based data visualization library)

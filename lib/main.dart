@@ -2,18 +2,27 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memory_cards/objects.dart';
+import 'package:memory_cards/Providers/ResultsState.dart';
+import 'package:memory_cards/Objects/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 
 import 'Deck/DeckManagement.dart';
-import 'Revision.dart';
+import 'Revision/Revision.dart';
+import 'Stats/Stats.dart';
 import 'Providers/DecksState.dart';
 
 void main(){
   runApp(
-    ChangeNotifierProvider(
-      create: (context) => DecksState(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => DecksState(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ResultsState(),
+        ),
+      ],
       child: MainApp(),
     ),
   );
@@ -36,33 +45,52 @@ class _MainAppState extends State<MainApp> {
     Text('Home'),
     DeckManagement(),
     Revision(),
-    Text('Stats'),
+    Stats(),
     Text('Options'),
   ];
 
-  initializeDecks() async{
+  initializeAll() async{
     final directory = await getApplicationDocumentsDirectory();
     // create `decks` directory if not found
-    if (await Directory('${directory.path}/decks').exists() == false) {
+    if (Directory('${directory.path}/decks').existsSync() == false) {
       Directory('${directory.path}/decks').create(recursive: true);
+    }
+    // create `results` directory if not found
+    if (Directory('${directory.path}/results').existsSync() == false) {
+      Directory('${directory.path}/results').create(recursive: true);
     }
 
     print("Checking /decks/...");
     Directory('${directory.path}/decks')
         .list(recursive: true)
         .listen((e){
-          print(e.path);
-          Provider.of<DecksState>(context, listen: false).add(
+          Provider.of<DecksState>(context, listen: false).loadFromFile(
             Deck.fromJson(jsonDecode(File(e.path).readAsStringSync()))
           );
+    });
+
+    print("Checking /results/...");
+    Directory('${directory.path}/results')
+        .list(recursive: true)
+        .listen((e){
+          for (var result in jsonDecode(File(e.path).readAsStringSync())){
+            Provider.of<ResultsState>(context, listen: false).loadFromFile(
+              Result.fromJson(result)
+            );
+          }
+          /*
+      Provider.of<ResultsState>(context, listen: false).loadFromFile(
+          Result.fromJson(jsonDecode(File(e.path).readAsStringSync()))
+      );
+           */
     });
   }
 
   @override
   void initState() {
     super.initState();
-    initializeDecks();
-    _selectedIdx = 1;
+    initializeAll();
+    _selectedIdx = 3; //debugging purposes
   }
 
   @override
