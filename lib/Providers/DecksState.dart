@@ -5,6 +5,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:memory_cards/Deck/CardsManagement.dart';
 import 'package:memory_cards/Deck/ModifyCard.dart';
+import 'package:memory_cards/Providers/ResultsState.dart';
 import 'package:memory_cards/Revision/RevisionSession.dart';
 import 'package:memory_cards/Objects/objects.dart';
 import 'package:path_provider/path_provider.dart';
@@ -51,6 +52,8 @@ class DecksState extends ChangeNotifier{
 
     // delete deck confirmation received from PageRoute
     if (result == false){
+      // remove any relevant results associated with deckName
+      Provider.of<ResultsState>(context, listen: false).remove(_decks[index].name);
       Provider.of<DecksState>(context, listen: false).remove(_decks[index]);
     }
   }

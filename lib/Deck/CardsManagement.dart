@@ -95,7 +95,20 @@ class _CardsManagementState extends State<CardsManagement> {
                                     context: context,
                                     builder: (BuildContext context) =>
                                         AlertDialog(
-                                          content: Text("Do you wish to delete this deck?"),
+                                          content: RichText(
+                                              text: TextSpan(
+                                                text: "Do you wish to delete this deck?\n",
+                                                style: TextStyle(color: Colors.black),
+                                                children: [
+                                                  TextSpan(
+                                                    text: "* Note that all related results will be removed as well",
+                                                    style: TextStyle(
+                                                      fontStyle: FontStyle.italic,
+                                                    ),
+                                                  ),
+                                                ]
+                                              )
+                                          ),
                                           actions: [
                                             FlatButton(
                                                 child: Text("Yes"),

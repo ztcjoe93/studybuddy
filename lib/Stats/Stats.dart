@@ -54,12 +54,13 @@ class _StatsState extends State<Stats> {
                   maxHeight: MediaQuery.of(context).size.height * 0.25,
                 ),
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) => results.generateChart,
+                  builder: (context, results, child) => results.generatePieChart,
                 ),
               ),
               Expanded(
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) => results.generateTable(context),
+                  builder: (context, results, child) =>
+                      results.generatePieChartTable(context),
                 ),
               ),
               Row(
@@ -139,6 +140,21 @@ class _StatsState extends State<Stats> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text("Deck performance"),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height * 0.25,
+                  maxHeight: MediaQuery.of(context).size.height * 0.25,
+                ),
+                child: Consumer<ResultsState>(
+                  builder: (context, results, child) => results.generateLineChart,
+                ),
+              ),
+              Expanded(
+                child: Consumer<ResultsState>(
+                  builder: (context, results, child) =>
+                      results.generateLineChartTable(context),
+                ),
+              ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [

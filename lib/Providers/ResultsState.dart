@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:memory_cards/Charts/CardPerformance.dart';
+import 'package:memory_cards/Charts/DeckPerformance.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../Objects/objects.dart';
@@ -15,13 +16,26 @@ class ResultsState extends ChangeNotifier {
 
   int get deckIndex => _selected;
 
-  Widget get generateChart => CardPerformance(
+
+  Widget get generateLineChart => DeckPerformance(
     results.where((d) => d.deckName == _selectedDeck).toList(),
     "chart",
   );
 
-  Widget generateTable(BuildContext context){
+  Widget get generatePieChart => CardPerformance(
+    results.where((d) => d.deckName == _selectedDeck).toList(),
+    "chart",
+  );
+
+  Widget generatePieChartTable(BuildContext context){
     return CardPerformance(
+      results.where((d) => d.deckName == _selectedDeck).toList(),
+      "list",
+    );
+  }
+
+  Widget generateLineChartTable(BuildContext context){
+    return DeckPerformance(
       results.where((d) => d.deckName == _selectedDeck).toList(),
       "list",
     );
@@ -29,17 +43,16 @@ class ResultsState extends ChangeNotifier {
 
   selectedText(BuildContext context){
     if(_selected != null){
-      _selectedDeck = results[_selected].deckName;
       return Center(
         child: Text(
-          "${results[_selected].deckName} is selected.",
+          "$_selectedDeck is selected.",
           style: Theme.of(context).textTheme.headline5,
         ),
       );
     } else {
       return Center(
         child: Text(
-          "No deck is selected.",
+          "Select a deck",
           style: Theme.of(context).textTheme.headline5,
         ),
       );
@@ -71,6 +84,11 @@ class ResultsState extends ChangeNotifier {
                 _selected = _selected == null
                     ? index
                     : _selected == index ? null : index;
+                if (_selected == null){
+                  _selectedDeck = null;
+                } else {
+                  _selectedDeck = deckNames[_selected];
+                }
                 notifyListeners();
               },
               title: Text(deckNames[index]),
@@ -101,6 +119,12 @@ class ResultsState extends ChangeNotifier {
   void add(Result result){
     results.add(result);
     print(results);
+    writeToFile(results);
+    notifyListeners();
+  }
+
+  void remove(String deckName){
+    results.removeWhere((r) => r.deckName == deckName);
     writeToFile(results);
     notifyListeners();
   }

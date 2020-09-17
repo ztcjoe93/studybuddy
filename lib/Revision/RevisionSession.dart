@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:memory_cards/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
@@ -20,11 +22,36 @@ class _RevisionSessionState extends State<RevisionSession> {
   int _index = 0;
   bool _revealed = false;
 
+  // for debugging purposes
+  var ran = Random();
+  List<Result> debugResults = [];
+
   @override
   void initState() {
     super.initState();
 
-    // shuffle cards for
+    // for debugging purposes
+    for (int j=1; j < ran.nextInt(30); j++)
+    debugResults.add(
+        Result(
+            DateTime(
+              2020,
+              ran.nextInt(12)+1,
+              ran.nextInt(25)+1,
+            ).toIso8601String(),
+            "test",
+            "knn",
+            [
+              for(int i = 1; i < ran.nextInt(12); i++)
+                CardResult(
+                  FlashCard("front", "back"),
+                  ran.nextBool(),
+                ),
+            ]
+        )
+    );
+
+    // shuffle cards for deck
     cards = widget.deck.cards;
     cards.shuffle();
   }
@@ -62,6 +89,17 @@ class _RevisionSessionState extends State<RevisionSession> {
               child: Text("Return to Revision list"),
               onPressed: (){
                 Provider.of<ResultsState>(context, listen: false).add(finalResult);
+                Navigator.of(context).pop();
+              },
+            ),
+          ),
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: RaisedButton(
+              child: Text("Debug for LineChart"),
+              onPressed: (){
+                for (var i in debugResults)
+                  Provider.of<ResultsState>(context, listen: false).add(i);
                 Navigator.of(context).pop();
               },
             ),
