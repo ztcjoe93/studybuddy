@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:memory_cards/Objects/objects.dart';
+import 'package:memory_cards/Providers/OverallState.dart';
+import 'package:provider/provider.dart';
 
 class CardPerformance extends StatefulWidget {
   final List<Result> results;
@@ -150,6 +152,7 @@ class _CardPerformanceState extends State<CardPerformance> {
   }
 
   generateChart(data){
+    final prefs = Provider.of<OverallState>(context, listen: true);
     final List<Map<String, dynamic>> chartData = [
       {'domain': "Great", 'count': 0},
       {'domain': "Good", 'count': 0},
@@ -158,9 +161,9 @@ class _CardPerformanceState extends State<CardPerformance> {
     int totalCount = 0;
 
     for (var key in data.keys){
-      if(data[key]['%'] >= 75.0) {
+      if(data[key]['%'] >= prefs.upperLimit){
         chartData[0]['count']++;
-      } else if (data[key]['%'] < 50.0) {
+      } else if (data[key]['%'] < prefs.lowerLimit){
         chartData[2]['count']++;
       } else {
         chartData[1]['count']++;

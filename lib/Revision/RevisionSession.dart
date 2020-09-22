@@ -31,7 +31,7 @@ class _RevisionSessionState extends State<RevisionSession> {
     super.initState();
 
     // for debugging purposes
-    for (int j=1; j < ran.nextInt(30); j++)
+    for (int j=1; j < ran.nextInt(120)+50; j++)
     debugResults.add(
         Result(
             DateTime(
@@ -42,7 +42,7 @@ class _RevisionSessionState extends State<RevisionSession> {
             "test",
             "knn",
             [
-              for(int i = 1; i < ran.nextInt(12); i++)
+              for(int i = 1; i < ran.nextInt(12)+2; i++)
                 CardResult(
                   FlashCard("front", "back"),
                   ran.nextBool(),
@@ -51,6 +51,7 @@ class _RevisionSessionState extends State<RevisionSession> {
         )
     );
 
+    print("debugResults.length = ${debugResults.length}");
     // shuffle cards for deck
     cards = widget.deck.cards;
     cards.shuffle();
@@ -98,8 +99,9 @@ class _RevisionSessionState extends State<RevisionSession> {
             child: RaisedButton(
               child: Text("Debug for LineChart"),
               onPressed: (){
-                for (var i in debugResults)
+                for (var i in debugResults){
                   Provider.of<ResultsState>(context, listen: false).add(i);
+                }
                 Navigator.of(context).pop();
               },
             ),
