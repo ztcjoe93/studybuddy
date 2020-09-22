@@ -101,8 +101,8 @@ class _MainAppState extends State<MainApp> {
            */
     });
 
+    // set state for darkMode to prevent flicker if there's a change
     setState(() {
-      // set state for darkmode to prevent flicker
       _ready = true;
     });
   }

@@ -16,8 +16,12 @@ class DeckPerformance extends StatefulWidget {
 
 class _DeckPerformanceState extends State<DeckPerformance> {
   List<dynamic> consolidatedList = [];
+  // function measuring purposes
+  // https://api.dart.dev/stable/2.9.3/dart-core/Stopwatch-class.html
+  Stopwatch sw = Stopwatch();
 
   consolidate(){
+    sw.start();
     consolidatedList = [];
 
     widget.results.forEach((result) {
@@ -60,6 +64,42 @@ class _DeckPerformanceState extends State<DeckPerformance> {
     });
 
     return generateChart(dateList);
+  }
+
+  generateListTable(){
+    return ListView.builder(
+      itemCount: consolidatedList.length,
+      itemBuilder: (BuildContext context, int index){
+        return InkWell(
+          onTap: (){},
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  flex: 1,
+                  child: Text(
+                      "${DateFormat.yMd()
+                          .add_jm()
+                          .format(consolidatedList[index].session)
+                      }"
+                  ),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
+                ),
+                Expanded(
+                  flex: 1,
+                  child: Text("${consolidatedList[index].totalCards}"),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
   }
 
   generateTable(){
@@ -202,7 +242,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
       );
     } else {
       consolidate();
-      return generateTable();
+      return generateListTable();
     }
   }
 }
