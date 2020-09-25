@@ -17,11 +17,7 @@ class _StatsState extends State<Stats> {
       return null;
     } else {
       return (){
-        pageController.animateToPage(
-          pageIndex,
-          duration: Duration(milliseconds: 150),
-          curve: Curves.easeIn,
-        );
+        pageController.jumpToPage(pageIndex);
       };
     }
   }
@@ -67,9 +63,7 @@ class _StatsState extends State<Stats> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
-                    onPressed: (){
-                      pageController.jumpToPage(2);
-                    },
+                    onPressed: () => pageController.jumpToPage(2),
                     child: Row(
                       children: [
                         Icon(Icons.show_chart),
@@ -78,13 +72,7 @@ class _StatsState extends State<Stats> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: (){
-                      pageController.animateToPage(
-                        1,
-                        duration: Duration(milliseconds: 150),
-                        curve: Curves.easeIn,
-                      );
-                    },
+                    onPressed: () => pageController.jumpToPage(1),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_right),
@@ -159,13 +147,7 @@ class _StatsState extends State<Stats> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
-                    onPressed: (){
-                      pageController.animateToPage(
-                        1,
-                        duration: Duration(milliseconds: 150),
-                        curve: Curves.easeInCubic,
-                      );
-                    },
+                    onPressed: () => pageController.jumpToPage(1),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_left),
@@ -174,9 +156,7 @@ class _StatsState extends State<Stats> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: (){
-                      pageController.jumpToPage(0);
-                    },
+                    onPressed: () => pageController.jumpToPage(0),
                     child: Row(
                       children: [
                         Text("Card performance"),
