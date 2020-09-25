@@ -33,7 +33,7 @@ class _DeckManagementState extends State<DeckManagement> {
     ..showSnackBar(
         SnackBar(
           content: Text("[$result] has been added to the list!"),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
         ),
     );
   }

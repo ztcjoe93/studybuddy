@@ -147,6 +147,15 @@ class _OptionsState extends State<Options> {
                           _lowerLimit.round().toInt(),
                           _upperLimit.round().toInt(),
                         );
+
+                      Scaffold.of(context)
+                      ..removeCurrentSnackBar()
+                      ..showSnackBar(
+                          SnackBar(
+                            content: const Text("Preferences saved!"),
+                            duration: Duration(seconds: 1),
+                          ),
+                      );
                     },
                     child: Text("Update preferences"),
                   ),
