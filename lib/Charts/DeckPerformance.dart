@@ -16,12 +16,9 @@ class DeckPerformance extends StatefulWidget {
 
 class _DeckPerformanceState extends State<DeckPerformance> {
   List<dynamic> consolidatedList = [];
-  // function measuring purposes
-  // https://api.dart.dev/stable/2.9.3/dart-core/Stopwatch-class.html
-  Stopwatch sw = Stopwatch();
+  bool _chartGenerated = false;
 
-  consolidate(){
-    sw.start();
+  consolidate(String type) async {
     consolidatedList = [];
 
     widget.results.forEach((result) {
@@ -63,7 +60,9 @@ class _DeckPerformanceState extends State<DeckPerformance> {
       element['performance'] /= element['count'];
     });
 
-    return generateChart(dateList);
+    return type == "chart"
+        ? generateChart(dateList)
+        : generateListTable();
   }
 
   generateListTable(){
@@ -71,115 +70,69 @@ class _DeckPerformanceState extends State<DeckPerformance> {
       itemCount: consolidatedList.length,
       itemBuilder: (BuildContext context, int index){
         return InkWell(
-          onTap: (){},
+          onTap: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext context) =>
+                SimpleDialog(
+                  title: Text("${DateFormat.yMd().add_jm().format(consolidatedList[index].session)}"),
+                  children: [
+                    Padding(
+                      padding: EdgeInsets.all(16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Performance: ${consolidatedList[index].performance.toStringAsFixed(2)}%"),
+                          Text("No. of Cards: ${consolidatedList[index].totalCards}"),
+                          SizedBox(height: 16.0),
+                          for (var c in consolidatedList[index].cards)
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Expanded(child: Text("${c.card.front}")),
+                                Text(c.score ? "◎" : "✘"),
+                              ],
+                            ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ));
+            },
           child: Padding(
-            padding: const EdgeInsets.symmetric(vertical: 16.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: Text(
-                      "${DateFormat.yMd()
-                          .add_jm()
-                          .format(consolidatedList[index].session)
-                      }"
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 3,
+                    child: Text(
+                        "${DateFormat.yMd()
+                            .add_jm()
+                            .format(consolidatedList[index].session)
+                        }"
+                    ),
                   ),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: Text("${consolidatedList[index].totalCards}"),
-                ),
-              ],
+                  Expanded(
+                    flex: 2,
+                    child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: Text("${consolidatedList[index].totalCards}"),
+                  ),
+                ],
+              ),
             ),
-          ),
         );
       },
     );
   }
 
-  generateTable(){
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: DataTable(
-        columnSpacing: MediaQuery.of(context).size.width * 0.085,
-        showCheckboxColumn: false,
-        columns: [
-          DataColumn(
-            label: Text("Session"),
-          ),
-          DataColumn(
-            label: Text("Performance"),
-          ),
-          DataColumn(
-            label: Text("Cards"),
-          ),
-        ],
-        rows: consolidatedList.map((res) =>
-            DataRow(
-              onSelectChanged: (bool selected){
-                showDialog(
-                  context: context,
-                  builder: (context) {
-                    return SimpleDialog(
-                      title: Text("${DateFormat.yMd().add_jm().format(res.session)}"),
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                               Text("Performance: ${res.performance.toStringAsFixed(2)}%"),
-                               Text("No. of Cards: ${res.totalCards}"),
-                               SizedBox(height: 16.0),
-                               for (var c in res.cards)
-                                 Row(
-                                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                   children: [
-                                     Expanded(child: Text("${c.card.front}")),
-                                     Text(c.score ? "◎" : "✘"),
-                                   ],
-                                 ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    );
-                  }
-                );
-              },
-              cells: [
-                DataCell(
-                  Container(
-                    child: Text("${DateFormat.yMd().add_jm().format(res.session)}"),
-                    width: MediaQuery.of(context).size.width * 0.25,
-                  ),
-                ),
-                DataCell(
-                  Container(
-                    child: Text("${res.performance.toStringAsFixed(2)}%"),
-                    width: MediaQuery.of(context).size.width * 0.25,
-                  ),
-                ),
-                DataCell(
-                  Container(
-                    child: Text("${res.totalCards}"),
-                    width: MediaQuery.of(context).size.width * 0.25,
-                  ),
-                ),
-              ]
-            )
-        ).toList(),
-      ),
-    );
-
-  }
-
   generateChart(dynamic data){
+    setState(() {
+      _chartGenerated = true;
+    });
     return [
       charts.Series<dynamic, DateTime>(
         id: 'Deck Performance',
@@ -199,50 +152,104 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   @override
   Widget build(BuildContext context) {
     if (widget.data == "chart") {
-      return charts.TimeSeriesChart(
-        consolidate(),
-        animate: false,
+      return FutureBuilder(
+        future: consolidate("chart"),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          return snapshot.hasData
+            ?  charts.TimeSeriesChart(
+                snapshot.data,
+                animate: false,
+                behaviors: [
+                  // setting axis labels using charttitle
+                  charts.ChartTitle(
+                    "%",
+                    behaviorPosition: charts.BehaviorPosition.top,
+                    titleOutsideJustification: charts.OutsideJustification.start,
+                  ),
+                  charts.ChartTitle(
+                    "Date",
+                    behaviorPosition: charts.BehaviorPosition.bottom,
+                    titleOutsideJustification: charts.OutsideJustification.endDrawArea,
+                  ),
+                ],
+                // y-axis formatting
+                primaryMeasureAxis: charts.NumericAxisSpec(
+                    tickProviderSpec: charts.StaticNumericTickProviderSpec(
+                        [
+                          charts.TickSpec(0),
+                          charts.TickSpec(25),
+                          charts.TickSpec(50),
+                          charts.TickSpec(75),
+                          charts.TickSpec(100),
+                        ]
+                    )
+                ),
 
-        behaviors: [
-          // setting axis labels using charttitle
-          charts.ChartTitle(
-            "%",
-            behaviorPosition: charts.BehaviorPosition.top,
-            titleOutsideJustification: charts.OutsideJustification.start,
-          ),
-          charts.ChartTitle(
-            "Date",
-            behaviorPosition: charts.BehaviorPosition.bottom,
-            titleOutsideJustification: charts.OutsideJustification.endDrawArea,
-          ),
-        ],
-
-        // y-axis formatting
-        primaryMeasureAxis: charts.NumericAxisSpec(
-            tickProviderSpec: charts.StaticNumericTickProviderSpec(
-                [
-                  charts.TickSpec(0),
-                  charts.TickSpec(25),
-                  charts.TickSpec(50),
-                  charts.TickSpec(75),
-                  charts.TickSpec(100),
-                ]
-            )
-        ),
-
-        //custom measure axis (increment by day)
-        domainAxis: charts.EndPointsTimeAxisSpec(
-          tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
-            day: charts.TimeFormatterSpec(
-                format: 'dd/MM', transitionFormat: 'dd/MM'
-            ),
-          ),
-          showAxisLine: false,
-        ),
+                //custom measure axis (increment by day)
+                domainAxis: charts.EndPointsTimeAxisSpec(
+                  tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
+                    day: charts.TimeFormatterSpec(
+                        format: 'dd/MM', transitionFormat: 'dd/MM'
+                    ),
+                  ),
+                  showAxisLine: false,
+                ),
+              )
+            : Center(
+                child: CircularProgressIndicator(),
+              );
+        }
       );
     } else {
-      consolidate();
-      return generateListTable();
+      return FutureBuilder(
+        future: consolidate("list"),
+        builder: (BuildContext context, AsyncSnapshot snapshot){
+          return snapshot.hasData
+              ? Column(
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            flex: 3,
+                            child: Text("Date/time"),
+                          ),
+                          Expanded(
+                            flex: 2,
+                            child: Text("Performance (%)"),
+                          ),
+                          Expanded(
+                            flex: 1,
+                            child: Text("Cards"),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Expanded(
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(12.0),
+                        child: Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.black,
+                              width: 1,
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(8.0),
+                            child: snapshot.data,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                )
+              : Center(child: CircularProgressIndicator());
+        },
+      );
     }
   }
 }
