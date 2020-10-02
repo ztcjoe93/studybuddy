@@ -31,7 +31,7 @@ class _CardsManagementState extends State<CardsManagement> {
 
     if (result != null) {
       widget.deck.cards.add(result);
-      Provider.of<DecksState>(context, listen: false).update(widget.deck);
+      Provider.of<DecksState>(context, listen: false).addCard(widget.deck, result);
       Scaffold.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(SnackBar(
@@ -67,18 +67,21 @@ class _CardsManagementState extends State<CardsManagement> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "${widget.deck.name}",
-                              style: Theme.of(context).textTheme.headline4,
-                            ),
-                            Text(
-                              "${widget.deck.tag}",
-                              style: Theme.of(context).textTheme.headline6,
-                            ),
-                          ],
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                "${widget.deck.name}",
+                                style: Theme.of(context).textTheme.headline4,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              Text(
+                                "${widget.deck.tag}",
+                                style: Theme.of(context).textTheme.headline6,
+                              ),
+                            ],
+                          ),
                         ),
                         Row(
                           children: [
@@ -122,6 +125,7 @@ class _CardsManagementState extends State<CardsManagement> {
                                             FlatButton(
                                               child: Text("No"),
                                               onPressed: (){
+                                                print(widget.deck);
                                                 Navigator.of(context).pop();
                                               },
                                             ),

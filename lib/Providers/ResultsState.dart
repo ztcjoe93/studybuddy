@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:memory_cards/Charts/CardPerformance.dart';
 import 'package:memory_cards/Charts/DeckPerformance.dart';
+import 'package:memory_cards/Database.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../Objects/objects.dart';
@@ -116,10 +117,14 @@ class ResultsState extends ChangeNotifier {
     file.writeAsString(jsonEncode(modified));
   }
 
+  writeToDb(Result result) async {
+    DBProvider.db.insertResult(result);
+    notifyListeners();
+  }
+
   void add(Result result){
     results.add(result);
-    print(results);
-    writeToFile(results);
+    writeToDb(result);
     notifyListeners();
   }
 

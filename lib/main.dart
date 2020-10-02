@@ -16,6 +16,10 @@ import 'Stats/Stats.dart';
 import 'Providers/DecksState.dart';
 import 'Options/Options.dart';
 
+import 'Utilities.dart';
+import 'Database.dart';
+import 'DebugHome.dart';
+
 void main() async {
   runApp(
     MultiProvider(
@@ -50,7 +54,7 @@ class _MainAppState extends State<MainApp> {
   ];
 
   static List<Widget> _widgetOptions = [
-    Text('Home'),
+    DebugHome(),
     DeckManagement(),
     Revision(),
     Stats(),
@@ -66,6 +70,9 @@ class _MainAppState extends State<MainApp> {
     Provider.of<OverallState>(context, listen: false)
         .setOptions(_darkMode, _lowerLimit, _upperLimit);
 
+    await dbstuff();
+
+    /**
     final directory = await getApplicationDocumentsDirectory();
     // create `decks` directory if not found
     if (Directory('${directory.path}/decks').existsSync() == false) {
@@ -94,24 +101,42 @@ class _MainAppState extends State<MainApp> {
               Result.fromJson(result)
             );
           }
-          /*
-      Provider.of<ResultsState>(context, listen: false).loadFromFile(
-          Result.fromJson(jsonDecode(File(e.path).readAsStringSync()))
-      );
-           */
-    });
+        }
+        );
+        **/
 
     // set state for darkMode to prevent flicker if there's a change
     setState(() {
       _ready = true;
     });
+
+    print("Completed initialization.");
+  }
+
+  dbstuff() async {
+    await DBProvider.db.database;
+
+    Deck deck= Deck(
+      ranStr(15),
+      ranStr(10),
+      [
+        FlashCard(ranStr(21), ranStr(21)),
+        FlashCard(ranStr(21), ranStr(21)),
+      ],
+    );
+
+    //DBProvider.db.insertDeck(deck);
+    //DBProvider.db.insertCard(deck);
+
+    Provider.of<DecksState>(context, listen:false).dbLoad();
   }
 
   @override
   void initState() {
     super.initState();
     initializeAll();
-    _selectedIdx = 3; //debugging purposes
+
+    _selectedIdx = 1; //debugging purposes
   }
 
   @override

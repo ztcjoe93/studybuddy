@@ -3,6 +3,8 @@ class Deck {
   List<FlashCard> cards = [];
 
   Deck(this.name, this.tag, this.cards);
+
+  // old JSON format
   Deck.fromJson(Map<String, dynamic> json){
     name = json['name'];
     tag = json['tag'];
@@ -41,6 +43,7 @@ class Result {
   List<CardResult> results = [];
 
   Result(this.isoTimestamp, this.deckName, this.deckTag, this.results);
+
   Result.fromJson(Map<String, dynamic> json){
     isoTimestamp = json['date'];
     deckName = json['name'];

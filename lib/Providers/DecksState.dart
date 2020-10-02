@@ -8,11 +8,15 @@ import 'package:memory_cards/Deck/ModifyCard.dart';
 import 'package:memory_cards/Providers/ResultsState.dart';
 import 'package:memory_cards/Revision/RevisionSession.dart';
 import 'package:memory_cards/Objects/objects.dart';
+import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:sqflite/sqflite.dart';
+
+import '../Database.dart';
 
 class DecksState extends ChangeNotifier{
-  final List<Deck> _decks = [];
+  List<Deck> _decks = [];
 
   // for deck management use; ontap brings to card management view
   Widget get deckManagementView => Scrollbar(
@@ -42,6 +46,7 @@ class DecksState extends ChangeNotifier{
     );
   }
 
+  // for card management use;
   void manageCards(BuildContext context, List<Deck> decks, int index) async {
     final result = await Navigator.of(context).push(
       PageRouteBuilder(
@@ -95,8 +100,8 @@ class DecksState extends ChangeNotifier{
                       FlatButton(
                         child: Text("Yes"),
                         onPressed: (){
+                          DBProvider.db.removeCard(deck, deck.cards[index]);
                           deck.cards.removeAt(index);
-                          writeToFile(deck);
                           notifyListeners();
                           Navigator.of(context).pop();
                         },
@@ -177,42 +182,91 @@ class DecksState extends ChangeNotifier{
     ).toList();
   }
 
-  void writeToFile(Deck deck) async{
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File("${directory.path}/decks/${deck.name}");
-    file.writeAsString(jsonEncode(deck.toJson()));
-  }
+  void writeToDb(Deck deck) async {
+    final db = await openDatabase(
+      join(await getDatabasesPath(), "study_buddy.db"),
+    );
 
-  void loadFromFile(Deck deck){
-    _decks.add(deck);
-    notifyListeners();
-  }
+    await db.insert(
+     "decks",
+     {
+       'deck_name': deck.name,
+       'deck_tag': deck.tag,
+     },
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
 
-  void deleteFromFile(Deck deck) async {
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File("${directory.path}/decks/${deck.name}");
-    file.deleteSync();
+    print("Completed inserting ${deck.name} into `decks` table.");
+
+    int deckId = await db.rawQuery(
+      'SELECT `deck_id` FROM decks WHERE deck_name = "${deck.name}"'
+    ).then((value) => value[0]['deck_id']);
+
+    await Future.forEach(deck.cards, (cardo) async{
+      await db.insert(
+        "cards",
+        {
+          'deck_id': deckId,
+          'front': cardo.front,
+          'back': cardo.back,
+        },
+        conflictAlgorithm: ConflictAlgorithm.replace,
+      );
+
+      print("Completed inserting ${cardo.front} into `cards` table.");
+    });
   }
 
   void update(Deck deck){
     for (var _deck in _decks){
       if (_deck.name == deck.name){
         _deck = deck;
-        writeToFile(deck);
         notifyListeners();
       }
     }
   }
 
-  void add(Deck deck){
-    _decks.add(deck);
-    writeToFile(deck);
+  dbLoad() async {
+    var tefuda = await DBProvider.db.decks;
+    var kaado = await DBProvider.db.cards;
+
+    _decks = tefuda.map<Deck>((dekki) =>
+        Deck(
+          dekki['deck_name'],
+          dekki['deck_tag'],
+          kaado
+              .where(
+                  (tanpin) => tanpin['deck_id'] == dekki['deck_id'])
+              .toList()
+              .map<FlashCard>(
+                  (filter) => FlashCard(filter['front'], filter['back']))
+              .toList(),
+        )
+    ).toList();
+
     notifyListeners();
   }
 
-  void remove(Deck deck){
+  addCard(Deck deck, FlashCard card) async {
+    await DBProvider.db.insertCard(deck, [card]);
+
+    notifyListeners();
+  }
+
+
+  add(Deck deck) async{
+    _decks.add(deck);
+
+    await DBProvider.db.insertDeck(deck);
+    await DBProvider.db.insertCard(deck, deck.cards);
+
+    notifyListeners();
+  }
+
+  remove(Deck deck){
     _decks.removeWhere((e) => e.name == deck.name);
-    deleteFromFile(deck);
+    DBProvider.db.removeDeck(deck);
+
     notifyListeners();
   }
 }

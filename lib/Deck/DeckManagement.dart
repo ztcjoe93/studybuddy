@@ -12,11 +12,6 @@ class DeckManagement extends StatefulWidget {
 class _DeckManagementState extends State<DeckManagement> {
   String _filter = "All";
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
   addDeck(BuildContext context) async {
     final result = await Navigator.push(
       context,

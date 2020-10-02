@@ -20,7 +20,6 @@ class OverallState extends ChangeNotifier{
     prefs.setInt('lowerLimit', _lowerLimit);
     prefs.setInt('upperLimit', _upperLimit);
 
-    print('Preferences set: $_darkMode, $_lowerLimit, $upperLimit');
     notifyListeners();
   }
 

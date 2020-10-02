@@ -50,8 +50,9 @@ class _AddDeckState extends State<AddDeck> {
                                   FlatButton(
                                     child: Text("Yes"),
                                     onPressed: (){
-                                      Navigator.of(context).pop();
-                                      Navigator.of(context).pop();
+                                      Navigator.of(context)
+                                        ..pop()
+                                        ..pop();
                                     },
                                   ),
                                   FlatButton(
