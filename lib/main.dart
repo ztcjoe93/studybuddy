@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Providers/OverallState.dart';
-import 'package:memory_cards/Providers/ResultsState.dart';
-import 'package:memory_cards/Objects/objects.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Objects/objects.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -24,15 +24,9 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(
-          create: (context) => DecksState(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => ResultsState(),
-        ),
-        ChangeNotifierProvider(
-          create: (context) => OverallState(),
-        ),
+        ChangeNotifierProvider(create: (context) => DecksState()),
+        ChangeNotifierProvider(create: (context) => ResultsState()),
+        ChangeNotifierProvider(create: (context) => OverallState()),
       ],
       child: MainApp(),
     ),
@@ -47,6 +41,7 @@ class MainApp extends StatefulWidget {
 class _MainAppState extends State<MainApp> {
   bool _ready = false;
   int _selectedIdx = 0;
+
   List<String> categories = [
     "Home", "Deck Management",
     "Revision", "Stats",
@@ -67,43 +62,10 @@ class _MainAppState extends State<MainApp> {
     final _lowerLimit = prefs.getInt('lowerLimit') ?? 50;
     final _upperLimit = prefs.getInt('upperLimit') ?? 75;
 
-    Provider.of<OverallState>(context, listen: false)
-        .setOptions(_darkMode, _lowerLimit, _upperLimit);
+    Provider.of<OverallState>(context, listen: false).setOptions(_darkMode, _lowerLimit, _upperLimit);
 
-    await dbstuff();
-
-    /**
-    final directory = await getApplicationDocumentsDirectory();
-    // create `decks` directory if not found
-    if (Directory('${directory.path}/decks').existsSync() == false) {
-      Directory('${directory.path}/decks').create(recursive: true);
-    }
-    // create `results` directory if not found
-    if (Directory('${directory.path}/results').existsSync() == false) {
-      Directory('${directory.path}/results').create(recursive: true);
-    }
-
-    print("Checking /decks/...");
-    Directory('${directory.path}/decks')
-        .list(recursive: true)
-        .listen((e){
-          Provider.of<DecksState>(context, listen: false).loadFromFile(
-            Deck.fromJson(jsonDecode(File(e.path).readAsStringSync()))
-          );
-    });
-
-    print("Checking /results/...");
-    Directory('${directory.path}/results')
-        .list(recursive: true)
-        .listen((e){
-          for (var result in jsonDecode(File(e.path).readAsStringSync())){
-            Provider.of<ResultsState>(context, listen: false).loadFromFile(
-              Result.fromJson(result)
-            );
-          }
-        }
-        );
-        **/
+    await DBProvider.db.initializeDatabase();
+    Provider.of<DecksState>(context, listen:false).loadFromDatabase();
 
     // set state for darkMode to prevent flicker if there's a change
     setState(() {
@@ -111,24 +73,6 @@ class _MainAppState extends State<MainApp> {
     });
 
     print("Completed initialization.");
-  }
-
-  dbstuff() async {
-    await DBProvider.db.database;
-
-    Deck deck= Deck(
-      ranStr(15),
-      ranStr(10),
-      [
-        FlashCard(ranStr(21), ranStr(21)),
-        FlashCard(ranStr(21), ranStr(21)),
-      ],
-    );
-
-    //DBProvider.db.insertDeck(deck);
-    //DBProvider.db.insertCard(deck);
-
-    Provider.of<DecksState>(context, listen:false).dbLoad();
   }
 
   @override
@@ -161,7 +105,7 @@ class _MainAppState extends State<MainApp> {
                   title: Text("Home"),
                 ),
                 BottomNavigationBarItem(
-                  icon: Icon(Icons.queue),
+                  icon: Icon(Icons.layers),
                   title: Text("Deck"),
                 ),
                 BottomNavigationBarItem(

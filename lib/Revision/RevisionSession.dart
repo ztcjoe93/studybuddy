@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Providers/ResultsState.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
 
 import '../Objects/objects.dart';
@@ -30,6 +30,7 @@ class _RevisionSessionState extends State<RevisionSession> {
   void initState() {
     super.initState();
 
+    /**
     // for debugging purposes
     for (int j=1; j < ran.nextInt(120)+50; j++)
     debugResults.add(
@@ -50,8 +51,8 @@ class _RevisionSessionState extends State<RevisionSession> {
             ]
         )
     );
+        **/
 
-    print("debugResults.length = ${debugResults.length}");
     // shuffle cards for deck
     cards = widget.deck.cards;
     cards.shuffle();
@@ -146,6 +147,7 @@ class _RevisionSessionState extends State<RevisionSession> {
                         color: Colors.lightGreenAccent,
                         icon: Icon(Icons.check),
                         onPressed: (){
+                          /**
                           cardResults.add(CardResult(
                             cards[_index],
                             true,
@@ -154,12 +156,14 @@ class _RevisionSessionState extends State<RevisionSession> {
                             _revealed = false;
                             _index += 1;
                           });
+                              **/
                         },
                       ),
                       IconButton(
                         color: Colors.redAccent,
                         icon: Icon(Icons.close),
                         onPressed: (){
+                          /**
                           cardResults.add(CardResult(
                             cards[_index],
                             false,
@@ -168,6 +172,7 @@ class _RevisionSessionState extends State<RevisionSession> {
                             _revealed = false;
                             _index += 1;
                           });
+                              **/
                         },
                       ),
                     ],

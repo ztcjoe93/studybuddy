@@ -3,11 +3,11 @@ import 'dart:io';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Deck/CardsManagement.dart';
-import 'package:memory_cards/Deck/ModifyCard.dart';
-import 'package:memory_cards/Providers/ResultsState.dart';
-import 'package:memory_cards/Revision/RevisionSession.dart';
-import 'package:memory_cards/Objects/objects.dart';
+import 'package:studybuddy/Deck/CardsManagement.dart';
+import 'package:studybuddy/Deck/ModifyCard.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Revision/RevisionSession.dart';
+import 'package:studybuddy/Objects/objects.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -16,53 +16,14 @@ import 'package:sqflite/sqflite.dart';
 import '../Database.dart';
 
 class DecksState extends ChangeNotifier{
-  List<Deck> _decks = [];
+  List<Deck> decks = [];
 
-  // for deck management use; ontap brings to card management view
-  Widget get deckManagementView => Scrollbar(
-    child: ListView.separated(
-      itemCount: _decks.length,
-      itemBuilder: (BuildContext context, int index) => ListTile(
-        onTap: (){
-          manageCards(context, _decks, index);
-        },
-        title: Text("${_decks[index].name}"),
-        subtitle: Text("${_decks[index].tag}"),
-      ),
-      separatorBuilder: (BuildContext context, int index) => Divider(),
-    ),
-  );
-
-  Widget deckManagementViewFiltered(String tag){
-    List<Deck> filtered = _decks.where((deck) => deck.tag == tag).toList();
-    return ListView.separated(
-      itemBuilder: (BuildContext context, int index) => ListTile(
-        onTap: () => manageCards(context, filtered, index),
-        title: Text("${filtered[index].name}"),
-        subtitle: Text("${filtered[index].tag}"),
-      ),
-      separatorBuilder: (_, __) => Divider(),
-      itemCount: filtered.length,
-    );
+  void removeCard(Deck _deck, FlashCard _card){
+    DBProvider.db.removeCard(_deck, _card);
+    decks.firstWhere((d) => d.name == _deck.name).cards.removeWhere((c) => c.front == _card.front);
+    notifyListeners();
   }
-
-  // for card management use;
-  void manageCards(BuildContext context, List<Deck> decks, int index) async {
-    final result = await Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => CardsManagement(decks[index]),
-        transitionDuration: Duration(seconds: 0),
-      ),
-    );
-
-    // delete deck confirmation received from PageRoute
-    if (result == false){
-      // remove any relevant results associated with deckName
-      Provider.of<ResultsState>(context, listen: false).remove(_decks[index].name);
-      Provider.of<DecksState>(context, listen: false).remove(_decks[index]);
-    }
-  }
-
+  
   void updateCard(BuildContext context, Deck deck, int index) async {
     final result = await Navigator.of(context).push(
       PageRouteBuilder(
@@ -73,7 +34,7 @@ class DecksState extends ChangeNotifier{
 
     if (result != null){
       deck.cards[index] = result;
-      Provider.of<DecksState>(context, listen: false).update(deck);
+      Provider.of<DecksState>(context, listen: false).update(deck, deck.cards[index]);
     }
   }
 
@@ -124,7 +85,7 @@ class DecksState extends ChangeNotifier{
 
   // for revision use; ontap brings to start of revision
   Widget get revisionView {
-    List<Deck> availableDecks = _decks.where((deck) => deck.cards.length != 0).toList();
+    List<Deck> availableDecks = decks.where((deck) => deck.cards.length != 0).toList();
 
     return ListView.builder(
       itemCount: availableDecks.length,
@@ -145,7 +106,7 @@ class DecksState extends ChangeNotifier{
   }
 
   Widget revisionViewFiltered(String tag){
-    List<Deck> filtered = _decks.where(
+    List<Deck> filtered = decks.where(
             (deck) => deck.tag == tag && deck.cards.length != 0
     ).toList();
 
@@ -168,7 +129,7 @@ class DecksState extends ChangeNotifier{
 
   List<DropdownMenuItem> get tagFilters{
     List<String> tags = [];
-    for (var deck in _decks){
+    for (var deck in decks){
       if(!tags.contains(deck.tag) && deck.tag != ""){
         tags.add(deck.tag);
       }
@@ -188,7 +149,7 @@ class DecksState extends ChangeNotifier{
     );
 
     await db.insert(
-     "decks",
+     "deck",
      {
        'deck_name': deck.name,
        'deck_tag': deck.tag,
@@ -196,15 +157,15 @@ class DecksState extends ChangeNotifier{
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
 
-    print("Completed inserting ${deck.name} into `decks` table.");
+    print("Completed inserting ${deck.name} into `deck` table.");
 
     int deckId = await db.rawQuery(
-      'SELECT `deck_id` FROM decks WHERE deck_name = "${deck.name}"'
+      'SELECT `deck_id` FROM deck WHERE deck_name = "${deck.name}"'
     ).then((value) => value[0]['deck_id']);
 
     await Future.forEach(deck.cards, (cardo) async{
       await db.insert(
-        "cards",
+        "card",
         {
           'deck_id': deckId,
           'front': cardo.front,
@@ -217,29 +178,31 @@ class DecksState extends ChangeNotifier{
     });
   }
 
-  void update(Deck deck){
-    for (var _deck in _decks){
+  void update(Deck deck, FlashCard card){
+    for (var _deck in decks){
       if (_deck.name == deck.name){
         _deck = deck;
+        DBProvider.db.updateCard(deck, card);
         notifyListeners();
       }
     }
   }
 
-  dbLoad() async {
-    var tefuda = await DBProvider.db.decks;
-    var kaado = await DBProvider.db.cards;
+  void loadFromDatabase() async {
+    var _decks = await DBProvider.db.decks;
+    var cards = await DBProvider.db.cards;
 
-    _decks = tefuda.map<Deck>((dekki) =>
+    decks = _decks.map<Deck>((deck) =>
         Deck(
-          dekki['deck_name'],
-          dekki['deck_tag'],
-          kaado
+          deck['deck_id'],
+          deck['deck_name'],
+          deck['deck_tag'],
+         cards
               .where(
-                  (tanpin) => tanpin['deck_id'] == dekki['deck_id'])
+                  (card) => card['deck_id'] == deck['deck_id'])
               .toList()
               .map<FlashCard>(
-                  (filter) => FlashCard(filter['front'], filter['back']))
+                  (filter) => FlashCard(filter['card_id'], filter['front'], filter['back']))
               .toList(),
         )
     ).toList();
@@ -255,7 +218,7 @@ class DecksState extends ChangeNotifier{
 
 
   add(Deck deck) async{
-    _decks.add(deck);
+    decks.add(deck);
 
     await DBProvider.db.insertDeck(deck);
     await DBProvider.db.insertCard(deck, deck.cards);
@@ -264,7 +227,7 @@ class DecksState extends ChangeNotifier{
   }
 
   remove(Deck deck){
-    _decks.removeWhere((e) => e.name == deck.name);
+    decks.removeWhere((e) => e.name == deck.name);
     DBProvider.db.removeDeck(deck);
 
     notifyListeners();

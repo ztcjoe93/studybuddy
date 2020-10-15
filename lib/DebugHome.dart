@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Database.dart';
+import 'package:studybuddy/Database.dart';
 
 class DebugHome extends StatefulWidget {
   @override

@@ -114,6 +114,7 @@ class _AddCardState extends State<AddCard> {
                           }
                         } else {
                           FlashCard card = FlashCard(
+                            1, // testing
                             frontTextController.text,
                             backTextController.text,
                           );

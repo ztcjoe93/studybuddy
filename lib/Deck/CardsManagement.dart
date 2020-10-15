@@ -2,15 +2,16 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Database.dart';
 
 import '../Providers/DecksState.dart';
 import '../Objects/objects.dart';
 import 'AddCard.dart';
 
 class CardsManagement extends StatefulWidget {
-  @required Deck deck;
+  @required int deckId;
 
-  CardsManagement(this.deck);
+  CardsManagement(this.deckId);
 
   @override
   _CardsManagementState createState() => _CardsManagementState();
@@ -30,8 +31,8 @@ class _CardsManagementState extends State<CardsManagement> {
     );
 
     if (result != null) {
-      widget.deck.cards.add(result);
-      Provider.of<DecksState>(context, listen: false).addCard(widget.deck, result);
+      //widget.deck.cards.add(result);
+      //Provider.of<DecksState>(context, listen: false).addCard(widget.deck, result);
       Scaffold.of(context)
           ..removeCurrentSnackBar()
           ..showSnackBar(SnackBar(
@@ -72,12 +73,12 @@ class _CardsManagementState extends State<CardsManagement> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                "${widget.deck.name}",
+                                "test",
                                 style: Theme.of(context).textTheme.headline4,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               Text(
-                                "${widget.deck.tag}",
+                                "test",
                                 style: Theme.of(context).textTheme.headline6,
                               ),
                             ],
@@ -125,7 +126,6 @@ class _CardsManagementState extends State<CardsManagement> {
                                             FlatButton(
                                               child: Text("No"),
                                               onPressed: (){
-                                                print(widget.deck);
                                                 Navigator.of(context).pop();
                                               },
                                             ),
@@ -147,9 +147,45 @@ class _CardsManagementState extends State<CardsManagement> {
                         minHeight: MediaQuery.of(context).size.height * 0.65,
                         maxHeight: MediaQuery.of(context).size.height * 0.65,
                       ),
-                      child: Consumer<DecksState>(
-                          builder: (context, decks, child) =>
-                              decks.cardManagementView(context, widget.deck)
+                      child: Scrollbar(
+                        child: ListView.separated(
+                          itemBuilder: (BuildContext context, int index) => Card(
+                            child: ListTile(
+                              onTap: (){},
+                              title: Text("test"),
+                              subtitle: Text("test"),
+                              trailing: IconButton(
+                                icon: Icon(Icons.delete),
+                                onPressed: () => showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) => AlertDialog(
+                                    content: Text("Are you sure you wish to delete this card?"),
+                                    actions: [
+                                      FlatButton(
+                                        child: Text("Yes"),
+                                        onPressed: (){
+                                          /**
+                                          Provider.of<DecksState>(context, listen:false).removeCard(
+                                              widget.deck,
+                                              widget.deck.cards[index],
+                                          );
+                                              **/
+                                          Navigator.of(context).pop();
+                                        },
+                                      ),
+                                      FlatButton(
+                                        child: Text("No"),
+                                        onPressed: () => Navigator.of(context).pop(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ),
+                          separatorBuilder: (BuildContext context, int index) => Divider(),
+                          itemCount: 10,//widget.deck.cards.length,
+                        ),
                       ),
                     ),
                   ],
@@ -157,14 +193,18 @@ class _CardsManagementState extends State<CardsManagement> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.05,
                 ),
-                Align(
-                  alignment: Alignment.bottomCenter,
-                  child: RaisedButton(
-                    onPressed: (){
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Return to Main Menu")
-                  ),
+                Row(
+                  children: [
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: RaisedButton(
+                        onPressed: (){
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Return to Main Menu")
+                      ),
+                    ),
+                  ],
                 )
               ],
             ),

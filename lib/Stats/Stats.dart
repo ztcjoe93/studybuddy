@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Providers/ResultsState.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
 
 class Stats extends StatefulWidget {

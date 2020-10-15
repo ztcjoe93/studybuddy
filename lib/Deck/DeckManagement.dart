@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Deck/CardsManagement.dart';
+import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 
 import '../Providers/DecksState.dart';
 import 'AddDeck.dart';
@@ -87,11 +90,58 @@ class _DeckManagementState extends State<DeckManagement> {
                 ),
               ),
               child: Consumer<DecksState>(
-                builder: (context, decks, child) {
-                  return _filter == "All"
-                      ? decks.deckManagementView
-                      : decks.deckManagementViewFiltered(
-                      _filter == "None" ? "" : _filter);
+                builder: (context, provider, child) {
+                  if (_filter == "All"){
+                    return Scrollbar(
+                      child: ListView.separated(
+                        itemCount: provider.decks.length,
+                        itemBuilder: (BuildContext context, int index) => ListTile(
+                          onTap: () async {
+                            final result = await Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => CardsManagement(provider.decks[index].id),
+                                transitionDuration: Duration(seconds: 0),
+                              ),
+                            );
+
+                            if (result == false){
+                              Provider.of<ResultsState>(context, listen: false).remove(provider.decks[index].name);
+                              Provider.of<DecksState>(context, listen: false).remove(provider.decks[index]);
+                            }
+                          },
+                          title: Text("${provider.decks[index].name}"),
+                          subtitle: Text("${provider.decks[index].tag}"),
+                        ),
+                        separatorBuilder: (BuildContext context, int index) => Divider(),
+                      ),
+                    );
+                  } else {
+                    List<Deck> filtered = provider.decks.where((deck) => deck.tag == _filter).toList();
+                    return Scrollbar(
+                      child: ListView.separated(
+                        itemBuilder: (BuildContext context, int index) => ListTile(
+                          onTap: () async {
+                            final result = await Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
+                                transitionDuration: Duration(seconds: 0),
+                              ),
+                            );
+
+                            if (result == false){
+                              Provider.of<ResultsState>(context, listen: false).remove(filtered[index].name);
+                              Provider.of<DecksState>(context, listen: false).remove(filtered[index]);
+                            }
+
+                          },
+                          title: Text("${filtered[index].name}"),
+                          subtitle: Text("${filtered[index].tag}"),
+                        ),
+                        separatorBuilder: (BuildContext context, int index) => Divider(),
+                        itemCount: filtered.length,
+                      ),
+                    );
+                  }
                 }
               ),
             ),

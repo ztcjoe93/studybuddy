@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Charts/CardPerformance.dart';
-import 'package:memory_cards/Charts/DeckPerformance.dart';
-import 'package:memory_cards/Database.dart';
+import 'package:studybuddy/Charts/CardPerformance.dart';
+import 'package:studybuddy/Charts/DeckPerformance.dart';
+import 'package:studybuddy/Database.dart';
 import 'package:path_provider/path_provider.dart';
 
 import '../Objects/objects.dart';
@@ -100,23 +100,6 @@ class ResultsState extends ChangeNotifier {
     }
   }
 
-  void loadFromFile(Result result){
-    results.add(result);
-    notifyListeners();
-  }
-
-  void writeToFile(List<Result> results) async{
-    var modified = [];
-
-    for (var result in results){
-      modified.add(result.toJson());
-    }
-
-    final directory = await getApplicationDocumentsDirectory();
-    final file = File("${directory.path}/results/data");
-    file.writeAsString(jsonEncode(modified));
-  }
-
   writeToDb(Result result) async {
     DBProvider.db.insertResult(result);
     notifyListeners();
@@ -130,7 +113,6 @@ class ResultsState extends ChangeNotifier {
 
   void remove(String deckName){
     results.removeWhere((r) => r.deckName == deckName);
-    writeToFile(results);
     notifyListeners();
   }
 }

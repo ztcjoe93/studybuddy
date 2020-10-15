@@ -76,6 +76,7 @@ class _AddDeckState extends State<AddDeck> {
                     onPressed: textController.text.isEmpty ? null : (){
                       Provider.of<DecksState>(context, listen: false).add(
                           Deck(
+                            2, //test
                             textController.text,
                             tagController.text,
                             [],
