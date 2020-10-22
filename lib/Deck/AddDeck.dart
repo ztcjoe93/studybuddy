@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Database.dart';
 
-import '../Providers/DecksState.dart';
 import '../Objects/objects.dart';
+import '../Providers/DecksState.dart';
 
 
 class AddDeck extends StatefulWidget {
@@ -27,8 +28,6 @@ class _AddDeckState extends State<AddDeck> {
     return SafeArea(
       child: GestureDetector(
         onTap: () => FocusManager.instance.primaryFocus.unfocus(),
-        // FocusScope.of(context).requestFocus(FocusNode()), <-- deprecated
-        // FocusScope.of(context).unfocus() causes keyboard focus glitch
         child: Scaffold(
           body: Column(
             children: [
@@ -57,9 +56,7 @@ class _AddDeckState extends State<AddDeck> {
                                   ),
                                   FlatButton(
                                     child: Text("No"),
-                                    onPressed: (){
-                                      Navigator.of(context).pop();
-                                    },
+                                    onPressed: () => Navigator.of(context).pop(),
                                   ),
                                 ],
                               );
@@ -73,10 +70,10 @@ class _AddDeckState extends State<AddDeck> {
                     iconSize: 36.0,
                     color: Colors.blueAccent,
                     splashColor: Colors.transparent,
-                    onPressed: textController.text.isEmpty ? null : (){
-                      Provider.of<DecksState>(context, listen: false).add(
+                    onPressed: textController.text.isEmpty ? null : () async {
+                      Provider.of<DecksState>(context, listen: false).addDeck(
                           Deck(
-                            2, //test
+                            await DBProvider.db.getNewRow("deck"),
                             textController.text,
                             tagController.text,
                             [],

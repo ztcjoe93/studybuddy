@@ -1,8 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
-import 'package:provider/provider.dart';
 
 class CardPerformance extends StatefulWidget {
   final List<Result> results;

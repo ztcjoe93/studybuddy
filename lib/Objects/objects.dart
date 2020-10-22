@@ -11,8 +11,8 @@ class Deck {
 
 
 class FlashCard {
-  String front, back;
   int id;
+  String front, back;
 
   FlashCard(this.id, this.front, this.back);
 
@@ -22,15 +22,15 @@ class FlashCard {
 
 
 class Result {
+  int id;
   String isoTimestamp;
-  String deckName;
-  String deckTag;
+  int deckId;
   List<CardResult> results = [];
 
-  Result(this.isoTimestamp, this.deckName, this.deckTag, this.results);
+  Result(this.id, this.isoTimestamp, this.deckId, this.results);
 
   @override
-  String toString() => "Result($isoTimestamp, $deckName, $deckTag, $results)";
+  String toString() => "Result($id, $isoTimestamp, $deckId, $results)";
 }
 
 

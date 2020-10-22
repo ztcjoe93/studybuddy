@@ -1,9 +1,4 @@
-import 'dart:async';
-
-import 'package:studybuddy/Objects/objects.dart';
-import 'package:studybuddy/Providers/DecksState.dart';
 import 'package:path/path.dart';
-import 'package:provider/provider.dart';
 import 'package:sqflite/sqflite.dart';
 
 class DBProvider {
@@ -11,9 +6,10 @@ class DBProvider {
   static final DBProvider db = DBProvider._();
   static Database database;
 
-  get results async => await database.query("result");
   get decks async => await database.query("deck");
   get cards async => await database.query("card");
+  get results async => await database.query("result");
+  get cardresults async => await database.query("cardresult");
 
   create(String tableName, Map items) async {
     return await database.insert(
@@ -48,101 +44,18 @@ class DBProvider {
     );
   }
 
+  getNewRow(String tableName) async{
+    Map<String, String> tablePk = {
+      'deck': 'deck_id',
+      'card': 'card_id',
+      'result': 'result_id',
+      'cardresult': 'cr_id',
+    };
 
-  insertDeck(Deck deck){
-    database.insert(
-      "deck",
-      {
-        'deck_name': deck.name,
-        'deck_tag': deck.tag,
-      },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
+    List<Map> results = await database.rawQuery("SELECT MAX(${tablePk[tableName]}) AS lastRow FROM $tableName");
 
-    print("Inserted ${deck.name} into `deck` table");
-  }
-
-  insertResult(Result result) async{
-    int deckId = await database.rawQuery('''
-      SELECT `deck_id` FROM deck WHERE deck_name = "${result.deckName}"
-    ''').then((value) => value[0]['deck_id']);
-
-    for (CardResult res in result.results){
-      int cardId = await database.rawQuery('''
-        SELECT `card_id` FROM `card` WHERE `deck_id` = $deckId AND `front` = "${res.card.front}"
-      ''').then((value) => value[0]['card_id']);
-
-      database.insert(
-          "result",
-          {
-            'datetime': result.isoTimestamp,
-            'deck_id': deckId,
-            'card_id': cardId,
-            'score': res.score ? 1 : 0,
-          }
-      );
-
-      print("Inserted ${res.card.front} into `card` table");
-    }
-  }
-
-  updateCard(Deck deck, FlashCard card) async {
-    int deckId = await database.rawQuery('''
-      SELECT `deck_id` FROM deck WHERE deck_name = "${deck.name}"
-    ''').then((value) => value[0]['deck_id']);
-
-    int cardId = await database.rawQuery('''
-      SELECT `card_id` FROM card WHERE deck_id = "$deckId" AND front = "${card.front}"
-    ''').then((val)=> val[0]['card_id']);
-
-    await database.rawUpdate(
-      'UPDATE `card` SET front = ? AND back = ? WHERE card_id = ?',
-      [card.front, card.back, cardId],
-    );
-  }
-
-  insertCard(Deck deck, List<FlashCard> cards) async {
-    int deckId = await database.rawQuery('''
-      SELECT `deck_id` FROM deck WHERE deck_name = "${deck.name}"
-    ''').then((value) => value[0]['deck_id']);
-
-    //https://api.dart.dev/stable/2.9.1/dart-async/Future/forEach.html
-    cards.forEach((fc) {
-        database.insert(
-          "card",
-          {
-            'deck_id': deckId,
-            'front': fc.front,
-            'back': fc.back,
-          },
-          conflictAlgorithm: ConflictAlgorithm.replace,
-        );
-        print("Inserted ${fc.front} into `card` table");
-      }
-    );
-  }
-
-  removeCard(Deck deck, FlashCard card) async {
-    int deck_id = await database.rawQuery(
-        "SELECT `deck_id` FROM deck WHERE deck_name = '${deck.name}'"
-    ).then((value) => value[0]['deck_id']);
-
-    database.delete(
-      "card",
-      where: 'deck_id = ? AND front = ?',
-      whereArgs: [deck_id, card.front],
-    );
-
-    print("Successfully deleted ${card.front} from the `card` table.");
-  }
-
-  removeDeck(Deck deck) {
-    database.delete(
-      "deck",
-      where: 'deck_name = ?',
-      whereArgs: [deck.name],
-    );
-    print("Successfully deleted ${deck.name} from the `deck` table.");
+    return results[0]['lastRow'] == null
+        ? 1 : results[0]['lastRow']+1;
   }
 
   initializeDatabase() async {
@@ -184,17 +97,23 @@ class DBProvider {
      result_id INTEGER PRIMARY KEY,
      datetime TEXT NOT NULL,
      deck_id INTEGER NOT NULL,
-     card_id INTEGER NOT NULL,
-     score INTEGER NOT NULL CHECK (score IN (0,1)),
      FOREIGN KEY (deck_id)
       REFERENCES deck(deck_id)
+        ON DELETE CASCADE
+     )''');
+
+    db.execute('''
+    CREATE TABLE cardresult(
+     cr_id INTEGER PRIMARY KEY,
+     result_id INTEGER NOT NULL,
+     card_id INTEGER NOT NULL,
+     score INTEGER NOT NULL CHECK (score IN (0,1)),
+     FOREIGN KEY (result_id)
+      REFERENCES result(result_id)
         ON DELETE CASCADE,
      FOREIGN KEY (card_id)
       REFERENCES card(card_id)
         ON DELETE CASCADE
-     )''');
+    )''');
   }
 }
-
-
-

@@ -1,5 +1,8 @@
-import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Revision/RevisionSession.dart';
+
 import '../Providers/DecksState.dart';
 
 class Revision extends StatefulWidget {
@@ -38,14 +41,17 @@ class _RevisionState extends State<Revision> {
                         _filter = val;
                       });
                     },
-                    items: [DropdownMenuItem(
-                      value: "All",
-                      child: Text("All"),
-                    ), ...deckState.tagFilters,
+                    items: [
+                      DropdownMenuItem(
+                        value: "All",
+                        child: Text("All"),
+                      ),
+                      ...deckState.tagFilters,
                       DropdownMenuItem(
                           value: "None",
                           child: Text("None")
-                      )],
+                      )
+                    ],
                   );
                 },
               ),
@@ -53,11 +59,35 @@ class _RevisionState extends State<Revision> {
           ),
           Expanded(
             child: Consumer<DecksState>(
-                builder: (context, decks, child) {
-                  return _filter == "All"
-                      ? decks.revisionView
-                      : decks.revisionViewFiltered(_filter == "None" ? "" : _filter);
-                }
+                builder: (context, provider, child) {
+                  List<Deck> availableDecks = [];
+
+                  if(_filter == "All") {
+                    availableDecks = provider.decks
+                        .where((d) => d.cards.length != 0)
+                        .toList();
+                  } else {
+                    availableDecks = provider.decks
+                        .where((d) => d.tag == _filter && d.cards.length>0)
+                        .toList();
+                  }
+                  return ListView.builder(
+                    itemCount: availableDecks.length,
+                    itemBuilder: (BuildContext context, int index) =>
+                      Card(
+                        child: ListTile(
+                          onTap: () => Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder: (_,__,___) => RevisionSession(availableDecks[index]),
+                              transitionDuration: Duration(seconds: 0),
+                            )
+                          ),
+                          title: Text("${availableDecks[index].name}"),
+                          subtitle: Text("${availableDecks[index].tag}"),
+                        ),
+                      ),
+                  );
+                },
             ),
           ),
         ],

@@ -1,24 +1,17 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/material.dart';
-import 'package:studybuddy/Providers/OverallState.dart';
-import 'package:studybuddy/Providers/ResultsState.dart';
-import 'package:studybuddy/Objects/objects.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 
-import 'Deck/DeckManagement.dart';
-import 'LDTheme.dart';
-import 'Revision/Revision.dart';
-import 'Stats/Stats.dart';
-import 'Providers/DecksState.dart';
-import 'Options/Options.dart';
-
-import 'Utilities.dart';
 import 'Database.dart';
 import 'DebugHome.dart';
+import 'Deck/DeckManagement.dart';
+import 'LDTheme.dart';
+import 'Options/Options.dart';
+import 'Providers/DecksState.dart';
+import 'Revision/Revision.dart';
+import 'Stats/Stats.dart';
 
 void main() async {
   runApp(
@@ -42,11 +35,7 @@ class _MainAppState extends State<MainApp> {
   bool _ready = false;
   int _selectedIdx = 0;
 
-  List<String> categories = [
-    "Home", "Deck Management",
-    "Revision", "Stats",
-    "Options"
-  ];
+  List<String> categories = ["Home", "Deck Management", "Revision", "Stats", "Options"];
 
   static List<Widget> _widgetOptions = [
     DebugHome(),
@@ -66,6 +55,7 @@ class _MainAppState extends State<MainApp> {
 
     await DBProvider.db.initializeDatabase();
     Provider.of<DecksState>(context, listen:false).loadFromDatabase();
+    Provider.of<ResultsState>(context, listen:false).loadFromDatabase();
 
     // set state for darkMode to prevent flicker if there's a change
     setState(() {
@@ -80,7 +70,7 @@ class _MainAppState extends State<MainApp> {
     super.initState();
     initializeAll();
 
-    _selectedIdx = 1; //debugging purposes
+    _selectedIdx = 0; //debugging purposes
   }
 
   @override

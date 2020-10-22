@@ -1,7 +1,13 @@
 import 'package:flutter/material.dart';
+
+import '../Database.dart';
 import '../Objects/objects.dart';
 
 class AddCard extends StatefulWidget {
+  @required int deckId;
+
+  AddCard({this.deckId});
+
   @override
   _AddCardState createState() => _AddCardState();
 }
@@ -50,9 +56,7 @@ class _AddCardState extends State<AddCard> {
                   child: PageView(
                     controller: pageController,
                     pageSnapping: true,
-                    onPageChanged: (int){
-                      FocusManager.instance.primaryFocus.unfocus();
-                    },
+                    onPageChanged: (int) => FocusManager.instance.primaryFocus.unfocus(),
                     children: [
                       // alignment to prevent clipping of textfield label
                       Align(
@@ -98,10 +102,10 @@ class _AddCardState extends State<AddCard> {
                   alignment: MainAxisAlignment.spaceAround,
                   children: [
                     RaisedButton(
-                      onPressed: (){
+                      onPressed: () async {
                         _emptyFront = frontTextController.text.isEmpty
                             ? true : false;
-                        _emptyBack= backTextController.text.isEmpty
+                        _emptyBack = backTextController.text.isEmpty
                             ? true : false;
                         if (_emptyBack || _emptyFront) {
                           // jump to relevant side with focus
@@ -114,7 +118,7 @@ class _AddCardState extends State<AddCard> {
                           }
                         } else {
                           FlashCard card = FlashCard(
-                            1, // testing
+                            await DBProvider.db.getNewRow("card"),
                             frontTextController.text,
                             backTextController.text,
                           );

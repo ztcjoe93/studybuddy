@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 
 import '../LDTheme.dart';
 

@@ -1,6 +1,11 @@
+import 'dart:collection';
+
 import 'package:flutter/material.dart';
-import 'package:studybuddy/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Charts/CardPerformance.dart';
+import 'package:studybuddy/Charts/DeckPerformance.dart';
+import 'package:studybuddy/Providers/DecksState.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 
 class Stats extends StatefulWidget {
   @override
@@ -8,19 +13,10 @@ class Stats extends StatefulWidget {
 }
 
 class _StatsState extends State<Stats> {
+  int _selectedDeck;
   PageController pageController = PageController(
     initialPage: 1,
   );
-
-  pageNavigation(BuildContext context, int pageIndex){
-    if (Provider.of<ResultsState>(context, listen: true).deckIndex == null) {
-      return null;
-    } else {
-      return (){
-        pageController.jumpToPage(pageIndex);
-      };
-    }
-  }
 
   @override
   void dispose() {
@@ -50,13 +46,18 @@ class _StatsState extends State<Stats> {
                   maxHeight: MediaQuery.of(context).size.height * 0.25,
                 ),
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) => results.generatePieChart,
+                  builder: (context, provider, child) => CardPerformance(
+                    provider.results.where((d) => d.deckId == _selectedDeck).toList(),
+                    "chart",
+                  ),
                 ),
               ),
               Expanded(
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) =>
-                      results.generatePieChartTable(context),
+                  builder: (context, provider, child) => CardPerformance(
+                    provider.results.where((d) => d.deckId == _selectedDeck).toList(),
+                    "list",
+                  ),
                 ),
               ),
               Row(
@@ -92,18 +93,61 @@ class _StatsState extends State<Stats> {
                   maxHeight: MediaQuery.of(context).size.height * 0.05,
                 ),
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) => results.selectedText(context),
+                  builder: (context, provider, child){
+                    String _selection = _selectedDeck == null
+                        ? "No deck"
+                        : Provider.of<DecksState>(context, listen: false)
+                            .getDeckFromId(_selectedDeck).name;
+                    return Center(
+                      child: Text(
+                        "$_selection is selected",
+                        style: Theme.of(context).textTheme.headline5,
+                      ),
+                    );
+                  },
                 ),
               ),
-              Consumer<ResultsState>(
-                builder: (context, results, child) => results.selection(),
+              Expanded(
+                child: Consumer<ResultsState>(
+                  builder: (context, provider, child){
+                    if(provider.results.length == 0) {
+                      return Center(child: Text("Empty"));
+                    } else {
+                      List resultSet = LinkedHashSet<int>.from(provider.results.map((r) => r.deckId)).toList();
+                      return ListView.builder(
+                        itemCount: resultSet.length,
+                        itemBuilder: (BuildContext context, int index) => Container(
+                          decoration: BoxDecoration(
+                            color: resultSet[index] == _selectedDeck
+                                ? Colors.lightBlueAccent : Colors.transparent,
+                          ),
+                          child: ListTile(
+                            onTap: (){
+                              print(index);
+                              setState(() {
+                                  _selectedDeck = _selectedDeck == resultSet[index]
+                                    ? null : resultSet[index];
+                              });
+                            },
+                            title: Text(
+                              Provider.of<DecksState>(context, listen: false)
+                                  .getDeckFromId(resultSet[index])
+                                  .name
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                  },
+                ),
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
                     // disable navigation button if no deck is selected
-                    onPressed: pageNavigation(context, 0),
+                    onPressed: _selectedDeck == null ? null
+                        : () => pageController.jumpToPage(0),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_left),
@@ -112,7 +156,8 @@ class _StatsState extends State<Stats> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: pageNavigation(context, 2),
+                    onPressed: _selectedDeck == null ? null
+                        : () => pageController.jumpToPage(2),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_right),
@@ -134,13 +179,18 @@ class _StatsState extends State<Stats> {
                   maxHeight: MediaQuery.of(context).size.height * 0.25,
                 ),
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) => results.generateLineChart,
+                  builder: (context, provider, child) => DeckPerformance(
+                    provider.results.where((d) => d.deckId == _selectedDeck).toList(),
+                    "chart",
+                  ),
                 ),
               ),
               Expanded(
                 child: Consumer<ResultsState>(
-                  builder: (context, results, child) =>
-                      results.generateLineChartTable(context),
+                  builder: (context, provider, child) => DeckPerformance(
+                    provider.results.where((d) => d.deckId == _selectedDeck).toList(),
+                    "list",
+                  ),
                 ),
               ),
               Row(

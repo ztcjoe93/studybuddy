@@ -30,6 +30,8 @@ class _DeckManagementState extends State<DeckManagement> {
     ..removeCurrentSnackBar()
     ..showSnackBar(
         SnackBar(
+          elevation: 6.0,
+          behavior: SnackBarBehavior.floating,
           content: Text("[$result] has been added to the list!"),
           duration: Duration(seconds: 1),
         ),
@@ -83,44 +85,45 @@ class _DeckManagementState extends State<DeckManagement> {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.5,
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.blue,
-                ),
-              ),
-              child: Consumer<DecksState>(
-                builder: (context, provider, child) {
-                  if (_filter == "All"){
-                    return Scrollbar(
-                      child: ListView.separated(
-                        itemCount: provider.decks.length,
-                        itemBuilder: (BuildContext context, int index) => ListTile(
+            child: Consumer<DecksState>(
+              builder: (context, provider, child) {
+                if (_filter == "All"){
+                  return Scrollbar(
+                    child: ListView.separated(
+                      itemCount: provider.decks.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Deck targetDeck = provider.decks[index];
+                        return ListTile(
                           onTap: () async {
+                            print(targetDeck);
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
-                                pageBuilder: (_, __, ___) => CardsManagement(provider.decks[index].id),
+                                pageBuilder: (_, __, ___) =>
+                                    CardsManagement(targetDeck.id),
                                 transitionDuration: Duration(seconds: 0),
                               ),
                             );
 
-                            if (result == false){
-                              Provider.of<ResultsState>(context, listen: false).remove(provider.decks[index].name);
-                              Provider.of<DecksState>(context, listen: false).remove(provider.decks[index]);
+                            if (result == false) {
+                              Provider.of<ResultsState>(context, listen: false)
+                                  .remove(targetDeck.id);
                             }
                           },
-                          title: Text("${provider.decks[index].name}"),
-                          subtitle: Text("${provider.decks[index].tag}"),
-                        ),
-                        separatorBuilder: (BuildContext context, int index) => Divider(),
-                      ),
-                    );
-                  } else {
-                    List<Deck> filtered = provider.decks.where((deck) => deck.tag == _filter).toList();
-                    return Scrollbar(
+                          title: Text("${targetDeck.name}"),
+                          subtitle: Text("${targetDeck.tag}"),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) => Divider(),
+                    ),
+                  );
+                } else {
+                  List<Deck> filtered = provider.decks.where((deck) => deck.tag == _filter).toList();
+                  return Container(
+                    child: Scrollbar(
                       child: ListView.separated(
                         itemBuilder: (BuildContext context, int index) => ListTile(
                           onTap: () async {
+                            _filter = 'All';
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
@@ -129,10 +132,9 @@ class _DeckManagementState extends State<DeckManagement> {
                             );
 
                             if (result == false){
-                              Provider.of<ResultsState>(context, listen: false).remove(filtered[index].name);
-                              Provider.of<DecksState>(context, listen: false).remove(filtered[index]);
+                              Provider.of<ResultsState>(context, listen: false)
+                                  .remove(filtered[index].id);
                             }
-
                           },
                           title: Text("${filtered[index].name}"),
                           subtitle: Text("${filtered[index].tag}"),
@@ -140,10 +142,10 @@ class _DeckManagementState extends State<DeckManagement> {
                         separatorBuilder: (BuildContext context, int index) => Divider(),
                         itemCount: filtered.length,
                       ),
-                    );
-                  }
+                    ),
+                  );
                 }
-              ),
+              }
             ),
           ),
         ],

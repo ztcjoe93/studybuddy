@@ -1,131 +1,11 @@
-import 'dart:convert';
-import 'dart:io';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:studybuddy/Deck/CardsManagement.dart';
-import 'package:studybuddy/Deck/ModifyCard.dart';
-import 'package:studybuddy/Providers/ResultsState.dart';
-import 'package:studybuddy/Revision/RevisionSession.dart';
 import 'package:studybuddy/Objects/objects.dart';
-import 'package:path/path.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:provider/provider.dart';
-import 'package:sqflite/sqflite.dart';
 
 import '../Database.dart';
 
 class DecksState extends ChangeNotifier{
   List<Deck> decks = [];
-
-  void removeCard(Deck _deck, FlashCard _card){
-    DBProvider.db.removeCard(_deck, _card);
-    decks.firstWhere((d) => d.name == _deck.name).cards.removeWhere((c) => c.front == _card.front);
-    notifyListeners();
-  }
-  
-  void updateCard(BuildContext context, Deck deck, int index) async {
-    final result = await Navigator.of(context).push(
-      PageRouteBuilder(
-        pageBuilder: (_, __, ___) => ModifyCard(deck.cards[index]),
-        transitionDuration: Duration(seconds: 0),
-      ),
-    );
-
-    if (result != null){
-      deck.cards[index] = result;
-      Provider.of<DecksState>(context, listen: false).update(deck, deck.cards[index]);
-    }
-  }
-
-  Widget cardManagementView(BuildContext context, Deck deck){
-    if(deck.cards.length == 0){
-      return Text("You have no cards in this deck!");
-    }
-    return Scrollbar(
-      child: ListView.separated(
-        itemCount: deck.cards.length,
-        itemBuilder: (BuildContext context, int index) => Card(
-          child: ListTile(
-            onTap: () => updateCard(context, deck, index),
-            title: Text("${deck.cards[index].front}"),
-            subtitle: Text("${deck.cards[index].back}"),
-            trailing: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: (){
-                showDialog(
-                  context: context,
-                  builder: (BuildContext context) => AlertDialog(
-                    content: Text("Are you sure you wish to delete this card?"),
-                    actions: [
-                      FlatButton(
-                        child: Text("Yes"),
-                        onPressed: (){
-                          DBProvider.db.removeCard(deck, deck.cards[index]);
-                          deck.cards.removeAt(index);
-                          notifyListeners();
-                          Navigator.of(context).pop();
-                        },
-                      ),
-                      FlatButton(
-                        child: Text("No"),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  )
-                );
-              },
-            ),
-          ),
-        ),
-        separatorBuilder: (BuildContext context, int index) => Divider(),
-      ),
-    );
-  }
-
-  // for revision use; ontap brings to start of revision
-  Widget get revisionView {
-    List<Deck> availableDecks = decks.where((deck) => deck.cards.length != 0).toList();
-
-    return ListView.builder(
-      itemCount: availableDecks.length,
-      itemBuilder: (BuildContext context, int index) =>
-          Card(
-            child: ListTile(
-              onTap: () {
-                Navigator.of(context).push(PageRouteBuilder(
-                  pageBuilder: (_, __, ___) => RevisionSession(availableDecks[index]),
-                  transitionDuration: Duration(seconds: 0),
-                ));
-              },
-              title: Text("${availableDecks[index].name}"),
-              subtitle: Text("${availableDecks[index].tag}"),
-            ),
-          ),
-    );
-  }
-
-  Widget revisionViewFiltered(String tag){
-    List<Deck> filtered = decks.where(
-            (deck) => deck.tag == tag && deck.cards.length != 0
-    ).toList();
-
-    return ListView.builder(
-      itemCount: filtered.length,
-      itemBuilder: (BuildContext context, int index) => Card(
-        child: ListTile(
-          onTap: (){
-            Navigator.of(context).push(PageRouteBuilder(
-              pageBuilder: (_, __, ___) => RevisionSession(filtered[index]),
-              transitionDuration: Duration(seconds: 0),
-            ));
-          },
-          title: Text("${filtered[index].name}"),
-          subtitle: Text("${filtered[index].tag}"),
-        ),
-      ),
-    );
-  }
 
   List<DropdownMenuItem> get tagFilters{
     List<String> tags = [];
@@ -141,51 +21,6 @@ class DecksState extends ChangeNotifier{
           child: Text(value),
         )
     ).toList();
-  }
-
-  void writeToDb(Deck deck) async {
-    final db = await openDatabase(
-      join(await getDatabasesPath(), "study_buddy.db"),
-    );
-
-    await db.insert(
-     "deck",
-     {
-       'deck_name': deck.name,
-       'deck_tag': deck.tag,
-     },
-      conflictAlgorithm: ConflictAlgorithm.replace,
-    );
-
-    print("Completed inserting ${deck.name} into `deck` table.");
-
-    int deckId = await db.rawQuery(
-      'SELECT `deck_id` FROM deck WHERE deck_name = "${deck.name}"'
-    ).then((value) => value[0]['deck_id']);
-
-    await Future.forEach(deck.cards, (cardo) async{
-      await db.insert(
-        "card",
-        {
-          'deck_id': deckId,
-          'front': cardo.front,
-          'back': cardo.back,
-        },
-        conflictAlgorithm: ConflictAlgorithm.replace,
-      );
-
-      print("Completed inserting ${cardo.front} into `cards` table.");
-    });
-  }
-
-  void update(Deck deck, FlashCard card){
-    for (var _deck in decks){
-      if (_deck.name == deck.name){
-        _deck = deck;
-        DBProvider.db.updateCard(deck, card);
-        notifyListeners();
-      }
-    }
   }
 
   void loadFromDatabase() async {
@@ -210,25 +45,47 @@ class DecksState extends ChangeNotifier{
     notifyListeners();
   }
 
-  addCard(Deck deck, FlashCard card) async {
-    await DBProvider.db.insertCard(deck, [card]);
-
+  void addCard({int deckId, FlashCard card}) async {
+    await DBProvider.db.create("card", Map<String, dynamic>.from({
+      'card_id': card.id,
+      'deck_id': deckId,
+      'front': card.front,
+      'back': card.back,
+    }));
+    decks.firstWhere((d) => d.id == deckId).cards.add(card);
     notifyListeners();
   }
 
-
-  add(Deck deck) async{
+  void addDeck(Deck deck) async{
     decks.add(deck);
+    await DBProvider.db.create(
+      'deck',
+      Map<String, dynamic>.from({
+        'deck_id': deck.id,
+        'deck_name': deck.name,
+        'deck_tag': deck.tag,
+      }),
+    );
 
-    await DBProvider.db.insertDeck(deck);
-    await DBProvider.db.insertCard(deck, deck.cards);
+    for(FlashCard fc in deck.cards){
+      await DBProvider.db.create('card',
+        Map<String, dynamic>.from({
+          'card_id': fc.id,
+          'deck_id': deck.id,
+          'front': fc.front,
+          'back': fc.back,
+        })
+      );
+    }
 
     notifyListeners();
   }
 
-  remove(Deck deck){
-    decks.removeWhere((e) => e.name == deck.name);
-    DBProvider.db.removeDeck(deck);
+  Deck getDeckFromId(int id) => decks.firstWhere((d) => d.id == id);
+
+  void removeCardFromId(int deckId, int cardId){
+    decks.firstWhere((d) => d.id == deckId).cards.removeWhere((c) => c.id == cardId);
+    DBProvider.db.delete("card", "card_id = ?", [cardId]);
 
     notifyListeners();
   }
