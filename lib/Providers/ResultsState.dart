@@ -8,11 +8,9 @@ class ResultsState extends ChangeNotifier {
 
   void loadFromDatabase() async {
     var _results = await DBProvider.db.results;
-
     var _crQuery = await DBProvider.db.cardresults;
 
     Map<int, List<dynamic>> _cardresults = Map();
-
     for(dynamic cr in _crQuery){
       if(_cardresults.containsKey(cr['result_id'])){
         _cardresults[cr['result_id']].add(cr);
@@ -26,23 +24,18 @@ class ResultsState extends ChangeNotifier {
       value: (obj) => obj,
     );
 
-    print("Finished hashmapping _cardresults.");
-
     results = _results.map<Result>((r) {
       return Result(
         r['result_id'],
         r['datetime'],
         r['deck_id'],
         _cardresults[r['result_id']]
-            //.where((cr) => cr['result_id'] == r['result_id'])
             .map<CardResult>((cr) => CardResult(
               cr['cr_id'],
               FlashCard(
                 cr['card_id'],
                 _cards[cr['card_id']]['front'],
                 _cards[cr['card_id']]['back'],
-                //_filteredQuery.firstWhere((c) => c['card_id'] == cr['card_id'])['front'],
-                //_filteredQuery.firstWhere((c) => c['card_id'] == cr['card_id'])['back'],
               ),
               cr['score'] == 1 ? true : false,
             ))
@@ -74,8 +67,8 @@ class ResultsState extends ChangeNotifier {
             'score': cr.score ? 1 : 0,
           })
       );
-      
     }
+
     notifyListeners();
   }
 

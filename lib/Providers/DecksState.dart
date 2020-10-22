@@ -30,8 +30,8 @@ class DecksState extends ChangeNotifier{
     );
 
     var _cQuery = await DBProvider.db.cards;
-    Map<int, List<dynamic>> _cards = Map();
 
+    Map<int, List<dynamic>> _cards = Map();
     for(dynamic c in _cQuery){
       if(_cards.containsKey(c['deck_id'])){
         _cards[c['deck_id']].add(c);
@@ -51,7 +51,6 @@ class DecksState extends ChangeNotifier{
         )
     ).toList();
 
-    print("Finish loading from database for DecksState");
     notifyListeners();
   }
 
