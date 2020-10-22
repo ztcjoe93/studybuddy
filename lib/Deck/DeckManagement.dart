@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Deck/CardsManagement.dart';
+import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 
 import '../Providers/DecksState.dart';
 import 'AddDeck.dart';
@@ -11,11 +14,6 @@ class DeckManagement extends StatefulWidget {
 
 class _DeckManagementState extends State<DeckManagement> {
   String _filter = "All";
-
-  @override
-  void initState() {
-    super.initState();
-  }
 
   addDeck(BuildContext context) async {
     final result = await Navigator.push(
@@ -32,8 +30,10 @@ class _DeckManagementState extends State<DeckManagement> {
     ..removeCurrentSnackBar()
     ..showSnackBar(
         SnackBar(
+          elevation: 6.0,
+          behavior: SnackBarBehavior.floating,
           content: Text("[$result] has been added to the list!"),
-          duration: Duration(seconds: 2),
+          duration: Duration(seconds: 1),
         ),
     );
   }
@@ -85,20 +85,67 @@ class _DeckManagementState extends State<DeckManagement> {
             constraints: BoxConstraints(
               maxHeight: MediaQuery.of(context).size.height * 0.5,
             ),
-            child: Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Colors.blue,
-                ),
-              ),
-              child: Consumer<DecksState>(
-                builder: (context, decks, child) {
-                  return _filter == "All"
-                      ? decks.deckManagementView
-                      : decks.deckManagementViewFiltered(
-                      _filter == "None" ? "" : _filter);
+            child: Consumer<DecksState>(
+              builder: (context, provider, child) {
+                if (_filter == "All"){
+                  return Scrollbar(
+                    child: ListView.separated(
+                      itemCount: provider.decks.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        Deck targetDeck = provider.decks[index];
+                        return ListTile(
+                          onTap: () async {
+                            print(targetDeck);
+                            final result = await Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (_, __, ___) =>
+                                    CardsManagement(targetDeck.id),
+                                transitionDuration: Duration(seconds: 0),
+                              ),
+                            );
+
+                            if (result == false) {
+                              Provider.of<ResultsState>(context, listen: false)
+                                  .remove(targetDeck.id);
+                            }
+                          },
+                          title: Text("${targetDeck.name}"),
+                          subtitle: Text("${targetDeck.tag}"),
+                        );
+                      },
+                      separatorBuilder: (BuildContext context, int index) => Divider(),
+                    ),
+                  );
+                } else {
+                  List<Deck> filtered = provider.decks.where((deck) => deck.tag == _filter).toList();
+                  return Container(
+                    child: Scrollbar(
+                      child: ListView.separated(
+                        itemBuilder: (BuildContext context, int index) => ListTile(
+                          onTap: () async {
+                            _filter = 'All';
+                            final result = await Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
+                                transitionDuration: Duration(seconds: 0),
+                              ),
+                            );
+
+                            if (result == false){
+                              Provider.of<ResultsState>(context, listen: false)
+                                  .remove(filtered[index].id);
+                            }
+                          },
+                          title: Text("${filtered[index].name}"),
+                          subtitle: Text("${filtered[index].tag}"),
+                        ),
+                        separatorBuilder: (BuildContext context, int index) => Divider(),
+                        itemCount: filtered.length,
+                      ),
+                    ),
+                  );
                 }
-              ),
+              }
             ),
           ),
         ],

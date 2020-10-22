@@ -1,75 +1,46 @@
 class Deck {
   String name, tag;
+  int id;
   List<FlashCard> cards = [];
 
-  Deck(this.name, this.tag, this.cards);
-  Deck.fromJson(Map<String, dynamic> json){
-    name = json['name'];
-    tag = json['tag'];
-    json['cards'].forEach((e) => cards.add(FlashCard.fromJson(e)));
-  }
+  Deck(this.id, this.name, this.tag, this.cards);
 
   @override
-  String toString() => "Deck($name, $tag, $cards)";
-  Map<String, dynamic> toJson() => {
-    "name": name,
-    "tag": tag,
-    "cards": cards.map((e) => e.toJson()).toList(),
-  };
+  String toString() => "Deck($id, $name, $tag, $cards)";
 }
 
 
 class FlashCard {
+  int id;
   String front, back;
 
-  FlashCard(this.front, this.back);
-  FlashCard.fromJson(Map<String, dynamic> json){
-    front = json['front'];
-    back = json['back'];
-  }
+  FlashCard(this.id, this.front, this.back);
 
   @override
-  String toString() => "FlashCard($front, $back)";
-  Map<String, dynamic> toJson() => {"front": front, "back": back};
+  String toString() => "FlashCard($id, $front, $back)";
 }
 
 
 class Result {
+  int id;
   String isoTimestamp;
-  String deckName;
-  String deckTag;
+  int deckId;
   List<CardResult> results = [];
 
-  Result(this.isoTimestamp, this.deckName, this.deckTag, this.results);
-  Result.fromJson(Map<String, dynamic> json){
-    isoTimestamp = json['date'];
-    deckName = json['name'];
-    deckTag = json['tag'];
-    json['results'].forEach((e) => results.add(CardResult.fromJson(e)));
-  }
+  Result(this.id, this.isoTimestamp, this.deckId, this.results);
 
   @override
-  String toString() => "Result($isoTimestamp, $deckName, $deckTag, $results)";
-  Map<String, dynamic> toJson() => {
-    "date": isoTimestamp,
-    "name": deckName,
-    "tag": deckTag,
-    "results": results.map((e) => e.toJson()).toList(),
-  };
+  String toString() => "Result($id, $isoTimestamp, $deckId, $results)";
 }
 
 
 class CardResult {
+  int id;
   FlashCard card;
   bool score;
 
-  CardResult(this.card, this.score);
-  CardResult.fromJson(Map<String, dynamic> json){
-    card = FlashCard.fromJson(json['card']);
-    score = json['score'];
-  }
+  CardResult(this.id, this.card, this.score);
 
   @override
-  String toString() => "CardResult($card, $score)";
-  Map<String, dynamic> toJson() => {"card": card.toJson(), "score": score};
+  String toString() => "CardResult($id, $card, $score)";
 }

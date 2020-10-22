@@ -15,3 +15,4 @@ and the following packages are required (can be found under `pubspec.yaml`):
 - provider ^4.3.2+2 (state management)
 - intl ^0.16.1 (date/time formatting and parsing)
 - charts_flutter ^0.9.0 (native Dart-based data visualization library)
+- shared_preferences (persistence storage for options)

@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'package:charts_flutter/flutter.dart' as charts;
-import 'package:memory_cards/Objects/objects.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 
 class CardPerformance extends StatefulWidget {
   final List<Result> results;
@@ -14,12 +16,13 @@ class CardPerformance extends StatefulWidget {
 
 class _CardPerformanceState extends State<CardPerformance> {
   List<dynamic> consolidatedList = [];
+
+  final consolidatedResults = Map();
+
   bool _sorted = false;
-  int _colInd = 0;
-  var listResults;
+  int _selectedCol;
 
   consolidate(BuildContext context){
-    final consolidatedResults = Map();
     // iterate over each card in result
     for (var result in widget.results){
       for (var card in result.results) {
@@ -42,114 +45,81 @@ class _CardPerformanceState extends State<CardPerformance> {
       consolidatedResults[key]['%'] = 100 * (value['score']/value['count']);
     });
 
-
-    if (widget.data == "chart"){
-      return generateChart(consolidatedResults);
-    } else {
-      if (consolidatedList.length == 0) {
-        consolidatedList = consolidatedResults.entries.map((r) =>
-        {
-          'front': r.key,
-          'back': r.value['back'],
-          '%': r.value['%'],
-          'score': r.value['score'],
-          'tries': r.value['count'],
-        }
-        ).toList();
+    if (consolidatedList.length == 0) {
+      consolidatedList = consolidatedResults.entries.map((r) =>
+      {
+        'front': r.key,
+        'back': r.value['back'],
+        '%': r.value['%'],
+        'score': r.value['score'],
+        'tries': r.value['count'],
       }
-
-      return generateTable(context);
+      ).toList();
     }
   }
 
-  sortFunction(int columnIndex, bool asc, String key){
+  sortFunction(bool asc, String key, int colIndex){
     setState(() {
-      _sorted = !_sorted;
-      _colInd = columnIndex;
-      if (_sorted) {
-        consolidatedList.sort((a, b) => a[key].compareTo(b[key]));
+      // selected on a new column
+      if (_selectedCol == colIndex){
+        _sorted = !_sorted;
       } else {
+        _selectedCol = colIndex;
+        _sorted = true;
+      }
+
+      // true -> descending, false -> ascending
+      if (_sorted) {
         consolidatedList.sort((a, b) => b[key].compareTo(a[key]));
+      } else {
+        consolidatedList.sort((a, b) => a[key].compareTo(b[key]));
       }
     });
   }
 
-  generateTable(context){
-    return SingleChildScrollView(
-      scrollDirection: Axis.vertical,
-      child: DataTable(
-        sortAscending: _sorted,
-        sortColumnIndex: _colInd,
-        columnSpacing: MediaQuery.of(context).size.width * 0.085,
-        columns: [
-          DataColumn(
-            onSort: (columnIndex, ascending) =>
-                sortFunction(columnIndex, ascending, "front"),
-            label: Text('Front'),
+  generateListTable(context){
+    //return Text("test");
+    return ListView.builder(
+      itemCount: consolidatedList.length,
+      itemBuilder: (BuildContext context, int index){
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 16.0),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                flex: 1,
+                child: Text("${consolidatedList[index]['front']}"),
+              ),
+              Expanded(
+                flex: 1,
+                child: Text("${consolidatedList[index]['back']}"),
+              ),
+              Expanded(
+                flex: 2,
+                child: Center(
+                  child: Text(
+                    "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                  ),
+                ),
+              ),
+              Expanded(
+                flex: 1,
+                child: Center(child: Text("${consolidatedList[index]['score']}")),
+              ),
+              Expanded(
+                flex: 1,
+                child: Center(child: Text("${consolidatedList[index]['tries']}")),
+              ),
+             ],
           ),
-          DataColumn(
-            onSort: (columnIndex, ascending) =>
-                sortFunction(columnIndex, ascending, "back"),
-            label: Text('Back'),
-          ),
-          DataColumn(
-            onSort: (columnIndex, ascending) =>
-                sortFunction(columnIndex, ascending, "%"),
-            label: Text('%'),
-          ),
-          DataColumn(
-            onSort: (columnIndex, ascending) =>
-                sortFunction(columnIndex, ascending, "score"),
-            label: Text('Score'),
-          ),
-          DataColumn(
-            onSort: (columnIndex, ascending) =>
-                sortFunction(columnIndex, ascending, "tries"),
-            label: Text('Tries'),
-          ),
-        ],
-        rows: consolidatedList.map((res) =>
-            DataRow(
-              cells: [
-                DataCell(Container(
-                  child: Text("${res['front']}"),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                )),
-                DataCell(Container(
-                  child: Text("${res['back']}"),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                )),
-                DataCell(Container(
-                  child: Text("${res['%'].toStringAsFixed(2)}"),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                )),
-                DataCell(Container(
-                  child: Text("${res['score']}"),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                )),
-                DataCell(Container(
-                  child: Text("${res['tries']}"),
-                  width: MediaQuery.of(context).size.width * 0.1,
-                )),
-              ]
-            )
-        ).toList(),
-            /*
-            color: MaterialStateProperty.resolveWith((states){
-              if (datum['%'] >= 75.0){
-               return Colors.lightGreen.withOpacity(0.5);
-              } else if (datum['%'] < 50.0) {
-                return Colors.redAccent.withOpacity(0.5);
-              } else {
-                return Colors.yellow.withOpacity(0.5);
-              }
-            }),
-             */
-      ),
+        );
+      },
     );
   }
 
   generateChart(data){
+    final prefs = Provider.of<OverallState>(context, listen: true);
     final List<Map<String, dynamic>> chartData = [
       {'domain': "Great", 'count': 0},
       {'domain': "Good", 'count': 0},
@@ -158,9 +128,9 @@ class _CardPerformanceState extends State<CardPerformance> {
     int totalCount = 0;
 
     for (var key in data.keys){
-      if(data[key]['%'] >= 75.0) {
+      if(data[key]['%'] >= prefs.upperLimit){
         chartData[0]['count']++;
-      } else if (data[key]['%'] < 50.0) {
+      } else if (data[key]['%'] < prefs.lowerLimit){
         chartData[2]['count']++;
       } else {
         chartData[1]['count']++;
@@ -192,10 +162,16 @@ class _CardPerformanceState extends State<CardPerformance> {
   }
 
   @override
+  void initState() {
+    super.initState();
+    consolidate(context);
+  }
+
+  @override
   Widget build(BuildContext context) {
     if (widget.data == "chart") {
       return charts.PieChart(
-        consolidate(context),
+        generateChart(consolidatedResults),
         animate: false,
         // https://google.github.io/charts/flutter/example/legends/datum_legend_options
         behaviors: [
@@ -229,7 +205,132 @@ class _CardPerformanceState extends State<CardPerformance> {
          */
       );
     } else if (widget.data == "list") {
-      return consolidate(context);
+      return Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.05,
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: InkWell(
+                      onTap: (){
+                        sortFunction(_sorted, "front", 0);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text("Front"),
+                            if (_selectedCol == 0)
+                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: InkWell(
+                      onTap: (){
+                        sortFunction(_sorted, "back", 1);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text("Back"),
+                            if (_selectedCol == 1)
+                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 2,
+                    child: InkWell(
+                      onTap: (){
+                        sortFunction(_sorted, "%", 2);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text("Performance (%)"),
+                            if (_selectedCol == 2)
+                              Icon(
+                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: InkWell(
+                      onTap: (){
+                        sortFunction(_sorted, "score", 3);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text("Score"),
+                            if (_selectedCol == 3)
+                              Icon(
+                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: InkWell(
+                      onTap: (){
+                       sortFunction(_sorted, "tries", 4);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0),
+                        child: Row(
+                          children: [
+                            Text("Tries"),
+                            if (_selectedCol == 4)
+                              Icon(
+                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                              ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.black,
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Padding(
+                padding: EdgeInsets.all(8.0),
+               child: generateListTable(context),
+              ),
+            ),
+          ),
+        ],
+      );
     }
   }
 }

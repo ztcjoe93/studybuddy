@@ -1,8 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:memory_cards/Providers/ResultsState.dart';
 import 'package:provider/provider.dart';
+import 'package:studybuddy/Database.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 
 import '../Objects/objects.dart';
 
@@ -30,43 +31,22 @@ class _RevisionSessionState extends State<RevisionSession> {
   void initState() {
     super.initState();
 
-    // for debugging purposes
-    for (int j=1; j < ran.nextInt(30); j++)
-    debugResults.add(
-        Result(
-            DateTime(
-              2020,
-              ran.nextInt(12)+1,
-              ran.nextInt(25)+1,
-            ).toIso8601String(),
-            "test",
-            "knn",
-            [
-              for(int i = 1; i < ran.nextInt(12); i++)
-                CardResult(
-                  FlashCard("front", "back"),
-                  ran.nextBool(),
-                ),
-            ]
-        )
-    );
-
     // shuffle cards for deck
     cards = widget.deck.cards;
     cards.shuffle();
   }
 
-  Widget session(List<FlashCard> cards, int index, List<CardResult> cardResults,
-      Deck deck){
+  Future<Widget> session(List<FlashCard> cards, int index, List<CardResult> cardResults,
+      Deck deck) async {
     if (index == cards.length){
       int score = 0;
       for (var cr in cardResults){
         score += cr.score ? 1 : 0;
       }
       Result finalResult = Result(
+        await DBProvider.db.getNewRow('result'),
         DateTime.now().toIso8601String(),
-        deck.name,
-        deck.tag,
+        deck.id,
         cardResults
       );
       return Column(
@@ -98,8 +78,9 @@ class _RevisionSessionState extends State<RevisionSession> {
             child: RaisedButton(
               child: Text("Debug for LineChart"),
               onPressed: (){
-                for (var i in debugResults)
+                for (var i in debugResults){
                   Provider.of<ResultsState>(context, listen: false).add(i);
+                }
                 Navigator.of(context).pop();
               },
             ),
@@ -143,8 +124,9 @@ class _RevisionSessionState extends State<RevisionSession> {
                       IconButton(
                         color: Colors.lightGreenAccent,
                         icon: Icon(Icons.check),
-                        onPressed: (){
+                        onPressed: () async {
                           cardResults.add(CardResult(
+                            await DBProvider.db.getNewRow('result'),
                             cards[_index],
                             true,
                           ));
@@ -157,8 +139,9 @@ class _RevisionSessionState extends State<RevisionSession> {
                       IconButton(
                         color: Colors.redAccent,
                         icon: Icon(Icons.close),
-                        onPressed: (){
+                        onPressed: () async {
                           cardResults.add(CardResult(
+                            await DBProvider.db.getNewRow('result'),
                             cards[_index],
                             false,
                           ));
@@ -174,9 +157,7 @@ class _RevisionSessionState extends State<RevisionSession> {
               ),
             ),
           RaisedButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text("Cancel revision")
           ),
         ],
@@ -198,7 +179,16 @@ class _RevisionSessionState extends State<RevisionSession> {
               horizontal: MediaQuery.of(context).size.width * 0.05,
               vertical: MediaQuery.of(context).size.height * 0.05,
             ),
-            child: session(cards, _index, cardResults, widget.deck),
+            child: FutureBuilder<Widget>(
+              future: session(cards, _index, cardResults, widget.deck),
+              builder: (BuildContext context, AsyncSnapshot<Widget> snapshot){
+                if(snapshot.hasData){
+                  return snapshot.data;
+                } else {
+                  return Center(child: CircularProgressIndicator());
+                }
+              }
+            ),
           ),
         ),
       ),
