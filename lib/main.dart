@@ -70,7 +70,7 @@ class _MainAppState extends State<MainApp> {
     super.initState();
     initializeAll();
 
-    _selectedIdx = 0; //debugging purposes
+    _selectedIdx = 3; //debugging purposes
   }
 
   @override

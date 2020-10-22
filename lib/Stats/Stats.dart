@@ -123,7 +123,6 @@ class _StatsState extends State<Stats> {
                           ),
                           child: ListTile(
                             onTap: (){
-                              print(index);
                               setState(() {
                                   _selectedDeck = _selectedDeck == resultSet[index]
                                     ? null : resultSet[index];

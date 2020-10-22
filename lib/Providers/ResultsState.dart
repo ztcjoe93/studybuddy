@@ -8,22 +8,41 @@ class ResultsState extends ChangeNotifier {
 
   void loadFromDatabase() async {
     var _results = await DBProvider.db.results;
-    var _cardresults = await DBProvider.db.cardresults;
-    var _cards = await DBProvider.db.cards;
+
+    var _crQuery = await DBProvider.db.cardresults;
+
+    Map<int, List<dynamic>> _cardresults = Map();
+
+    for(dynamic cr in _crQuery){
+      if(_cardresults.containsKey(cr['result_id'])){
+        _cardresults[cr['result_id']].add(cr);
+      } else {
+        _cardresults[cr['result_id']] = [cr];
+      }
+    }
+
+    Map<int, dynamic> _cards = Map.fromIterable(await DBProvider.db.cards,
+      key: (obj) => obj['card_id'],
+      value: (obj) => obj,
+    );
+
+    print("Finished hashmapping _cardresults.");
 
     results = _results.map<Result>((r) {
       return Result(
         r['result_id'],
         r['datetime'],
         r['deck_id'],
-        _cardresults
-            .where((cr) => cr['result_id'] == r['result_id'])
+        _cardresults[r['result_id']]
+            //.where((cr) => cr['result_id'] == r['result_id'])
             .map<CardResult>((cr) => CardResult(
               cr['cr_id'],
               FlashCard(
                 cr['card_id'],
-                _cards.firstWhere((c) => c['card_id'] == cr['card_id'])['front'],
-                _cards.firstWhere((c) => c['card_id'] == cr['card_id'])['back'],
+                _cards[cr['card_id']]['front'],
+                _cards[cr['card_id']]['back'],
+                //_filteredQuery.firstWhere((c) => c['card_id'] == cr['card_id'])['front'],
+                //_filteredQuery.firstWhere((c) => c['card_id'] == cr['card_id'])['back'],
               ),
               cr['score'] == 1 ? true : false,
             ))
@@ -31,6 +50,7 @@ class ResultsState extends ChangeNotifier {
       );
     }).toList();
 
+    print("Finish loading from database for ResultsState.");
     notifyListeners();
   }
 

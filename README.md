@@ -16,3 +16,11 @@ and the following packages are required (can be found under `pubspec.yaml`):
 - intl ^0.16.1 (date/time formatting and parsing)
 - charts_flutter ^0.9.0 (native Dart-based data visualization library)
 - shared_preferences (persistence storage for options)
+- sqflite ^1.3.0 (database)
+
+
+## Work in progress
+
+- Frontend design
+- Revision (input verification instead of revealing)
+- Options (Push notification? )

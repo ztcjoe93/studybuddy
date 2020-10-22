@@ -24,24 +24,34 @@ class DecksState extends ChangeNotifier{
   }
 
   void loadFromDatabase() async {
-    var _decks = await DBProvider.db.decks;
-    var cards = await DBProvider.db.cards;
+    var _decks = Map.fromIterable(await DBProvider.db.decks,
+      key: (obj) => obj['deck_id'],
+      value: (obj) => obj,
+    );
 
-    decks = _decks.map<Deck>((deck) =>
+    var _cQuery = await DBProvider.db.cards;
+    Map<int, List<dynamic>> _cards = Map();
+
+    for(dynamic c in _cQuery){
+      if(_cards.containsKey(c['deck_id'])){
+        _cards[c['deck_id']].add(c);
+      } else {
+        _cards[c['deck_id']] = [c];
+      }
+    }
+
+    decks = _decks.keys.map((k) =>
         Deck(
-          deck['deck_id'],
-          deck['deck_name'],
-          deck['deck_tag'],
-         cards
-              .where(
-                  (card) => card['deck_id'] == deck['deck_id'])
-              .toList()
-              .map<FlashCard>(
-                  (filter) => FlashCard(filter['card_id'], filter['front'], filter['back']))
-              .toList(),
+          _decks[k]['deck_id'],
+          _decks[k]['deck_name'],
+          _decks[k]['deck_tag'],
+          _cards[_decks[k]['deck_id']].map<FlashCard>(
+              (f) => FlashCard(f['card_id'], f['front'], f['back'])
+          ).toList(),
         )
     ).toList();
 
+    print("Finish loading from database for DecksState");
     notifyListeners();
   }
 
