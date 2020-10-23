@@ -64,7 +64,10 @@ class _StatsState extends State<Stats> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
-                    onPressed: () => pageController.jumpToPage(2),
+                    onPressed: () => pageController.animateToPage(2,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Icon(Icons.show_chart),
@@ -73,7 +76,10 @@ class _StatsState extends State<Stats> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: () => pageController.jumpToPage(1),
+                    onPressed: () => pageController.animateToPage(1,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_right),
@@ -146,7 +152,11 @@ class _StatsState extends State<Stats> {
                   FlatButton(
                     // disable navigation button if no deck is selected
                     onPressed: _selectedDeck == null ? null
-                        : () => pageController.jumpToPage(0),
+                        : () => pageController.animateToPage(
+                        0,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_left),
@@ -156,7 +166,10 @@ class _StatsState extends State<Stats> {
                   ),
                   FlatButton(
                     onPressed: _selectedDeck == null ? null
-                        : () => pageController.jumpToPage(2),
+                        : () => pageController.animateToPage(2,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_right),
@@ -196,7 +209,10 @@ class _StatsState extends State<Stats> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   FlatButton(
-                    onPressed: () => pageController.jumpToPage(1),
+                    onPressed: () => pageController.animateToPage(1,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Icon(Icons.subdirectory_arrow_left),
@@ -205,7 +221,10 @@ class _StatsState extends State<Stats> {
                     ),
                   ),
                   FlatButton(
-                    onPressed: () => pageController.jumpToPage(0),
+                    onPressed: () => pageController.animateToPage(0,
+                      curve: Curves.linear,
+                      duration: Duration(milliseconds: 125),
+                    ),
                     child: Row(
                       children: [
                         Text("Card performance"),

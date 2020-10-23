@@ -122,7 +122,7 @@ class _DebugHomeState extends State<DebugHome> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
-            RaisedButton(
+            MaterialButton(
               onPressed: (){
                 setState(() {
                   _selection = 0;
@@ -169,16 +169,12 @@ class _DebugHomeState extends State<DebugHome> {
                         minHeight: MediaQuery.of(context).size.height * 0.05,
                         maxHeight: MediaQuery.of(context).size.height * 0.05,
                       ),
-                      child: Card(
-                        child: Row(
-                          children: [
-                            for(var i in snapshot.data[index].keys)
-                              Expanded(
-                                flex: 1,
-                                child: Text("${snapshot.data[index][i]}"),
-                              ),
-                          ],
-                        ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          for(var i in snapshot.data[index].keys)
+                            Text("${snapshot.data[index][i]}"),
+                        ],
                       ),
                     );
                   },
