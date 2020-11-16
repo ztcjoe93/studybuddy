@@ -52,10 +52,9 @@ class _DeckManagementState extends State<DeckManagement> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              RaisedButton(
+              IconButton(
                 onPressed: () => addDeck(context),
-                child: Text("Add"),
-                color: Color.fromRGBO(255, 255, 255, 0.9),
+                icon: Icon(Icons.library_add),
               ),
               Consumer<DecksState>(
                 builder: (context, deckState, child){

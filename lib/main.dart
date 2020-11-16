@@ -31,19 +31,12 @@ class MainApp extends StatefulWidget {
   _MainAppState createState() => _MainAppState();
 }
 
-class _MainAppState extends State<MainApp> {
+class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   bool _ready = false;
   int _selectedIdx = 0;
 
   List<String> categories = ["Home", "Deck Management", "Revision", "Stats", "Options"];
-
-  static List<Widget> _widgetOptions = [
-    DebugHome(),
-    DeckManagement(),
-    Revision(),
-    Stats(),
-    Options(),
-  ];
+  List<Widget> _widgetOptions = [];
 
   initializeAll() async{
     final prefs = await SharedPreferences.getInstance();
@@ -68,9 +61,18 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
+
+    _widgetOptions = [
+      DebugHome(),
+      DeckManagement(),
+      Revision(),
+      Stats(),
+      Options(),
+    ];
+
     initializeAll();
 
-    _selectedIdx = 3; //debugging purposes
+    _selectedIdx = 0; //debugging purposes
   }
 
   @override
@@ -89,7 +91,11 @@ class _MainAppState extends State<MainApp> {
                 categories[_selectedIdx],
               ),
             ),
-            body: Center(child: _widgetOptions[_selectedIdx]),
+            body: //_widgetOptions[_selectedIdx],
+            Center(child: AnimatedSwitcher(
+              duration: Duration(milliseconds: 125),
+              child: _widgetOptions[_selectedIdx],
+            )),
             bottomNavigationBar: BottomNavigationBar(
               items: [
                 BottomNavigationBarItem(
@@ -116,7 +122,12 @@ class _MainAppState extends State<MainApp> {
               currentIndex: _selectedIdx,
               showUnselectedLabels: true,
               type: BottomNavigationBarType.fixed,
-              onTap: (_) => setState(() => _selectedIdx = _),
+              selectedIconTheme: IconThemeData(size: 30.0),
+              selectedItemColor: Colors.white,
+              onTap: (ind) => setState((){
+                _selectedIdx = ind;
+                }
+              ),
             ),
           ),
         )
