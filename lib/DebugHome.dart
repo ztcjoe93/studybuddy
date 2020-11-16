@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/Database.dart';
 import 'package:studybuddy/Providers/DecksState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
-import 'package:studybuddy/Utilities.dart';
+import 'package:faker/faker.dart';
 
 import 'Objects/objects.dart';
 
@@ -18,6 +18,7 @@ class _DebugHomeState extends State<DebugHome> {
   int _selection;
 
   Random rand = Random();
+  Faker faker = Faker();
 
   Map<int, dynamic> dataProvider = {
     0: DBProvider.db.decks,
@@ -38,21 +39,21 @@ class _DebugHomeState extends State<DebugHome> {
     int resultRow = await DBProvider.db.getNewRow('result');
     int crRow = await DBProvider.db.getNewRow('cardresult');
 
-    for(int i = 0; i < 100; i++){ // number of decks
+    for(int i = 0; i < 5; i++){ // number of decks
       List<FlashCard> fcDebug = [];
       for(int j = 0; j < rand.nextInt(7)+5; j++){ // number of cards in a deck
         fcDebug.add(FlashCard(
           cardRow,
-          ranStr(12),
-          ranStr(12),
+          faker.person.name(),
+          faker.food.dish(),
         ));
         cardRow++;
       }
 
       Deck generatedDeck = Deck(
         deckRow,
-        ranStr(15),
-        ranStr(7),
+        faker.conference.name(),
+        faker.company.name(),
         fcDebug,
       );
 

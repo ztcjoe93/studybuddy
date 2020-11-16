@@ -66,7 +66,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   }
 
   generateListTable(){
-    return ListView.builder(
+    return ListView.separated(
       itemCount: consolidatedList.length,
       itemBuilder: (BuildContext context, int index){
         return InkWell(
@@ -101,31 +101,37 @@ class _DeckPerformanceState extends State<DeckPerformance> {
             },
           child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                        "${DateFormat.yMd()
-                            .add_jm()
-                            .format(consolidatedList[index].session)
-                        }"
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        flex: 3,
+                        child: Text(
+                            "${DateFormat.yMd()
+                                .add_jm()
+                                .format(consolidatedList[index].session)
+                            }"
+                        ),
+                      ),
+                      Expanded(
+                        flex: 2,
+                        child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: Text("${consolidatedList[index].totalCards}"),
+                      ),
+                    ],
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text("${consolidatedList[index].totalCards}"),
-                  ),
+                  //const Divider(height: 16.0, thickness: 1.0),
                 ],
               ),
             ),
         );
       },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
     );
   }
 

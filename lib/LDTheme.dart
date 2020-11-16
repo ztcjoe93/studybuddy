@@ -4,6 +4,14 @@ ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   visualDensity: VisualDensity.adaptivePlatformDensity,
   primaryColor: Colors.blueGrey,
+  appBarTheme: AppBarTheme(
+    textTheme: TextTheme(
+      headline6: TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+      ),
+    ),
+  ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.blueGrey,
     selectedItemColor: Colors.white,
@@ -20,6 +28,14 @@ ThemeData darkTheme= ThemeData(
   primaryColor: Color(0xffffffff).withOpacity(0.16),
   backgroundColor: Color(0xff121212),
   accentColor: Colors.white.withOpacity(0.16),
+  appBarTheme: AppBarTheme(
+    textTheme: TextTheme(
+      headline6: TextStyle(
+        color: Colors.white,
+        fontSize: 20,
+      ),
+    ),
+  ),
   fontFamily: 'Roboto',
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.white.withOpacity(0.16),
@@ -36,10 +52,10 @@ SliderThemeData greatSlider = SliderThemeData(
 );
 
 SliderThemeData goodSlider = SliderThemeData(
-  activeTrackColor: Colors.yellow,
-  inactiveTrackColor: Colors.yellow[300],
-  thumbColor: Colors.yellow,
-  overlayColor: Colors.yellow[200].withOpacity(0.2),
+  activeTrackColor: Colors.amber,
+  inactiveTrackColor: Colors.amber[300],
+  thumbColor: Colors.amber,
+  overlayColor: Colors.amber[200].withOpacity(0.2),
 );
 
 SliderThemeData poorSlider = SliderThemeData(

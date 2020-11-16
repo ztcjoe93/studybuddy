@@ -145,10 +145,10 @@ class _CardPerformanceState extends State<CardPerformance> {
         id: 'Card Performance',
         colorFn: (dynamic datum, _) => charts.ColorUtil.fromDartColor(
           datum['domain'] == "Great"
-              ? Colors.lightGreen.withOpacity(0.5)
+              ? Colors.lightGreen[300]
               : datum['domain'] == "Good"
-                ? Colors.yellow.withOpacity(0.5)
-                : Colors.redAccent.withOpacity(0.5)
+                ? Colors.amber[300]
+                : Colors.red[300]
         ),
         domainFn: (dynamic datum, _) => datum['domain'],
         measureFn: (dynamic datum, _) => datum['count'],
@@ -180,12 +180,23 @@ class _CardPerformanceState extends State<CardPerformance> {
             insideJustification: charts.InsideJustification.topEnd,
             horizontalFirst: false,
             desiredMaxRows: 3,
-            cellPadding: EdgeInsets.all(4.0),
+            cellPadding: EdgeInsets.all(2.0),
           ),
         ],
         //defaultInteractions: true,
         defaultRenderer: charts.ArcRendererConfig(
-            arcRendererDecorators: [charts.ArcLabelDecorator()]
+          arcRendererDecorators: [
+            charts.ArcLabelDecorator(
+              outsideLabelStyleSpec: charts.TextStyleSpec(
+                color: charts.ColorUtil.fromDartColor(
+                  Provider.of<OverallState>(context, listen:false).brightness
+                    ? Colors.white : Colors.black,
+                ),
+                fontSize: 12,
+              ),
+            )
+          ],
+          arcWidth: 20,
         ),
         /* for interaction with PieChart
         selectionModels: [

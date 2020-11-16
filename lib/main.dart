@@ -85,7 +85,9 @@ class _MainAppState extends State<MainApp> {
               ? ThemeMode.dark : ThemeMode.light,
           home: Scaffold(
             appBar: AppBar(
-              title: Text(categories[_selectedIdx]),
+              title: Text(
+                categories[_selectedIdx],
+              ),
             ),
             body: Center(child: _widgetOptions[_selectedIdx]),
             bottomNavigationBar: BottomNavigationBar(

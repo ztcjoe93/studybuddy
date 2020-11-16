@@ -17,7 +17,7 @@ and the following packages are required (can be found under `pubspec.yaml`):
 - charts_flutter ^0.9.0 (native Dart-based data visualization library)
 - shared_preferences (persistence storage for options)
 - sqflite ^1.3.0 (database)
-
+- faker ^1.2.1 (testing purposes)
 
 ## Work in progress
 
