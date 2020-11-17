@@ -72,7 +72,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
     initializeAll();
 
-    _selectedIdx = 0; //debugging purposes
+    _selectedIdx = 4; //debugging purposes
   }
 
   @override

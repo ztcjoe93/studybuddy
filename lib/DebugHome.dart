@@ -171,10 +171,19 @@ class _DebugHomeState extends State<DebugHome> {
                         maxHeight: MediaQuery.of(context).size.height * 0.05,
                       ),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: [
                           for(var i in snapshot.data[index].keys)
-                            Text("${snapshot.data[index][i]}"),
+                            Flexible(
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 32.0),
+                                child: Container(
+                                  child: Text(
+                                    "${snapshot.data[index][i]}",
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                              ),
+                            ),
                         ],
                       ),
                     );

@@ -1,6 +1,8 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 
 import '../Objects/objects.dart';
 
@@ -171,28 +173,53 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                     "%",
                     behaviorPosition: charts.BehaviorPosition.top,
                     titleOutsideJustification: charts.OutsideJustification.start,
+                    titleStyleSpec: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).brightness
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                      fontSize: 14,
+                    ),
                   ),
                   charts.ChartTitle(
                     "Date",
                     behaviorPosition: charts.BehaviorPosition.bottom,
                     titleOutsideJustification: charts.OutsideJustification.endDrawArea,
+                    titleStyleSpec: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).brightness
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                      fontSize: 14,
+                    ),
                   ),
                 ],
                 // y-axis formatting
                 primaryMeasureAxis: charts.NumericAxisSpec(
-                    tickProviderSpec: charts.StaticNumericTickProviderSpec(
-                        [
-                          charts.TickSpec(0),
-                          charts.TickSpec(25),
-                          charts.TickSpec(50),
-                          charts.TickSpec(75),
-                          charts.TickSpec(100),
-                        ]
-                    )
+                  renderSpec: charts.GridlineRendererSpec(
+                    lineStyle: charts.LineStyleSpec(
+                      color: charts.MaterialPalette.gray.shade300,
+                    ),
+                    labelStyle: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).brightness
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                    ),
+                  ),
+                  tickProviderSpec: charts.StaticNumericTickProviderSpec(
+                      [
+                        charts.TickSpec(0),
+                        charts.TickSpec(25),
+                        charts.TickSpec(50),
+                        charts.TickSpec(75),
+                        charts.TickSpec(100),
+                      ]
+                  ),
                 ),
 
                 //custom measure axis (increment by day)
                 domainAxis: charts.EndPointsTimeAxisSpec(
+                  renderSpec: charts.GridlineRendererSpec(
+                    labelStyle: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).brightness
+                        ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                    ),
+                  ),
                   tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
                     day: charts.TimeFormatterSpec(
                         format: 'dd/MM', transitionFormat: 'dd/MM'
