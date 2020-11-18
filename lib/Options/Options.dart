@@ -95,96 +95,101 @@ class _OptionsState extends State<Options> {
                 Bounce(
                   duration: Duration(milliseconds: 50),
                   onPressed: (){
+                    // https://stackoverflow.com/questions/51271061/flutter-why-slider-doesnt-update-in-alertdialog
                     showDialog(
                       context: context,
                       builder: (BuildContext context){
-                        _upperLimit = _upperLimit;
-                        _lowerLimit = _lowerLimit;
-                        return SimpleDialog(
-                            children: [
-                              Column(children: [
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text("${_upperLimit.round().toString()}"),
-                                      Expanded(
-                                        child: SliderTheme(
-                                          data: greatSlider,
-                                          child: Slider(
-                                            value: _upperLimit,
-                                            min: 0,
-                                            max: 100,
-                                            label: _upperLimit.round().toString(),
-                                            onChanged: (newValue){
-                                              // prevent slider from sliding if <= minvalue
-                                              if (newValue > _lowerLimit){
-                                                setState(() {
-                                                  _upperLimit = newValue;
-                                                });
-                                              } else {
-                                                return null;
-                                              }
-                                            },
+                        // https://api.flutter.dev/flutter/widgets/StatefulBuilder-class.html
+                        return StatefulBuilder(
+                          builder: (context, state) => SimpleDialog(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Column(children: [
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text("${_upperLimit.round().toString()}"),
+                                          Expanded(
+                                            child: SliderTheme(
+                                              data: greatSlider,
+                                              child: Slider(
+                                                value: _upperLimit,
+                                                min: 0,
+                                                max: 100,
+                                                label: _upperLimit.round().toString(),
+                                                onChanged: (newValue){
+                                                  // prevent slider from sliding if <= minvalue
+                                                  if (newValue > _lowerLimit){
+                                                    state(() {
+                                                      _upperLimit = newValue;
+                                                    });
+                                                  } else {
+                                                    return null;
+                                                  }
+                                                },
+                                              ),
+                                            ),
                                           ),
-                                        ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text("${_lowerLimit.round().toString()}"),
+                                          Expanded(
+                                            child: SliderTheme(
+                                              data: goodSlider,
+                                              child: RangeSlider(
+                                                values: RangeValues(_lowerLimit, _upperLimit),
+                                                min: 0,
+                                                max: 100,
+                                                onChanged: (RangeValues values){
+                                                  if(values.start <= _upperLimit &&
+                                                      values.end >= _lowerLimit){
+                                                    state(() {
+                                                      _lowerLimit = values.start;
+                                                      _upperLimit = values.end;
+                                                    });
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        mainAxisSize: MainAxisSize.max,
+                                        children: [
+                                          Text("${_lowerLimit.round().toString()}"),
+                                          Expanded(
+                                            child: SliderTheme(
+                                              data: poorSlider,
+                                              child: Slider(
+                                                value: _lowerLimit,
+                                                min: 0,
+                                                max: 100,
+                                                label: _lowerLimit.round().toString(),
+                                                onChanged: (newValue){
+                                                  if (newValue < _upperLimit){
+                                                    state(() {
+                                                      _lowerLimit = newValue;
+                                                    });
+                                                  } else {
+                                                    return null;
+                                                  }
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text("${_lowerLimit.round().toString()}"),
-                                      Expanded(
-                                        child: SliderTheme(
-                                          data: goodSlider,
-                                          child: RangeSlider(
-                                            values: RangeValues(_lowerLimit, _upperLimit),
-                                            min: 0,
-                                            max: 100,
-                                            onChanged: (RangeValues values){
-                                              if(values.start <= _upperLimit &&
-                                                  values.end >= _lowerLimit){
-                                                setState(() {
-                                                  _lowerLimit = values.start;
-                                                  _upperLimit = values.end;
-                                                });
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      Text("${_lowerLimit.round().toString()}"),
-                                      Expanded(
-                                        child: SliderTheme(
-                                          data: poorSlider,
-                                          child: Slider(
-                                            value: _lowerLimit,
-                                            min: 0,
-                                            max: 100,
-                                            label: _lowerLimit.round().toString(),
-                                            onChanged: (newValue){
-                                              if (newValue < _upperLimit){
-                                                setState(() {
-                                                  _lowerLimit = newValue;
-                                                });
-                                              } else {
-                                                return null;
-                                              }
-                                            },
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ],
-                              )
-                            ],
-                          );
+                                )
+                              ],
+                            ),
+                        );
                       }
                     );
                   },
@@ -252,7 +257,6 @@ class _OptionsState extends State<Options> {
                   )
               ]
             ),
-            /*
             RaisedButton(
               onPressed: (){
                 Provider.of<OverallState>(context, listen: false).
@@ -273,37 +277,9 @@ class _OptionsState extends State<Options> {
               },
               child: Text("Update preferences"),
             ),
-             */
           ],
         ),
       ],
-    );
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.15),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Icon(Icons.brightness_6),
-                  Text("Dark Mode"),
-                ],
-              ),
-              Switch(
-                value: _darkMode,
-                onChanged: (value){
-                  setState(() {
-                    Provider.of<OverallState>(context, listen: false).changeBrightness();
-                    _darkMode = !_darkMode;
-                  });
-                }
-              ),
-            ],
-          ),
-        ],
-      ),
     );
   }
 }

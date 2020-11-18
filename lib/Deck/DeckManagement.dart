@@ -14,13 +14,26 @@ class DeckManagement extends StatefulWidget {
 
 class _DeckManagementState extends State<DeckManagement> {
   String _filter = "All";
+  final _scrollController = ScrollController();
 
   addDeck(BuildContext context) async {
     final result = await Navigator.push(
       context,
       PageRouteBuilder(
         pageBuilder: (_, __, ___) => AddDeck(),
-        transitionDuration: Duration(seconds: 0),
+        transitionsBuilder: (context, animation, secondaryAnimation, child) {
+          var begin = Offset(0.0, 1.0);
+          var end = Offset.zero;
+          var curve = Curves.ease;
+
+          var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+          return SlideTransition(
+            position: animation.drive(tween),
+            child: child,
+          );
+        },
+        transitionDuration: Duration(milliseconds: 200),
       ),
     );
 
@@ -88,13 +101,15 @@ class _DeckManagementState extends State<DeckManagement> {
               builder: (context, provider, child) {
                 if (_filter == "All"){
                   return Scrollbar(
+                    isAlwaysShown: true,
+                    controller: _scrollController,
                     child: ListView.separated(
+                      controller: _scrollController,
                       itemCount: provider.decks.length,
                       itemBuilder: (BuildContext context, int index) {
                         Deck targetDeck = provider.decks[index];
                         return ListTile(
                           onTap: () async {
-                            print(targetDeck);
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (_, __, ___) =>
@@ -119,7 +134,10 @@ class _DeckManagementState extends State<DeckManagement> {
                   List<Deck> filtered = provider.decks.where((deck) => deck.tag == _filter).toList();
                   return Container(
                     child: Scrollbar(
+                      isAlwaysShown: true,
+                      controller: _scrollController,
                       child: ListView.separated(
+                        controller: _scrollController,
                         itemBuilder: (BuildContext context, int index) => ListTile(
                           onTap: () async {
                             _filter = 'All';
