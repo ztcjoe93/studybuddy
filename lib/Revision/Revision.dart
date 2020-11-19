@@ -12,6 +12,7 @@ class Revision extends StatefulWidget {
 
 class _RevisionState extends State<Revision> {
   String _filter = "All";
+  ScrollController _scrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
@@ -71,21 +72,26 @@ class _RevisionState extends State<Revision> {
                         .where((d) => d.tag == _filter && d.cards.length>0)
                         .toList();
                   }
-                  return ListView.builder(
-                    itemCount: availableDecks.length,
-                    itemBuilder: (BuildContext context, int index) =>
-                      Card(
-                        child: ListTile(
-                          onTap: () => Navigator.of(context).push(
-                            PageRouteBuilder(
-                              pageBuilder: (_,__,___) => RevisionSession(availableDecks[index]),
-                              transitionDuration: Duration(seconds: 0),
-                            )
+                  return Scrollbar(
+                    isAlwaysShown: true,
+                    controller: _scrollController,
+                    child: ListView.builder(
+                      controller: _scrollController,
+                      itemCount: availableDecks.length,
+                      itemBuilder: (BuildContext context, int index) =>
+                        Card(
+                          child: ListTile(
+                            onTap: () => Navigator.of(context).push(
+                              PageRouteBuilder(
+                                pageBuilder: (_,__,___) => RevisionSession(availableDecks[index]),
+                                transitionDuration: Duration(seconds: 0),
+                              )
+                            ),
+                            title: Text("${availableDecks[index].name}"),
+                            subtitle: Text("${availableDecks[index].tag}"),
                           ),
-                          title: Text("${availableDecks[index].name}"),
-                          subtitle: Text("${availableDecks[index].tag}"),
                         ),
-                      ),
+                    ),
                   );
                 },
             ),

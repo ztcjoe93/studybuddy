@@ -24,7 +24,7 @@ class _DeckManagementState extends State<DeckManagement> {
         transitionsBuilder: (context, animation, secondaryAnimation, child) {
           var begin = Offset(0.0, 1.0);
           var end = Offset.zero;
-          var curve = Curves.ease;
+          var curve = Curves.easeOutQuint;
 
           var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
 
@@ -110,11 +110,24 @@ class _DeckManagementState extends State<DeckManagement> {
                         Deck targetDeck = provider.decks[index];
                         return ListTile(
                           onTap: () async {
+                            print("tapped");
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (_, __, ___) =>
                                     CardsManagement(targetDeck.id),
-                                transitionDuration: Duration(seconds: 0),
+                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                  var begin = Offset(1.0, 0.0);
+                                  var end = Offset.zero;
+                                  var curve = Curves.ease;
+
+                                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                                  return SlideTransition(
+                                    position: animation.drive(tween),
+                                    child: child,
+                                  );
+                                },
+                                transitionDuration: Duration(milliseconds: 200),
                               ),
                             );
 
@@ -144,7 +157,19 @@ class _DeckManagementState extends State<DeckManagement> {
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
-                                transitionDuration: Duration(seconds: 0),
+                                transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                  var begin = Offset(1.0, 0.0);
+                                  var end = Offset.zero;
+                                  var curve = Curves.ease;
+
+                                  var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                                  return SlideTransition(
+                                    position: animation.drive(tween),
+                                    child: child,
+                                  );
+                                },
+                                transitionDuration: Duration(milliseconds: 200),
                               ),
                             );
 

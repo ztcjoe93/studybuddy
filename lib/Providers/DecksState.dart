@@ -28,7 +28,6 @@ class DecksState extends ChangeNotifier{
       key: (obj) => obj['deck_id'],
       value: (obj) => obj,
     );
-    print("debug: $_decks");
     var _cQuery = await DBProvider.db.cards;
 
     Map<int, List<dynamic>> _cards = Map();
@@ -39,11 +38,8 @@ class DecksState extends ChangeNotifier{
         _cards[c['deck_id']] = [c];
       }
     }
-    print("debug: $_cards");
 
     decks = _decks.keys.map((k) {
-      print("bing: ${_decks[k]['deck_id']}");
-      print("bong: ${_cards[_decks[k]['deck_id']]}");
       return Deck(
         _decks[k]['deck_id'],
         _decks[k]['deck_name'],

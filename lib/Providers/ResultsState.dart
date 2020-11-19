@@ -61,7 +61,7 @@ class ResultsState extends ChangeNotifier {
       await DBProvider.db.create(
           'cardresult',
           Map<String, dynamic>.from({
-            'cr_id': cr.id,
+            'cr_id': await DBProvider.db.getNewRow('cardresult'),
             'result_id': result.id,
             'card_id': cr.card.id,
             'score': cr.score ? 1 : 0,

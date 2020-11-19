@@ -67,7 +67,10 @@ class _StatsState extends State<Stats> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     FlatButton(
-                      onPressed: () => pageController.jumpToPage(2),
+                      onPressed: () => pageController.animateToPage(2,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(
@@ -79,7 +82,10 @@ class _StatsState extends State<Stats> {
                       ),
                     ),
                     FlatButton(
-                      onPressed: () => pageController.jumpToPage(1),
+                      onPressed: () => pageController.animateToPage(1,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(
@@ -167,7 +173,10 @@ class _StatsState extends State<Stats> {
                     FlatButton(
                       // disable navigation button if no deck is selected
                       onPressed: _selectedDeck == null ? null
-                          : () => pageController.jumpToPage(0),
+                          : () => pageController.animateToPage(0,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(
@@ -180,7 +189,10 @@ class _StatsState extends State<Stats> {
                     ),
                     FlatButton(
                       onPressed: _selectedDeck == null ? null
-                          : () => pageController.jumpToPage(2),
+                          : () => pageController.animateToPage(2,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(
@@ -226,19 +238,25 @@ class _StatsState extends State<Stats> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     FlatButton(
-                      onPressed: () => pageController.jumpToPage(1),
+                      onPressed: () => pageController.animateToPage(1,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(vertical: 8.0),
-                            child: Icon(Icons.subdirectory_arrow_left),
+                            child: Icon(Icons.layers),
                           ),
                           Text("Return to deck selection"),
                         ],
                       ),
                     ),
                     FlatButton(
-                      onPressed: () => pageController.jumpToPage(0),
+                      onPressed: () => pageController.animateToPage(0,
+                        duration: Duration(milliseconds: 200),
+                        curve: Curves.easeIn,
+                      ),
                       child: Column(
                         children: [
                           Padding(

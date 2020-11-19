@@ -12,6 +12,7 @@ import 'Options/Options.dart';
 import 'Providers/DecksState.dart';
 import 'Revision/Revision.dart';
 import 'Stats/Stats.dart';
+import 'SubDebug.dart';
 
 void main() async {
   runApp(
@@ -35,7 +36,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   bool _ready = false;
   int _selectedIdx = 0;
 
-  List<String> categories = ["Home", "Deck Management", "Revision", "Stats", "Options"];
+  List<String> categories = ["Debug", "Deck Management", "Revision", "Stats", "Options", "Sub-debug"];
   List<Widget> _widgetOptions = [];
 
   initializeAll() async{
@@ -68,11 +69,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
       Revision(),
       Stats(),
       Options(),
+      SubDebug(),
     ];
 
     initializeAll();
 
-    _selectedIdx = 4; //debugging purposes
+    _selectedIdx = 5; //debugging purposes
   }
 
   @override
@@ -92,31 +94,41 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               ),
             ),
             body: //_widgetOptions[_selectedIdx],
+            IndexedStack(
+              children: _widgetOptions,
+              index: _selectedIdx,
+            ),
+            /*
             Center(child: AnimatedSwitcher(
               duration: Duration(milliseconds: 125),
               child: _widgetOptions[_selectedIdx],
             )),
+             */
             bottomNavigationBar: BottomNavigationBar(
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
-                  title: Text("Home"),
+                  label: "Debug",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.layers),
-                  title: Text("Deck"),
+                  label: "Deck",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.assignment),
-                  title: Text("Revision"),
+                  label: "Revision",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.equalizer),
-                  title: Text("Stats"),
+                  label: "Stats",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
-                  title: Text("Options"),
+                  label: "Options",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bug_report),
+                  label: "Sub-debug",
                 ),
               ],
               currentIndex: _selectedIdx,

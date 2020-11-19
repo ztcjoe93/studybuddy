@@ -172,7 +172,7 @@ class _CardPerformanceState extends State<CardPerformance> {
     if (widget.data == "chart") {
       return charts.PieChart(
         generateChart(consolidatedResults),
-        animate: false,
+        animate: true,
         // https://google.github.io/charts/flutter/example/legends/datum_legend_options
         behaviors: [
           charts.DatumLegend(
