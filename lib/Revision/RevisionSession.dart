@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Database.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Widgets/LoadingBlocks.dart';
 
 import '../Objects/objects.dart';
 
@@ -78,12 +79,13 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
         cardResults
       );
 
+      return LoadingBlocks(rawScore: [score, cardResults.length]);
+
       /*
       Provider.of<ResultsState>(context, listen: false).add(finalResult);
       Future.delayed(Duration(seconds: 5), () {
         Navigator.of(context).pop();
       });
-       */
 
       return Column(
         children: [
@@ -101,6 +103,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
           ),
         ],
       );
+       */
     } else {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,

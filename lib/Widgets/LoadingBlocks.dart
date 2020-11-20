@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import '../FadeIn.dart';
 
-import 'FadeIn.dart';
 
-class SubDebug extends StatefulWidget {
+class LoadingBlocks extends StatefulWidget {
+  List<int> rawScore;
+
+  LoadingBlocks({@required this.rawScore});
+
   @override
-  _SubDebugState createState() => _SubDebugState();
+  _LoadingBlocksState createState() => _LoadingBlocksState();
 }
 
-class _SubDebugState extends State<SubDebug> with SingleTickerProviderStateMixin{
+class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProviderStateMixin{
   int score;
   bool _results = false;
   List<List<Widget>> data = [
@@ -27,7 +31,7 @@ class _SubDebugState extends State<SubDebug> with SingleTickerProviderStateMixin
   @override
   void initState() {
     super.initState();
-    score = ((12/17)*100).round();
+    score = ((widget.rawScore[0]/widget.rawScore[1])*100).round();
     initializeSquares();
   }
 
@@ -37,7 +41,7 @@ class _SubDebugState extends State<SubDebug> with SingleTickerProviderStateMixin
     List<Widget> row = [];
 
     for (int i = 0; i < 100; i++) {
-      if (x <= score) {
+      if (x < score) {
         row.add(
             Container(
               width: 10.0,
@@ -67,12 +71,15 @@ class _SubDebugState extends State<SubDebug> with SingleTickerProviderStateMixin
     for(int i = 0; i < 4; i++){
       for(int j = 0; j < 25; j++){
         future = future.then((_){
-            if(i == 3 && j == 24){
-              setState(() {
-                _results = true;
-              });
-            }
-          return Future.delayed(Duration(milliseconds: 25), (){
+          if(i == 3 && j == 24){
+            setState(() {
+              _results = true;
+            });
+            Future.delayed(Duration(seconds: 3), () {
+              Navigator.of(context).pop();
+            });
+          }
+          return Future.delayed(Duration(milliseconds: 10), (){
             print("[${DateTime.now()}] adding...");
             data[i].add(row[25*i+j]);
             _listKeys[i].currentState.insertItem(data[i].length-1);
@@ -91,34 +98,34 @@ class _SubDebugState extends State<SubDebug> with SingleTickerProviderStateMixin
         Column(
           children: [
             for(int i=0; i < 4; i++)
-            Center(
-              child: SizedBox(
-                height: MediaQuery.of(context).size.height * 0.04,
-                width: MediaQuery.of(context).size.width * 0.8,
-                child: AnimatedList(
-                  scrollDirection: Axis.horizontal,
-                  key: _listKeys[i],
-                  initialItemCount: data[i].length,
-                  itemBuilder: (context, index, animation){
-                    return FadeIn(
-                      duration: 300,
-                      child: data[i][index],
-                    );
-                  },
+              Center(
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.04,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  child: AnimatedList(
+                    scrollDirection: Axis.horizontal,
+                    key: _listKeys[i],
+                    initialItemCount: data[i].length,
+                    itemBuilder: (context, index, animation){
+                      return FadeIn(
+                        duration: 300,
+                        child: data[i][index],
+                      );
+                    },
+                  ),
                 ),
               ),
-            ),
             AnimatedOpacity(
               opacity: _results ? 1.0 : 0.0,
               duration: Duration(milliseconds: 500),
               child: Text(
-                "$score",
+                "Your score is: ${widget.rawScore[0]}/${widget.rawScore[1]}",
                 style: Theme.of(context).textTheme.headline2,
               ),
             )
           ],
         ),
-    ],
+      ],
     );
   }
 }
