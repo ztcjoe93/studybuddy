@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
@@ -79,6 +80,21 @@ class _RevisionState extends State<Revision> {
                       controller: _scrollController,
                       itemCount: availableDecks.length,
                       itemBuilder: (BuildContext context, int index) =>
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: OpenContainer(
+                            closedBuilder: (context, action){
+                              return ListTile(
+                                title: Text("${availableDecks[index].name}"),
+                                subtitle: Text("${availableDecks[index].tag}"),
+                              );
+                            },
+                            openBuilder: (context, action){
+                              return RevisionSession(availableDecks[index]);
+                            },
+                          ),
+                        ),
+                        /*
                         Card(
                           child: ListTile(
                             onTap: () => Navigator.of(context).push(
@@ -90,12 +106,11 @@ class _RevisionState extends State<Revision> {
                             title: Text("${availableDecks[index].name}"),
                             subtitle: Text("${availableDecks[index].tag}"),
                           ),
+                               */
                         ),
-                    ),
-                  );
-                },
+                    );}
+                  )
             ),
-          ),
         ],
       ),
     );

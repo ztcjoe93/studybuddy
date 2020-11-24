@@ -5,6 +5,7 @@ class OverallState extends ChangeNotifier{
   bool _darkMode;
   int _lowerLimit;
   int _upperLimit;
+  bool deckChange = false;
 
   bool get brightness => _darkMode;
   int get lowerLimit => _lowerLimit;
@@ -20,6 +21,15 @@ class OverallState extends ChangeNotifier{
     prefs.setInt('lowerLimit', _lowerLimit);
     prefs.setInt('upperLimit', _upperLimit);
 
+    notifyListeners();
+  }
+
+  void updateDeckHasChanged(){
+    deckChange = !deckChange;
+  }
+
+  void deckHasBeenChanged(){
+    deckChange = !deckChange;
     notifyListeners();
   }
 

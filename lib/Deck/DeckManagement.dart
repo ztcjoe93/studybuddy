@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Deck/CardsManagement.dart';
 import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 
 import '../Providers/DecksState.dart';
@@ -110,7 +111,6 @@ class _DeckManagementState extends State<DeckManagement> {
                         Deck targetDeck = provider.decks[index];
                         return ListTile(
                           onTap: () async {
-                            print("tapped");
                             final result = await Navigator.of(context).push(
                               PageRouteBuilder(
                                 pageBuilder: (_, __, ___) =>
@@ -132,8 +132,16 @@ class _DeckManagementState extends State<DeckManagement> {
                             );
 
                             if (result == false) {
-                              Provider.of<ResultsState>(context, listen: false)
-                                  .remove(targetDeck.id);
+                              // prevent CardsManagement widget from being deleted before transition is complete
+                              Future.delayed(Duration(milliseconds: 350), (){
+                                Provider.of<OverallState>(context, listen: false)
+                                    .deckHasBeenChanged();
+                                Provider.of<DecksState>(context, listen: false)
+                                    .remove(targetDeck.id);
+                                Provider.of<ResultsState>(context, listen: false)
+                                    .remove(targetDeck.id);
+                                print("Deletion complete");
+                              });
                             }
                           },
                           title: Text("${targetDeck.name}"),

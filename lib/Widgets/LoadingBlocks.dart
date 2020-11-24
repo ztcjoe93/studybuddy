@@ -1,11 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Charts/CardPerformance.dart';
+import 'package:studybuddy/Objects/objects.dart';
+import 'package:studybuddy/Providers/ResultsState.dart';
 import '../FadeIn.dart';
 
 
 class LoadingBlocks extends StatefulWidget {
   List<int> rawScore;
+  Result finalResult;
 
-  LoadingBlocks({@required this.rawScore});
+  LoadingBlocks({@required this.rawScore, @required this.finalResult});
 
   @override
   _LoadingBlocksState createState() => _LoadingBlocksState();
@@ -75,12 +80,15 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
             setState(() {
               _results = true;
             });
-            Future.delayed(Duration(seconds: 3), () {
+
+            Provider.of<ResultsState>(context, listen: false).add(
+                widget.finalResult
+            );
+            Future.delayed(Duration(seconds: 2), () {
               Navigator.of(context).pop();
             });
           }
           return Future.delayed(Duration(milliseconds: 10), (){
-            print("[${DateTime.now()}] adding...");
             data[i].add(row[25*i+j]);
             _listKeys[i].currentState.insertItem(data[i].length-1);
           });
@@ -108,7 +116,7 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
                     initialItemCount: data[i].length,
                     itemBuilder: (context, index, animation){
                       return FadeIn(
-                        duration: 300,
+                        duration: 100,
                         child: data[i][index],
                       );
                     },

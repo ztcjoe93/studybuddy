@@ -1,3 +1,4 @@
+import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -37,7 +38,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   int _selectedIdx = 0;
 
   List<String> categories = ["Debug", "Deck Management", "Revision", "Stats", "Options", "Sub-debug"];
-  List<Widget> _widgetOptions = [];
 
   initializeAll() async{
     final prefs = await SharedPreferences.getInstance();
@@ -62,25 +62,15 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-
-    _widgetOptions = [
-      DebugHome(),
-      DeckManagement(),
-      Revision(),
-      Stats(),
-      Options(),
-      SubDebug(),
-    ];
-
     initializeAll();
 
-    _selectedIdx = 2; //debugging purposes
+    _selectedIdx = 1; //debugging purposes
   }
 
   @override
   Widget build(BuildContext context) {
-    return _ready
-      ? MaterialApp(
+    if (_ready) {
+      return MaterialApp(
           debugShowCheckedModeBanner: false,
           //showPerformanceOverlay: true,
           theme: lightTheme,
@@ -93,17 +83,17 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                 categories[_selectedIdx],
               ),
             ),
-            body: //_widgetOptions[_selectedIdx],
-            IndexedStack(
-              children: _widgetOptions,
+            body: IndexedStack(
+              children: [
+                DebugHome(),
+                DeckManagement(),
+                Revision(),
+                Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
+                Options(),
+                SubDebug(),
+              ],
               index: _selectedIdx,
             ),
-            /*
-            Center(child: AnimatedSwitcher(
-              duration: Duration(milliseconds: 125),
-              child: _widgetOptions[_selectedIdx],
-            )),
-             */
             bottomNavigationBar: BottomNavigationBar(
               items: [
                 BottomNavigationBarItem(
@@ -142,8 +132,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               ),
             ),
           ),
-        )
-      : Column(
+        );
+    } else {
+      return Column(
           children: [
             Center(
               child: SizedBox(
@@ -153,5 +144,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             )
           ],
         );
+    }
   }
 }

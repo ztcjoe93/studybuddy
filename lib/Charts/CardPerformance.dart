@@ -162,6 +162,11 @@ class _CardPerformanceState extends State<CardPerformance> {
   }
 
   @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     consolidate(context);
@@ -169,6 +174,8 @@ class _CardPerformanceState extends State<CardPerformance> {
 
   @override
   Widget build(BuildContext context) {
+    // https://github.com/google/charts/issues/277
+    // check charts_flutter/base_chart_state.dart line 72
     if (widget.data == "chart") {
       return charts.PieChart(
         generateChart(consolidatedResults),

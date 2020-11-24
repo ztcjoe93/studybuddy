@@ -80,7 +80,7 @@ class ResultsState extends ChangeNotifier {
 
   void remove(int deckId){
     results.removeWhere((r) => r.deckId == deckId);
-    DBProvider.db.delete('deck', 'deck_id = ?', [deckId]);
+    DBProvider.db.delete('result', 'deck_id = ?', [deckId]);
     notifyListeners();
   }
 }

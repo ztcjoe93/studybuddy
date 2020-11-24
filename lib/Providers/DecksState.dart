@@ -94,6 +94,12 @@ class DecksState extends ChangeNotifier{
 
   Deck getDeckFromId(int id) => decks.firstWhere((d) => d.id == id);
 
+  void remove(int deckId) {
+    decks.removeWhere((d) => d.id == deckId);
+    DBProvider.db.delete("deck", "deck_id = ?", [deckId]);
+    notifyListeners();
+  }
+
   void removeCardFromId(int deckId, int cardId){
     decks.firstWhere((d) => d.id == deckId).cards.removeWhere((c) => c.id == cardId);
     DBProvider.db.delete("card", "card_id = ?", [cardId]);

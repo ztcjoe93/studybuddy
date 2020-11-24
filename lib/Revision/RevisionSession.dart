@@ -41,6 +41,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
       _revealed = false;
       _index += 1;
       if(_index < cards.length){
+        topDisplay = "FRONT";
         display = cards[_index].front;
       }
     });
@@ -79,31 +80,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
         cardResults
       );
 
-      return LoadingBlocks(rawScore: [score, cardResults.length]);
-
-      /*
-      Provider.of<ResultsState>(context, listen: false).add(finalResult);
-      Future.delayed(Duration(seconds: 5), () {
-        Navigator.of(context).pop();
-      });
-
-      return Column(
-        children: [
-          Text(
-            "You have finished the revision session!",
-            style: Theme.of(context).textTheme.headline4,
-            textAlign: TextAlign.center,
-          ),
-          SizedBox(
-            height: MediaQuery.of(context).size.height * 0.05,
-          ),
-          Text(
-            "Score: $score / ${cardResults.length}",
-            style: Theme.of(context).textTheme.headline4,
-          ),
-        ],
-      );
-       */
+      return LoadingBlocks(rawScore: [score, cardResults.length], finalResult: finalResult);
     } else {
       return Column(
         mainAxisAlignment: MainAxisAlignment.center,
