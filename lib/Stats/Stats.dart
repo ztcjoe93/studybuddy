@@ -30,8 +30,7 @@ class _StatsState extends State<Stats> {
       // check for deck deletion changes
       pageController.jumpToPage(1);
       _selectedDeck = null;
-      print("Debug :: widget state reset.");
-      Provider.of<OverallState>(context, listen: false).updateDeckHasChanged();
+      Provider.of<OverallState>(context, listen: false).deckHasBeenChanged(true);
       widget.state = Provider.of<OverallState>(context, listen: false).deckChange;
     }
   }
@@ -241,19 +240,6 @@ class _StatsState extends State<Stats> {
                               child: Icon(Icons.pie_chart),
                             ),
                             Text("Card performances"),
-                          ],
-                        ),
-                      ),
-                      FlatButton(
-                        onPressed: (){
-                          print("${widget.state}");
-                        },
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: EdgeInsets.symmetric(vertical: 8.0),
-                            ),
-                            Text("Check values"),
                           ],
                         ),
                       ),

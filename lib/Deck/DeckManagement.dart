@@ -70,27 +70,34 @@ class _DeckManagementState extends State<DeckManagement> {
                 onPressed: () => addDeck(context),
                 icon: Icon(Icons.library_add),
               ),
-              Consumer<DecksState>(
-                builder: (context, deckState, child){
-                  return DropdownButton(
-                    value: _filter,
-                    icon: Icon(Icons.arrow_drop_down),
-                    underline: SizedBox(),
-                    onChanged: (val){
-                      setState(() {
-                        _filter = val;
-                      });
-                    },
-                    items: [DropdownMenuItem(
-                      value: "All",
-                      child: Text("All"),
-                    ), ...deckState.tagFilters,
-                    DropdownMenuItem(
-                      value: "None",
-                      child: Text("None")
-                    )],
-                  );
-                },
+              Container(
+                padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Consumer<DecksState>(
+                  builder: (context, deckState, child){
+                    return DropdownButton(
+                      value: _filter,
+                      icon: Icon(Icons.arrow_drop_down),
+                      underline: SizedBox(),
+                      onChanged: (val){
+                        setState(() {
+                          _filter = val;
+                        });
+                      },
+                      items: [DropdownMenuItem(
+                        value: "All",
+                        child: Text("All"),
+                      ), ...deckState.tagFilters,
+                      DropdownMenuItem(
+                        value: "None",
+                        child: Text("None")
+                      )],
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -135,7 +142,7 @@ class _DeckManagementState extends State<DeckManagement> {
                               // prevent CardsManagement widget from being deleted before transition is complete
                               Future.delayed(Duration(milliseconds: 350), (){
                                 Provider.of<OverallState>(context, listen: false)
-                                    .deckHasBeenChanged();
+                                    .deckHasBeenChanged(false);
                                 Provider.of<DecksState>(context, listen: false)
                                     .remove(targetDeck.id);
                                 Provider.of<ResultsState>(context, listen: false)
@@ -182,8 +189,15 @@ class _DeckManagementState extends State<DeckManagement> {
                             );
 
                             if (result == false){
-                              Provider.of<ResultsState>(context, listen: false)
-                                  .remove(filtered[index].id);
+                              Future.delayed(Duration(milliseconds: 350), (){
+                                Provider.of<OverallState>(context, listen: false)
+                                    .deckHasBeenChanged(false);
+                                Provider.of<DecksState>(context, listen: false)
+                                    .remove(filtered[index].id);
+                                Provider.of<ResultsState>(context, listen: false)
+                                    .remove(filtered[index].id);
+                                print("Deletion complete");
+                              });
                             }
                           },
                           title: Text("${filtered[index].name}"),

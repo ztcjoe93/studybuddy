@@ -7,7 +7,7 @@ import 'package:studybuddy/Providers/OverallState.dart';
 import '../Objects/objects.dart';
 
 class DeckPerformance extends StatefulWidget {
-  final List<Result> results;
+  List<Result> results;
   String data;
 
   DeckPerformance(this.results, this.data);
@@ -21,6 +21,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   bool _chartGenerated = false;
 
   consolidate(String type) async {
+    widget.results.sort((a, b) => a.isoTimestamp.compareTo(b.isoTimestamp));
     consolidatedList = [];
 
     widget.results.forEach((result) {
@@ -154,7 +155,6 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   @override
   void initState() {
     super.initState();
-    widget.results.sort((a, b) => a.isoTimestamp.compareTo(b.isoTimestamp));
   }
 
   @override

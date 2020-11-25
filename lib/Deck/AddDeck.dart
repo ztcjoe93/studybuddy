@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Database.dart';
@@ -107,24 +108,32 @@ class _AddDeckState extends State<AddDeck> {
                         prefixIcon: Icon(Icons.label),
                       ),
                     ),
-                    Row(
-                      children: [
-                        Text("Existing tags: "),
-                        Consumer<DecksState>(
-                          builder: (context, deckState, child) => DropdownButton(
-                            value: _tag,
-                            icon: Icon(Icons.arrow_drop_down),
-                            underline: SizedBox(),
-                            onChanged: (val){
-                              tagController.text = val;
-                              setState(() {
-                                _tag = val;
-                              });
-                            },
-                            items: deckState.tagFilters,
+                    Container(
+                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Text("Existing tags: "),
+                          Consumer<DecksState>(
+                            builder: (context, deckState, child) => DropdownButton(
+                              value: _tag,
+                              icon: Icon(Icons.arrow_drop_down),
+                              underline: SizedBox(),
+                              onChanged: (val){
+                                tagController.text = val;
+                                setState(() {
+                                  _tag = val;
+                                });
+                              },
+                              items: deckState.tagFilters,
+                            ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ],
                 ),

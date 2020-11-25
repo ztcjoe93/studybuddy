@@ -24,13 +24,11 @@ class OverallState extends ChangeNotifier{
     notifyListeners();
   }
 
-  void updateDeckHasChanged(){
+  void deckHasBeenChanged(bool insideStats){
     deckChange = !deckChange;
-  }
-
-  void deckHasBeenChanged(){
-    deckChange = !deckChange;
-    notifyListeners();
+    if(!insideStats){
+      notifyListeners();
+    }
   }
 
   void changeBrightness(){

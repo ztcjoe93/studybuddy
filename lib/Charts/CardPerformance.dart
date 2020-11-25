@@ -5,7 +5,7 @@ import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 
 class CardPerformance extends StatefulWidget {
-  final List<Result> results;
+  List<Result> results;
   String data;
 
   CardPerformance(this.results, this.data);
@@ -16,8 +16,7 @@ class CardPerformance extends StatefulWidget {
 
 class _CardPerformanceState extends State<CardPerformance> {
   List<dynamic> consolidatedList = [];
-
-  final consolidatedResults = Map();
+  var consolidatedResults = Map();
 
   bool _sorted = false;
   int _selectedCol;
@@ -45,16 +44,18 @@ class _CardPerformanceState extends State<CardPerformance> {
       consolidatedResults[key]['%'] = 100 * (value['score']/value['count']);
     });
 
-    if (consolidatedList.length == 0) {
-      consolidatedList = consolidatedResults.entries.map((r) =>
-      {
-        'front': r.key,
-        'back': r.value['back'],
-        '%': r.value['%'],
-        'score': r.value['score'],
-        'tries': r.value['count'],
-      }
-      ).toList();
+    if (consolidatedList.length >= 0) {
+      setState(() {
+        consolidatedList = consolidatedResults.entries.map((r) =>
+        {
+          'front': r.key,
+          'back': r.value['back'],
+          '%': r.value['%'],
+          'score': r.value['score'],
+          'tries': r.value['count'],
+        }
+        ).toList();
+      });
     }
   }
 
@@ -75,47 +76,6 @@ class _CardPerformanceState extends State<CardPerformance> {
         consolidatedList.sort((a, b) => a[key].compareTo(b[key]));
       }
     });
-  }
-
-  generateListTable(context){
-    //return Text("test");
-    return ListView.builder(
-      itemCount: consolidatedList.length,
-      itemBuilder: (BuildContext context, int index){
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Text("${consolidatedList[index]['front']}"),
-              ),
-              Expanded(
-                flex: 1,
-                child: Text("${consolidatedList[index]['back']}"),
-              ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Text(
-                    "${consolidatedList[index]['%'].toStringAsFixed(2)}",
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Center(child: Text("${consolidatedList[index]['score']}")),
-              ),
-              Expanded(
-                flex: 1,
-                child: Center(child: Text("${consolidatedList[index]['tries']}")),
-              ),
-             ],
-          ),
-        );
-      },
-    );
   }
 
   generateChart(data){
@@ -159,6 +119,17 @@ class _CardPerformanceState extends State<CardPerformance> {
         data: chartData,
       )
     ];
+  }
+
+  @override
+  void didUpdateWidget(covariant CardPerformance oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.results.length != oldWidget.results.length){
+      setState(() {
+        oldWidget.results = widget.results;
+        consolidate(context);
+      });
+    }
   }
 
   @override
@@ -343,7 +314,43 @@ class _CardPerformanceState extends State<CardPerformance> {
               ),
               child: Padding(
                 padding: EdgeInsets.all(8.0),
-               child: generateListTable(context),
+               child: ListView.builder(
+                 itemCount: consolidatedList.length,
+                 itemBuilder: (context, index){
+                   return Padding(
+                     padding: EdgeInsets.symmetric(vertical: 16.0),
+                     child: Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                       children: [
+                         Expanded(
+                           flex: 1,
+                           child: Text("${consolidatedList[index]['front']}"),
+                         ),
+                         Expanded(
+                           flex: 1,
+                           child: Text("${consolidatedList[index]['back']}"),
+                         ),
+                         Expanded(
+                           flex: 2,
+                           child: Center(
+                             child: Text(
+                               "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                             ),
+                           ),
+                         ),
+                         Expanded(
+                           flex: 1,
+                           child: Center(child: Text("${consolidatedList[index]['score']}")),
+                         ),
+                         Expanded(
+                           flex: 1,
+                           child: Center(child: Text("${consolidatedList[index]['tries']}")),
+                         ),
+                       ],
+                     )
+                   );
+                 }
+               ),
               ),
             ),
           ),
