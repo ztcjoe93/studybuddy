@@ -58,7 +58,7 @@ class _RevisionState extends State<Revision> {
                           value: "All",
                           child: Text("All"),
                         ),
-                        ...deckState.tagFilters,
+                        ...deckState.tagFilters(emptyIncluded: false),
                         DropdownMenuItem(
                             value: "None",
                             child: Text("None")
@@ -82,6 +82,10 @@ class _RevisionState extends State<Revision> {
                     if(_filter == "All") {
                       availableDecks = provider.decks
                           .where((d) => d.cards.length != 0)
+                          .toList();
+                    } else if (_filter == "None"){
+                      availableDecks = provider.decks
+                          .where((d) => d.tag == "" && d.cards.length > 0)
                           .toList();
                     } else {
                       availableDecks = provider.decks

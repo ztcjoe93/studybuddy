@@ -182,7 +182,7 @@ class _AddDeckState extends State<AddDeck> {
                                       _tag = val;
                                     });
                                   },
-                                  items: deckState.tagFilters,
+                                  items: deckState.tagFilters(emptyIncluded: true),
                                 ),
                               ),
                             ),

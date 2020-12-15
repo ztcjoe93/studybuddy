@@ -7,11 +7,17 @@ import '../Database.dart';
 class DecksState extends ChangeNotifier{
   List<Deck> decks = [];
 
-  List<DropdownMenuItem> get tagFilters{
+  List<DropdownMenuItem>  tagFilters({bool emptyIncluded}){
     List<String> tags = [];
     for (var deck in decks){
       if(!tags.contains(deck.tag) && deck.tag != ""){
-        tags.add(deck.tag);
+        if (!emptyIncluded){
+          if(deck.cards.length > 0){
+            tags.add(deck.tag);
+          }
+        } else {
+          tags.add(deck.tag);
+        }
       }
     }
 

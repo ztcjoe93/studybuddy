@@ -92,7 +92,7 @@ class _DeckManagementState extends State<DeckManagement> {
                       items: [DropdownMenuItem(
                         value: "All",
                         child: Text("All"),
-                      ), ...deckState.tagFilters,
+                      ), ...deckState.tagFilters(emptyIncluded: true),
                       DropdownMenuItem(
                         value: "None",
                         child: Text("None")
