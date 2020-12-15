@@ -23,6 +23,17 @@ class DecksState extends ChangeNotifier{
     ).toList();
   }
 
+  List<String> get tags{
+    List<String> tags = [];
+    for (var deck in decks){
+      if(!tags.contains(deck.tag) && deck.tag != ""){
+        tags.add(deck.tag);
+      }
+    }
+
+    return tags;
+  }
+
   void loadFromDatabase() async {
     var _decks = Map.fromIterable(await DBProvider.db.decks,
       key: (obj) => obj['deck_id'],

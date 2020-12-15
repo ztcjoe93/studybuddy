@@ -15,6 +15,7 @@ class AddDeck extends StatefulWidget {
 class _AddDeckState extends State<AddDeck> {
   final textController = TextEditingController();
   final tagController = TextEditingController();
+  final _scrollViewController = ScrollController();
   String _tag ;
 
   @override
@@ -90,50 +91,104 @@ class _AddDeckState extends State<AddDeck> {
                 child: Column(
                   children: [
                     Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0),
-                      child: TextField(
-                        controller: textController,
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(),
-                          labelText: "Deck Name",
-                          prefixIcon: Icon(Icons.list),
-                        ),
-                      ),
-                    ),
-                    TextField(
-                      controller: tagController,
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        labelText: "Tag",
-                        prefixIcon: Icon(Icons.label),
-                      ),
-                    ),
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Existing tags: "),
-                          Consumer<DecksState>(
-                            builder: (context, deckState, child) => DropdownButton(
-                              value: _tag,
-                              icon: Icon(Icons.arrow_drop_down),
-                              underline: SizedBox(),
-                              onChanged: (val){
-                                tagController.text = val;
-                                setState(() {
-                                  _tag = val;
-                                });
-                              },
-                              items: deckState.tagFilters,
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "DECK NAME",
+                              style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          TextField(
+                            controller: textController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              filled: true,
+                              fillColor: Colors.grey.shade200,
+                              hintText: "Enter a name for your deck here!",
                             ),
                           ),
                         ],
                       ),
+                    ),
+                    Padding(
+                      padding: EdgeInsets.only(bottom: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.symmetric(vertical: 8.0),
+                            child: Text(
+                              "TAG NAME (optional)",
+                              style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                          TextField(
+                            controller: tagController,
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              filled: true,
+                              fillColor: Colors.grey.shade200,
+                              hintText: "You can enter a tag to associate your deck here!",
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Column(
+                      mainAxisSize: MainAxisSize.max,
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "EXISTING TAGS",
+                              style: TextStyle(
+                                fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        Align(
+                          alignment: Alignment.centerLeft,
+                          child: Consumer<DecksState>(
+                            builder: (context, deckState, child) => Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade200,
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              width: MediaQuery.of(context).size.width * 0.35,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                                child: DropdownButton(
+                                  isExpanded: true,
+                                  value: _tag,
+                                  icon: Icon(Icons.arrow_drop_down),
+                                  underline: SizedBox(),
+                                  onChanged: (val){
+                                    tagController.text = val;
+                                    setState(() {
+                                      _tag = val;
+                                    });
+                                  },
+                                  items: deckState.tagFilters,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),

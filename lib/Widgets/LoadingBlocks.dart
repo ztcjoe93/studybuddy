@@ -53,6 +53,7 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
               height: 10.0,
               margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
               decoration: BoxDecoration(
+                shape: BoxShape.circle,
                 color: Colors.lightGreen,
               ),
             )
@@ -64,6 +65,7 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
               height: 10.0,
               margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
               decoration: BoxDecoration(
+                shape: BoxShape.circle,
                 color: Colors.redAccent,
               ),
             )
@@ -77,10 +79,7 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
       for(int j = 0; j < 25; j++){
         future = future.then((_){
           if(i == 3 && j == 24){
-            setState(() {
-              _results = true;
-            });
-
+            setState(() {_results = true;});
             Provider.of<ResultsState>(context, listen: false).add(
                 widget.finalResult
             );
@@ -103,7 +102,18 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
+        Padding(
+          padding: EdgeInsets.only(bottom: 16.0),
+          child: Text(
+            "YOUR SCORE",
+            style: TextStyle(
+              fontSize: Theme.of(context).textTheme.headline4.fontSize,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
         Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             for(int i=0; i < 4; i++)
               Center(
@@ -123,15 +133,21 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
                   ),
                 ),
               ),
-            AnimatedOpacity(
-              opacity: _results ? 1.0 : 0.0,
-              duration: Duration(milliseconds: 500),
-              child: Text(
-                "Your score is: ${widget.rawScore[0]}/${widget.rawScore[1]}",
-                style: Theme.of(context).textTheme.headline2,
-              ),
-            )
           ],
+        ),
+        Padding(
+          padding: EdgeInsets.only(top: 16.0),
+          child: AnimatedOpacity(
+            opacity: _results ? 1.0 : 0.0,
+            duration: Duration(milliseconds: 500),
+            child: Text(
+              "$score%",
+              style: TextStyle(
+                fontSize: Theme.of(context).textTheme.headline4.fontSize,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ],
     );

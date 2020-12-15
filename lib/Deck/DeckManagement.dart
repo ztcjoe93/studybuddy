@@ -71,6 +71,7 @@ class _DeckManagementState extends State<DeckManagement> {
                 icon: Icon(Icons.library_add),
               ),
               Container(
+                width: MediaQuery.of(context).size.width * 0.35,
                 padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -79,6 +80,7 @@ class _DeckManagementState extends State<DeckManagement> {
                 child: Consumer<DecksState>(
                   builder: (context, deckState, child){
                     return DropdownButton(
+                      isExpanded: true,
                       value: _filter,
                       icon: Icon(Icons.arrow_drop_down),
                       underline: SizedBox(),

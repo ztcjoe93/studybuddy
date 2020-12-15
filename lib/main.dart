@@ -6,14 +6,13 @@ import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 
 import 'Database.dart';
-import 'DebugHome.dart';
 import 'Deck/DeckManagement.dart';
+import 'HomePage.dart';
 import 'LDTheme.dart';
 import 'Options/Options.dart';
 import 'Providers/DecksState.dart';
 import 'Revision/Revision.dart';
 import 'Stats/Stats.dart';
-import 'SubDebug.dart';
 
 void main() async {
   runApp(
@@ -37,7 +36,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   bool _ready = false;
   int _selectedIdx = 0;
 
-  List<String> categories = ["Debug", "Deck Management", "Revision", "Stats", "Options", "Sub-debug"];
+  List<String> categories = ["Home", "Deck Management", "Revision", "Stats", "Options"];
 
   initializeAll() async{
     final prefs = await SharedPreferences.getInstance();
@@ -64,7 +63,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     super.initState();
     initializeAll();
 
-    _selectedIdx = 1; //debugging purposes
+    _selectedIdx = 0; //debugging purposes
   }
 
   @override
@@ -85,12 +84,11 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             ),
             body: IndexedStack(
               children: [
-                DebugHome(),
+                HomePage(),
                 DeckManagement(),
                 Revision(),
                 Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
                 Options(),
-                SubDebug(),
               ],
               index: _selectedIdx,
             ),
@@ -98,7 +96,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               items: [
                 BottomNavigationBarItem(
                   icon: Icon(Icons.home),
-                  label: "Debug",
+                  label: "Home",
                 ),
                 BottomNavigationBarItem(
                   icon: Icon(Icons.layers),
@@ -115,10 +113,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: "Options",
-                ),
-                BottomNavigationBarItem(
-                  icon: Icon(Icons.bug_report),
-                  label: "Sub-debug",
                 ),
               ],
               currentIndex: _selectedIdx,

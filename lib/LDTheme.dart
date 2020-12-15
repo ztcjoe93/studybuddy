@@ -12,6 +12,8 @@ ThemeData lightTheme = ThemeData(
       ),
     ),
   ),
+  inputDecorationTheme: InputDecorationTheme(
+  ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.blueGrey,
     selectedItemColor: Colors.white,
