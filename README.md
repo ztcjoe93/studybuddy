@@ -2,14 +2,12 @@
 
 Convenience application where flash cards are used for memorization.
 
-## Required environment and packages for the application
-
-The current application is developed using the following environment:
+## Environment
 
 - Flutter 1.20.3
 - Android Studio 4.0
 
-and the following packages are required (can be found under `pubspec.yaml`):
+## Packages
 
 - path_provider ^1.6.14 (for file I/O)
 - provider ^4.3.2+2 (state management)
@@ -19,8 +17,19 @@ and the following packages are required (can be found under `pubspec.yaml`):
 - sqflite ^1.3.0 (database)
 - faker ^1.2.1 (testing purposes)
 
-## Work in progress
+## Features
 
-- Frontend design
-- Revision (input verification instead of revealing)
-- Options (Push notification? )
+[x] Decks to collate cards for revision
+[x] Tagging for decks for filtering purposes
+[x] Revision sessions for deck and card scoring
+[x] Allow users to set their own performance thresholds
+
+## In progress
+[ ] Dark mode
+[ ] Frontend design and animations
+[ ] Input-verification for revision sessions
+[ ] Push notifications for options
+
+## Licensing
+
+This project is licensed under the MIT License - see the LICENSE.txt file for details.

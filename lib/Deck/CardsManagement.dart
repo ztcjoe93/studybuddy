@@ -25,7 +25,19 @@ class _CardsManagementState extends State<CardsManagement> {
         context,
         PageRouteBuilder(
           pageBuilder: (_, __, ___) => AddCard(deckId: widget.deckId),
-          transitionDuration: Duration(seconds: 0),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            var begin = Offset(0.0, 1.0);
+            var end = Offset.zero;
+            var curve = Curves.easeOutQuint;
+
+            var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+            return SlideTransition(
+              position: animation.drive(tween),
+              child: child,
+            );
+          },
+          transitionDuration: Duration(milliseconds: 200),
         )
     );
 
@@ -77,12 +89,15 @@ class _CardsManagementState extends State<CardsManagement> {
                               children: [
                                 Text(
                                   provider.getDeckFromId(widget.deckId).name,
-                                  style: Theme.of(context).textTheme.headline4,
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.headline4.fontSize,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black,
+                                  ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
                                 Text(
                                   provider.getDeckFromId(widget.deckId).tag,
-                                  style: Theme.of(context).textTheme.headline6,
                                 ),
                               ],
                             ),
@@ -101,11 +116,14 @@ class _CardsManagementState extends State<CardsManagement> {
                                       AlertDialog(
                                         content: RichText(
                                             text: TextSpan(
-                                              text: "Do you wish to delete this deck?\n",
-                                              style: TextStyle(color: Colors.black),
+                                              text: "Do you wish to delete this deck?\n\n",
+                                              style: TextStyle(
+                                                color: Colors.black,
+                                                fontSize: Theme.of(context).textTheme.bodyText1.fontSize * 1.05,
+                                              ),
                                               children: [
                                                 TextSpan(
-                                                  text: "* Note that all related results will be removed as well",
+                                                  text: "* Note that all related results will be removed",
                                                   style: TextStyle(fontStyle: FontStyle.italic),
                                                 ),
                                               ]
@@ -115,9 +133,11 @@ class _CardsManagementState extends State<CardsManagement> {
                                           FlatButton(
                                             child: Text("Yes"),
                                             // return false to provider to delete deck
-                                            onPressed: () => Navigator.of(context)
-                                              ..pop()
-                                              ..pop(false),
+                                            onPressed: (){
+                                              Navigator.of(context)
+                                                ..pop()
+                                                ..pop(false);
+                                            }
                                           ),
                                           FlatButton(
                                             child: Text("No"),
@@ -187,6 +207,7 @@ class _CardsManagementState extends State<CardsManagement> {
                     height: MediaQuery.of(context).size.height * 0.05,
                   ),
                   Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Align(
                         alignment: Alignment.bottomCenter,

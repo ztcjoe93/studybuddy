@@ -3,11 +3,16 @@ import 'package:flutter/material.dart';
 ThemeData lightTheme = ThemeData(
   brightness: Brightness.light,
   visualDensity: VisualDensity.adaptivePlatformDensity,
-  primaryColor: Colors.blueGrey,
+  primaryColor: Colors.blueGrey[100],
+  primaryColorLight: Colors.white,
+  primaryColorDark: Color(0xFF9ea7aa),
   appBarTheme: AppBarTheme(
     textTheme: TextTheme(
+      headline4: TextStyle(
+        color: Colors.black,
+      ),
       headline6: TextStyle(
-        color: Colors.white,
+        color: Colors.black,
         fontSize: 20,
       ),
     ),
@@ -15,11 +20,11 @@ ThemeData lightTheme = ThemeData(
   inputDecorationTheme: InputDecorationTheme(
   ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
-    backgroundColor: Colors.blueGrey,
-    selectedItemColor: Colors.white,
-    unselectedItemColor: Colors.white60,
+    backgroundColor: Colors.blueGrey[100],
+    selectedItemColor: Colors.black.withOpacity(0.8),
+    unselectedItemColor: Colors.black.withOpacity(0.4),
   ),
-  accentColor: Colors.blue,
+  accentColor: Color(0xFF9ea7aa),
   fontFamily: 'Roboto',
 );
 

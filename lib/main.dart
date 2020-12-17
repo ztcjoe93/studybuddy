@@ -36,7 +36,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   bool _ready = false;
   int _selectedIdx = 0;
 
-  List<String> categories = ["Home", "Deck Management", "Revision", "Stats", "Options"];
+  List<String> categories = [
+    "HOME", "DECK MANAGEMENT", "REVISION",
+    "STATISTICS", "OPTIONS",
+  ];
 
   initializeAll() async{
     final prefs = await SharedPreferences.getInstance();
@@ -63,7 +66,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     super.initState();
     initializeAll();
 
-    _selectedIdx = 0; //debugging purposes
+    _selectedIdx = 1; //debugging purposes
   }
 
   @override
@@ -80,6 +83,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
             appBar: AppBar(
               title: Text(
                 categories[_selectedIdx],
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             body: IndexedStack(
@@ -119,7 +125,6 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               showUnselectedLabels: true,
               type: BottomNavigationBarType.fixed,
               selectedIconTheme: IconThemeData(size: 30.0),
-              selectedItemColor: Colors.white,
               onTap: (ind) => setState((){
                 _selectedIdx = ind;
                 }
