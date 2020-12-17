@@ -168,7 +168,12 @@ class _CardsManagementState extends State<CardsManagement> {
                                 itemBuilder: (BuildContext context, int index) =>
                                     Card(
                                       child: ListTile(
-                                        title: Text("${cardList[index].front}"),
+                                        title: Text(
+                                          "${cardList[index].front}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
                                         subtitle: Text("${cardList[index].back}"),
                                         trailing: IconButton(
                                           icon: Icon(Icons.delete),

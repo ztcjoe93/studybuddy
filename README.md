@@ -22,6 +22,8 @@ Convenience application where flash cards are used for memorization.
 - [x] Decks to collate cards for revision
 - [x] Tagging for decks for filtering purposes
 - [x] Revision sessions for deck and card scoring
+- [x] Performance measurement for each card
+- [x] Performance measurement for each deck
 - [x] Allow users to set their own performance thresholds
 
 ## In progress
