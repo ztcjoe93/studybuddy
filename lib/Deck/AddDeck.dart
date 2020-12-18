@@ -27,11 +27,11 @@ class _AddDeckState extends State<AddDeck> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: GestureDetector(
-        onTap: () => FocusManager.instance.primaryFocus.unfocus(),
-        child: Scaffold(
-          body: Column(
+    return GestureDetector(
+      onTap: () => FocusManager.instance.primaryFocus.unfocus(),
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
             children: [
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,

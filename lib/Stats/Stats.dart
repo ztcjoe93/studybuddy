@@ -174,7 +174,15 @@ class _StatsState extends State<Stats> {
                 ),
                 Expanded(
                   child: Container(
-                    color: Colors.white.withOpacity(0.8),
+                    //color: Colors.white.withOpacity(0.8),
+                    decoration: BoxDecoration(
+                      border: Border.all(
+                        color: const Color(0x7Acfd8dc),
+                        width: 1,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      color: const Color(0x7Acfd8dc),
+                    ),
                     child: Consumer<ResultsState>(
                       builder: (context, provider, child) {
                         if (provider.results.length == 0) {
@@ -185,30 +193,37 @@ class _StatsState extends State<Stats> {
                           return ListView.builder(
                             itemCount: resultSet.length,
                             itemBuilder: (BuildContext context, int index) =>
-                                Container(
-                                  decoration: BoxDecoration(
-                                    color: resultSet[index] == _selectedDeck
-                                        ? Colors.lightBlueAccent : Colors
-                                        .transparent,
+                                Padding(
+                                  padding: EdgeInsets.only(
+                                    top: 4.0,
+                                    left: 5.0,
+                                    right: 5.0,
                                   ),
-                                  child: ListTile(
-                                    onTap: () {
-                                      setState(() {
-                                        _selectedDeck =
-                                        _selectedDeck == resultSet[index]
-                                            ? null : resultSet[index];
-                                      });
-                                    },
-                                    title: Text(
-                                      Provider
-                                          .of<DecksState>(
-                                          context, listen: false)
-                                          .getDeckFromId(resultSet[index])
-                                          .name,
-                                      style: TextStyle(
-                                          color: _selectedDeck ==
-                                              resultSet[index]
-                                              ? Colors.white : Colors.black
+                                  child: Container(
+                                    decoration: BoxDecoration(
+                                      color: resultSet[index] == _selectedDeck
+                                          ? Colors.blueGrey[300]
+                                          : Colors.transparent,
+                                    ),
+                                    child: ListTile(
+                                      onTap: () {
+                                        setState(() {
+                                          _selectedDeck =
+                                          _selectedDeck == resultSet[index]
+                                              ? null : resultSet[index];
+                                        });
+                                      },
+                                      title: Text(
+                                        Provider
+                                            .of<DecksState>(
+                                            context, listen: false)
+                                            .getDeckFromId(resultSet[index])
+                                            .name,
+                                        style: TextStyle(
+                                            color: _selectedDeck ==
+                                                resultSet[index]
+                                                ? Colors.white : Colors.black
+                                        ),
                                       ),
                                     ),
                                   ),

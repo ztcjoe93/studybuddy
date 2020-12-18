@@ -196,6 +196,12 @@ class _DeckManagementState extends State<DeckManagement> {
                         child: ListView.builder(
                           controller: _scrollController,
                           itemBuilder: (BuildContext context, int index) => Card(
+                            margin: EdgeInsets.only(
+                              top: 5.0,
+                              bottom: 5.0,
+                              left: 5.0,
+                              right: 15.0,
+                            ),
                             child: ListTile(
                               onTap: () async {
                                 _filter = 'All';

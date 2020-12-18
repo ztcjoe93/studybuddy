@@ -75,60 +75,67 @@ class _RevisionState extends State<Revision> {
               padding: EdgeInsets.symmetric(
                   vertical: MediaQuery.of(context).size.height * 0.01,
               ),
-              child: Consumer<DecksState>(
-                  builder: (context, provider, child) {
-                    List<Deck> availableDecks = [];
+              child: Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: const Color(0x7Acfd8dc),
+                    width: 1,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                  color: const Color(0x7Acfd8dc),
+                ),
+                child: Consumer<DecksState>(
+                    builder: (context, provider, child) {
+                      List<Deck> availableDecks = [];
 
-                    if(_filter == "All") {
-                      availableDecks = provider.decks
-                          .where((d) => d.cards.length != 0)
-                          .toList();
-                    } else if (_filter == "None"){
-                      availableDecks = provider.decks
-                          .where((d) => d.tag == "" && d.cards.length > 0)
-                          .toList();
-                    } else {
-                      availableDecks = provider.decks
-                          .where((d) => d.tag == _filter && d.cards.length>0)
-                          .toList();
-                    }
-                    return Scrollbar(
-                      isAlwaysShown: true,
-                      controller: _scrollController,
-                      child: ListView.builder(
+                      if(_filter == "All") {
+                        availableDecks = provider.decks
+                            .where((d) => d.cards.length != 0)
+                            .toList();
+                      } else if (_filter == "None"){
+                        availableDecks = provider.decks
+                            .where((d) => d.tag == "" && d.cards.length > 0)
+                            .toList();
+                      } else {
+                        availableDecks = provider.decks
+                            .where((d) => d.tag == _filter && d.cards.length>0)
+                            .toList();
+                      }
+                      return Scrollbar(
+                        isAlwaysShown: true,
                         controller: _scrollController,
-                        itemCount: availableDecks.length,
-                        itemBuilder: (BuildContext context, int index) =>
-                          Padding(
-                            padding: const EdgeInsets.only(bottom: 8.0),
-                            child: OpenContainer(
-                              closedBuilder: (context, action){
-                                return ListTile(
-                                  title: Text("${availableDecks[index].name}"),
-                                  subtitle: Text("${availableDecks[index].tag}"),
-                                );
-                              },
-                              openBuilder: (context, action){
-                                return RevisionSession(availableDecks[index]);
-                              },
-                            ),
-                          ),
-                          /*
-                          Card(
-                            child: ListTile(
-                              onTap: () => Navigator.of(context).push(
-                                PageRouteBuilder(
-                                  pageBuilder: (_,__,___) => RevisionSession(availableDecks[index]),
-                                  transitionDuration: Duration(seconds: 0),
-                                )
+                        child: ListView.builder(
+                          controller: _scrollController,
+                          itemCount: availableDecks.length,
+                          itemBuilder: (BuildContext context, int index) =>
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 5.0,
+                                left: 5.0,
+                                bottom: 8.0,
+                                right: 15.0,
                               ),
-                              title: Text("${availableDecks[index].name}"),
-                              subtitle: Text("${availableDecks[index].tag}"),
+                              child: OpenContainer(
+                                closedBuilder: (context, action){
+                                  return ListTile(
+                                    title: Text(
+                                      "${availableDecks[index].name}",
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    subtitle: Text("${availableDecks[index].tag}"),
+                                  );
+                                },
+                                openBuilder: (context, action){
+                                  return RevisionSession(availableDecks[index]);
+                                },
+                              ),
                             ),
-                                 */
                           ),
-                      );}
-                    ),
+                        );}
+                      ),
+              ),
             )
             ),
         ],

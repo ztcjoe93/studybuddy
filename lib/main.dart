@@ -6,6 +6,7 @@ import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 
 import 'Database.dart';
+import 'Debug.dart';
 import 'Deck/DeckManagement.dart';
 import 'HomePage.dart';
 import 'LDTheme.dart';
@@ -38,7 +39,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
 
   List<String> categories = [
     "HOME", "DECK MANAGEMENT", "REVISION",
-    "STATISTICS", "OPTIONS",
+    "STATISTICS", "OPTIONS", "DEBUG",
   ];
 
   initializeAll() async{
@@ -95,6 +96,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                 Revision(),
                 Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
                 Options(),
+                Debug(),
               ],
               index: _selectedIdx,
             ),
@@ -119,6 +121,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
                 BottomNavigationBarItem(
                   icon: Icon(Icons.settings),
                   label: "Options",
+                ),
+                BottomNavigationBarItem(
+                  icon: Icon(Icons.bug_report),
+                  label: "Debug",
                 ),
               ],
               currentIndex: _selectedIdx,

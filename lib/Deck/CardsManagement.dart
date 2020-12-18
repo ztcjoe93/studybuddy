@@ -19,6 +19,7 @@ class CardsManagement extends StatefulWidget {
 class _CardsManagementState extends State<CardsManagement> {
   TextEditingController frontTextController = TextEditingController();
   TextEditingController backTextController = TextEditingController();
+  ScrollController _scrollController = ScrollController();
 
   addCard(BuildContext context) async {
     final result = await Navigator.push(
@@ -34,7 +35,14 @@ class _CardsManagementState extends State<CardsManagement> {
 
             return SlideTransition(
               position: animation.drive(tween),
-              child: child,
+              child: GestureDetector(
+                onTap: () => FocusManager.instance.primaryFocus.unfocus(),
+                child: Scaffold(
+                  body: SafeArea(
+                    child: AddCard(deckId: widget.deckId),
+                  ),
+                ),
+              ),
             );
           },
           transitionDuration: Duration(milliseconds: 200),
@@ -66,10 +74,10 @@ class _CardsManagementState extends State<CardsManagement> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: Scaffold(
-        // use builder to ensure that nested scaffolds correctly display snackbar
-        body: Consumer<DecksState>(
+    return Scaffold(
+      // use builder to ensure that nested scaffolds correctly display snackbar
+      body: SafeArea(
+        child: Consumer<DecksState>(
           builder: (context, provider, child) => Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05,
@@ -161,12 +169,21 @@ class _CardsManagementState extends State<CardsManagement> {
                           maxHeight: MediaQuery.of(context).size.height * 0.65,
                         ),
                         child: Scrollbar(
+                          isAlwaysShown: true,
+                          controller: _scrollController,
                           child: Consumer<DecksState>(
                             builder: (context, provider, child) {
                               List<FlashCard> cardList = provider.getDeckFromId(widget.deckId).cards;
                               return ListView.separated(
+                                controller: _scrollController,
                                 itemBuilder: (BuildContext context, int index) =>
                                     Card(
+                                      margin: EdgeInsets.only(
+                                        top: 5.0,
+                                        bottom: 5.0,
+                                        left: 5.0,
+                                        right: 15.0,
+                                      ),
                                       child: ListTile(
                                         title: Text(
                                           "${cardList[index].front}",
@@ -229,8 +246,8 @@ class _CardsManagementState extends State<CardsManagement> {
               ),
             ),
           ),
-        ),
-    );
+      ),
+      );
   }
 }
 
