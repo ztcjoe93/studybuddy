@@ -38,7 +38,9 @@ class _RevisionState extends State<Revision> {
                   horizontal: MediaQuery.of(context).size.width * 0.05
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).brightness == Brightness.light
+                    ? Colors.white
+                    : Colors.grey.shade800,
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: Consumer<DecksState>(
@@ -116,6 +118,9 @@ class _RevisionState extends State<Revision> {
                                 right: 15.0,
                               ),
                               child: OpenContainer(
+                                closedColor: Theme.of(context).brightness == Brightness.light
+                                  ? Colors.white
+                                  : Colors.grey.shade800,
                                 closedBuilder: (context, action){
                                   return ListTile(
                                     title: Text(

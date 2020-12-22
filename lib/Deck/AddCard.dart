@@ -94,7 +94,9 @@ class _AddCardState extends State<AddCard> {
                           decoration: InputDecoration(
                             border: InputBorder.none,
                             filled: true,
-                            fillColor: Colors.grey.shade200,
+                            fillColor: Theme.of(context).brightness == Brightness.light
+                              ? Colors.grey.shade200
+                              : Colors.grey.shade600,
                             hintText: "Enter text for the front side of your card here!",
                           ),
                           validator: (value) => _fieldValidator(value, true),
@@ -121,7 +123,9 @@ class _AddCardState extends State<AddCard> {
                         decoration: InputDecoration(
                           border: InputBorder.none,
                           filled: true,
-                          fillColor: Colors.grey.shade200,
+                          fillColor: Theme.of(context).brightness == Brightness.light
+                              ? Colors.grey.shade200
+                              : Colors.grey.shade600,
                           hintText: "Enter text for the back side of your card here!",
                         ),
                         validator: (value) => _fieldValidator(value, false),

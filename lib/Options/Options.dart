@@ -198,7 +198,9 @@ class _OptionsState extends State<Options> {
                       decoration: BoxDecoration(
                           image: DecorationImage(
                             colorFilter: ColorFilter.mode(
-                              Colors.white.withOpacity(0.7),
+                              _darkMode
+                                  ? Colors.black.withOpacity(0.3)
+                                  : Colors.white.withOpacity(0.6),
                               BlendMode.dstATop,
                             ),
                             image: AssetImage("assets/performance.jpg"),
@@ -248,11 +250,14 @@ class _OptionsState extends State<Options> {
               children: [
                 for (int i=0; i < 2; i++)
                   Container(
-                    width: _page == i ? 10.0 : 6.0,
-                    height: _page == i ? 10.0 : 6.0,
+                    width: 6.0,
+                    height: 6.0,
                     margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                     decoration: BoxDecoration(
-                      color: _page == i ? Colors.black : Colors.grey,
+                      shape: BoxShape.circle,
+                      color: Theme.of(context).brightness == Brightness.light
+                        ? _page == i ? Colors.blueGrey[100] : Colors.grey
+                        : _page == i ? Colors.white : Colors.grey
                     ),
                   )
               ]

@@ -100,7 +100,6 @@ class _CardsManagementState extends State<CardsManagement> {
                                   style: TextStyle(
                                     fontSize: Theme.of(context).textTheme.headline4.fontSize,
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.black,
                                   ),
                                   overflow: TextOverflow.ellipsis,
                                 ),
@@ -126,7 +125,6 @@ class _CardsManagementState extends State<CardsManagement> {
                                             text: TextSpan(
                                               text: "Do you wish to delete this deck?\n\n",
                                               style: TextStyle(
-                                                color: Colors.black,
                                                 fontSize: Theme.of(context).textTheme.bodyText1.fontSize * 1.05,
                                               ),
                                               children: [

@@ -167,6 +167,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
             ?  charts.TimeSeriesChart(
                 snapshot.data,
                 animate: false,
+                defaultInteractions: false,
                 behaviors: [
                   // setting axis labels using charttitle
                   charts.ChartTitle(

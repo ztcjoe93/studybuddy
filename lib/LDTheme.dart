@@ -19,6 +19,7 @@ ThemeData lightTheme = ThemeData(
   ),
   inputDecorationTheme: InputDecorationTheme(
   ),
+  buttonColor: Colors.blueGrey[100],
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.blueGrey[100],
     selectedItemColor: Colors.black.withOpacity(0.8),
@@ -32,10 +33,11 @@ ThemeData lightTheme = ThemeData(
 ThemeData darkTheme= ThemeData(
   brightness: Brightness.dark,
   visualDensity: VisualDensity.adaptivePlatformDensity,
-  primaryColor: Color(0xffffffff).withOpacity(0.16),
-  backgroundColor: Color(0xff121212),
+  primaryColor: Colors.white.withOpacity(0.16),
+  backgroundColor: Color(0xFF121212),
   accentColor: Colors.white.withOpacity(0.16),
   appBarTheme: AppBarTheme(
+    brightness: Brightness.dark,
     textTheme: TextTheme(
       headline6: TextStyle(
         color: Colors.white,
@@ -44,6 +46,10 @@ ThemeData darkTheme= ThemeData(
     ),
   ),
   fontFamily: 'Roboto',
+  buttonColor: Colors.blueGrey,
+  buttonBarTheme: ButtonBarThemeData(
+    buttonTextTheme: ButtonTextTheme.normal,
+  ),
   bottomNavigationBarTheme: BottomNavigationBarThemeData(
     backgroundColor: Colors.white.withOpacity(0.16),
     selectedItemColor: Colors.white.withOpacity(0.7),

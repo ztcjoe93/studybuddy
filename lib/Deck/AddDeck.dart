@@ -110,7 +110,9 @@ class _AddDeckState extends State<AddDeck> {
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               filled: true,
-                              fillColor: Colors.grey.shade200,
+                              fillColor: Theme.of(context).brightness == Brightness.light
+                                ? Colors.grey.shade200
+                                : Colors.grey.shade800,
                               hintText: "Enter a name for your deck here!",
                             ),
                           ),
@@ -137,7 +139,9 @@ class _AddDeckState extends State<AddDeck> {
                             decoration: InputDecoration(
                               border: InputBorder.none,
                               filled: true,
-                              fillColor: Colors.grey.shade200,
+                              fillColor: Theme.of(context).brightness == Brightness.light
+                                  ? Colors.grey.shade200
+                                  : Colors.grey.shade800,
                               hintText: "You can enter a tag to associate your deck here!",
                             ),
                           ),
@@ -165,7 +169,9 @@ class _AddDeckState extends State<AddDeck> {
                           child: Consumer<DecksState>(
                             builder: (context, deckState, child) => Container(
                               decoration: BoxDecoration(
-                                color: Colors.grey.shade200,
+                                color: Theme.of(context).brightness == Brightness.light
+                                    ? Colors.grey.shade200
+                                    : Colors.grey.shade800,
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               width: MediaQuery.of(context).size.width * 0.35,
