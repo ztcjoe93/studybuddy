@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Database.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 import 'package:studybuddy/Widgets/LoadingBlocks.dart';
 
@@ -24,6 +25,8 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
   AnimationController _controller;
   TextEditingController inputField = TextEditingController();
   Color fieldColor;
+  bool buttonProcessing = false;
+  bool validity;
 
   String display = "";
   String topDisplay = "";
@@ -58,6 +61,15 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
     super.dispose();
   }
 
+  void resetFields(BuildContext context){
+    setState(() {
+      buttonProcessing = false;
+      inputField.clear();
+      fieldColor = Theme.of(context).brightness == Brightness.light
+          ? Colors.grey.shade200 : Colors.grey.shade800;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -68,6 +80,8 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
     );
 
     // shuffle cards for deck
+    fieldColor = Provider.of<OverallState>(context, listen:false).brightness
+      ? Colors.grey.shade800 : Colors.grey.shade200;
     cards = widget.deck.cards;
     cards.shuffle();
 
@@ -182,6 +196,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                 ],
               ),
             ),
+            // tick and cross confirmation
             Expanded(
               flex: 1,
               child: _revealed
@@ -244,68 +259,116 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
         );
       } else {
         // input-based revision
-        fieldColor = Theme.of(context).brightness == Brightness.light
-          ? Colors.grey.shade200 : Colors.grey.shade800;
-
         return Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Card(
-              child: Container(
-                height: 200,
-                width: 400,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        topDisplay,
-                        style: Theme.of(context).textTheme.headline4,
+            Column(
+              children: [
+                Card(
+                  child: Container(
+                    height: 200,
+                    width: 400,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "FRONT",
+                            style: Theme.of(context).textTheme.headline4,
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              display,
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                          SizedBox(),
+                        ],
                       ),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                        child: Text(
-                          display,
-                          textAlign: TextAlign.center,
-                          style: Theme.of(context).textTheme.headline6,
-                          overflow: TextOverflow.visible,
-                        ),
-                      ),
-                      SizedBox(),
-                    ],
+                    ),
                   ),
                 ),
-              ),
-            ),
-            SizedBox(height: 16.0),
-            TextField(
-              controller: inputField,
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                filled: true,
-                fillColor: fieldColor,
-                hintText: "Enter your input here!",
-              ),
-              minLines: 2,
-              maxLines: 2,
-            ),
-            RaisedButton(
-              onPressed: () async {
-                bool validity = inputField.text == cards[_index].back;
-                /*
-                fieldColor = validity
-                    ? Colors.lightGreen.shade200 : Colors.redAccent.shade200;
-                 */
-                setState(() {
-                  fieldColor = Colors.red;
-                  Future.delayed(Duration(seconds: 1), (){
-                    recordResult(validity);
-                    inputField.clear();
-                  });
-                });
-                // clear field for next card
-              },
-              child: Text("Next"),
+                SizedBox(height: 16.0),
+                TextField(
+                  controller: inputField,
+                  enabled: !_revealed,
+                  decoration: InputDecoration(
+                    border: InputBorder.none,
+                    filled: true,
+                    fillColor: fieldColor,
+                    hintText: "Enter your input here!",
+                  ),
+                  // to disable textfield after submission
+                  minLines: 2,
+                  maxLines: 2,
+                ),
+                SizedBox(height: 16.0),
+                Card(
+                  child: Container(
+                    height: 100,
+                    width: 400,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                            child: Text(
+                              _revealed ? cards[_index].back : "",
+                              textAlign: TextAlign.center,
+                              style: Theme.of(context).textTheme.headline6,
+                              overflow: TextOverflow.visible,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16.0),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    for(int i=0; i < cards.length; i++)
+                      Container(
+                        width: _index == i ? 10.0 : 6.0,
+                        height: _index == i ? 10.0 : 6.0,
+                        margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: _index == i ? Colors.blueGrey: Colors.grey,
+                        ),
+                      )
+                  ],
+                ),
+                SizedBox(height: 16.0),
+                RaisedButton(
+                  onPressed: (){
+                    if(_revealed){
+                      setState(() {
+                        _revealed = false;
+                        recordResult(validity);
+                        resetFields(context);
+                      });
+                    } else {
+                      setState(() {
+                        _revealed = true;
+                        validity = (inputField.text == cards[_index].back);
+                        fieldColor = validity
+                            ? Colors.lightGreen.shade200
+                            : Colors.redAccent.shade200;
+                      });
+                    }
+                    // clear field for next card
+                  },
+                  child: Text(_revealed ? "Next" : "Verify"),
+                ),
+              ],
             ),
             RaisedButton(
               onPressed: (){
@@ -330,6 +393,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
         onWillPop: () async => false,
         child: SafeArea(
           child: Scaffold(
+            resizeToAvoidBottomPadding: false,
             body: Padding(
               padding: EdgeInsets.symmetric(
                 horizontal: MediaQuery.of(context).size.width * 0.05,

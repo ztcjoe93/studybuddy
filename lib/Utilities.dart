@@ -8,3 +8,14 @@ ranStr(int length){
       length, (_) => _chars.codeUnitAt(_ran.nextInt(length)))
   );
 }
+
+firstUpper(String s){
+  if(s.length < 2){
+    return s.toUpperCase();
+  } else if (s.length < 1){
+    return null;
+  } else {
+    var f = s.substring(0, 1).toUpperCase();
+    return f + s.substring(1);
+  }
+}

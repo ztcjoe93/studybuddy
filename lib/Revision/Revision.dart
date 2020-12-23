@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 
+import '../Utilities.dart';
 import '../Providers/DecksState.dart';
 import 'RevisionSession.dart';
 
@@ -33,7 +34,10 @@ class _RevisionState extends State<Revision> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(Provider.of<OverallState>(context, listen: true).revision),
+              Padding(
+                padding: const EdgeInsets.only(left: 24.0),
+                child: Text("Revision mode: ${firstUpper(Provider.of<OverallState>(context, listen: true).revision)}"),
+              ),
               Container(
                 width: MediaQuery.of(context).size.width * 0.35,
                 padding: EdgeInsets.symmetric(
