@@ -45,7 +45,8 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
   int _selectedIdx = 0;
 
   List<String> categories = [
-    "HOME", "DECK MANAGEMENT", "REVISION",
+    //"HOME",
+    "DECK MANAGEMENT", "REVISION",
     "STATISTICS", "OPTIONS",
   ];
 
@@ -54,8 +55,9 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     final _darkMode = prefs.getBool('darkMode') ?? false;
     final _lowerLimit = prefs.getInt('lowerLimit') ?? 50;
     final _upperLimit = prefs.getInt('upperLimit') ?? 75;
+    final _revisionStyle = prefs.getString('revisionStyle') ?? 'flip';
 
-    Provider.of<OverallState>(context, listen: false).setOptions(_darkMode, _lowerLimit, _upperLimit);
+    Provider.of<OverallState>(context, listen: false).setOptions(_darkMode, _lowerLimit, _upperLimit, _revisionStyle);
 
     await DBProvider.db.initializeDatabase();
     Provider.of<DecksState>(context, listen:false).loadFromDatabase();
@@ -99,7 +101,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
           body: IndexedStack(
             children: [
-              HomePage(),
+              //HomePage(),
               DeckManagement(),
               Revision(),
               Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
@@ -109,13 +111,15 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: [
+              /*
               BottomNavigationBarItem(
                 icon: Icon(Icons.home),
                 label: "Home",
               ),
+               */
               BottomNavigationBarItem(
                 icon: Icon(Icons.layers),
-                label: "Deck",
+                label: "Decks",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.assignment),
@@ -123,7 +127,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.equalizer),
-                label: "Stats",
+                label: "Statistics",
               ),
               BottomNavigationBarItem(
                 icon: Icon(Icons.settings),

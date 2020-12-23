@@ -175,20 +175,23 @@ class _AddDeckState extends State<AddDeck> {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               width: MediaQuery.of(context).size.width * 0.35,
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 16.0, right: 8.0),
-                                child: DropdownButton(
-                                  isExpanded: true,
-                                  value: _tag,
-                                  icon: Icon(Icons.arrow_drop_down),
-                                  underline: SizedBox(),
-                                  onChanged: (val){
-                                    tagController.text = val;
-                                    setState(() {
-                                      _tag = val;
-                                    });
-                                  },
-                                  items: deckState.tagFilters(emptyIncluded: true),
+                              child: ButtonTheme(
+                                alignedDropdown: true,
+                                child: Padding(
+                                  padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                                  child: DropdownButton(
+                                    isExpanded: true,
+                                    value: _tag,
+                                    icon: Icon(Icons.arrow_drop_down),
+                                    underline: SizedBox(),
+                                    onChanged: (val){
+                                      tagController.text = val;
+                                      setState(() {
+                                        _tag = val;
+                                      });
+                                    },
+                                    items: deckState.tagFilters(emptyIncluded: true),
+                                  ),
                                 ),
                               ),
                             ),

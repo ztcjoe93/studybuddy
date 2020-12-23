@@ -220,9 +220,9 @@ class _StatsState extends State<Stats> {
                                             .getDeckFromId(resultSet[index])
                                             .name,
                                         style: TextStyle(
-                                            color: _selectedDeck ==
-                                                resultSet[index]
-                                                ? Colors.white : Colors.black
+                                          color: _selectedDeck ==
+                                              resultSet[index]
+                                              ? Colors.white : Colors.black
                                         ),
                                       ),
                                     ),

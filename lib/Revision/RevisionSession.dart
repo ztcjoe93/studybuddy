@@ -131,9 +131,14 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                                     topDisplay,
                                     style: Theme.of(context).textTheme.headline4,
                                   ),
-                                  Text(
-                                    display,
-                                    style: Theme.of(context).textTheme.headline6,
+                                  Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                                    child: Text(
+                                      display,
+                                      textAlign: TextAlign.center,
+                                      style: Theme.of(context).textTheme.headline6,
+                                      overflow: TextOverflow.visible,
+                                    ),
                                   ),
                                   Text("Swipe left or right to flip to the other side"),
                                 ],
@@ -159,7 +164,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                     margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: _index == i ? Colors.black : Colors.grey,
+                      color: _index == i ? Colors.blueGrey: Colors.grey,
                     ),
                   )
               ],

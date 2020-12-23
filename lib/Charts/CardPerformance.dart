@@ -324,27 +324,42 @@ class _CardPerformanceState extends State<CardPerformance> {
                        children: [
                          Expanded(
                            flex: 1,
-                           child: Text("${consolidatedList[index]['front']}"),
+                           child: Padding(
+                             padding: EdgeInsets.only(right: 10.0),
+                             child: Text("${consolidatedList[index]['front']}"),
+                           ),
                          ),
                          Expanded(
                            flex: 1,
-                           child: Text("${consolidatedList[index]['back']}"),
+                           child: Padding(
+                             padding: EdgeInsets.only(right: 10.0),
+                             child: Text("${consolidatedList[index]['back']}"),
+                           ),
                          ),
                          Expanded(
                            flex: 2,
-                           child: Center(
-                             child: Text(
-                               "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                           child: Padding(
+                             padding: EdgeInsets.only(right: 10.0),
+                             child: Center(
+                               child: Text(
+                                 "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                               ),
                              ),
                            ),
                          ),
                          Expanded(
                            flex: 1,
-                           child: Center(child: Text("${consolidatedList[index]['score']}")),
+                           child: Padding(
+                             padding: EdgeInsets.only(right: 10.0),
+                             child: Center(child: Text("${consolidatedList[index]['score']}")),
+                           ),
                          ),
                          Expanded(
                            flex: 1,
-                           child: Center(child: Text("${consolidatedList[index]['tries']}")),
+                           child: Padding(
+                             padding: EdgeInsets.only(right: 10.0),
+                             child: Center(child: Text("${consolidatedList[index]['tries']}")),
+                           ),
                          ),
                        ],
                      )

@@ -54,113 +54,119 @@ class _AddCardState extends State<AddCard> {
       ),
       child: Column(
         children: [
-          Align(
-            alignment: Alignment.centerLeft,
-            child: Text(
-              "Add a card",
-              style: TextStyle(
-                fontSize: Theme.of(context).textTheme.headline4.fontSize,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              maxHeight: MediaQuery.of(context).size.height * 0.45,
-            ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  SizedBox(height: 24.0),
-                  Divider(height: 2.0),
-                  // alignment to prevent clipping of textfield label
-                  Padding(
-                    padding: const EdgeInsets.only(bottom: 16.0),
+          Expanded(
+            child: Column(
+              children: [
+                Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    "Add a card",
+                    style: TextStyle(
+                      fontSize: Theme.of(context).textTheme.headline4.fontSize,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+                ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(context).size.height * 0.425,
+                  ),
+                  child: Form(
+                    key: _formKey,
                     child: Column(
                       children: [
+                        SizedBox(height: 24.0),
+                        Divider(height: 2.0),
+                        // alignment to prevent clipping of textfield label
                         Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 8.0),
-                          child: Text(
-                            "FRONT",
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                              fontWeight: FontWeight.bold,
-                            )
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                    "FRONT",
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                              ),
+                              TextFormField(
+                                controller: frontTextController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  filled: true,
+                                  fillColor: Theme.of(context).brightness == Brightness.light
+                                      ? Colors.grey.shade200
+                                      : Colors.grey.shade600,
+                                  hintText: "Enter text for the front side of your card here!",
+                                ),
+                                validator: (value) => _fieldValidator(value, true),
+                                minLines: 3,
+                                maxLines: 3,
+                              ),
+                            ],
                           ),
                         ),
-                        TextFormField(
-                          controller: frontTextController,
-                          decoration: InputDecoration(
-                            border: InputBorder.none,
-                            filled: true,
-                            fillColor: Theme.of(context).brightness == Brightness.light
-                              ? Colors.grey.shade200
-                              : Colors.grey.shade600,
-                            hintText: "Enter text for the front side of your card here!",
-                          ),
-                          validator: (value) => _fieldValidator(value, true),
-                          minLines: 5,
-                          maxLines: 5,
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                  "BACK",
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                    fontWeight: FontWeight.bold,
+                                  )
+                              ),
+                            ),
+                            TextFormField(
+                              controller: backTextController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                filled: true,
+                                fillColor: Theme.of(context).brightness == Brightness.light
+                                    ? Colors.grey.shade200
+                                    : Colors.grey.shade600,
+                                hintText: "Enter text for the back side of your card here!",
+                              ),
+                              validator: (value) => _fieldValidator(value, false),
+                              minLines: 5,
+                              maxLines: 5,
+                            ),
+                          ],
                         ),
                       ],
                     ),
                   ),
-                  Column(
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Text(
-                            "BACK",
-                            style: TextStyle(
-                              fontSize: Theme.of(context).textTheme.headline6.fontSize,
-                              fontWeight: FontWeight.bold,
-                            )
-                        ),
-                      ),
-                      TextFormField(
-                        controller: backTextController,
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          filled: true,
-                          fillColor: Theme.of(context).brightness == Brightness.light
-                              ? Colors.grey.shade200
-                              : Colors.grey.shade600,
-                          hintText: "Enter text for the back side of your card here!",
-                        ),
-                        validator: (value) => _fieldValidator(value, false),
-                        minLines: 5,
-                        maxLines: 5,
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+                ),
+                Divider(height: 2.0),
+                ButtonBar(
+                  alignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    RaisedButton(
+                      onPressed: () async {
+                        if (_formKey.currentState.validate()){
+                          FlashCard card = FlashCard(
+                            await DBProvider.db.getNewRow("card"),
+                            frontTextController.text,
+                            backTextController.text,
+                          );
+                          Navigator.of(context).pop(card);
+                        }
+                      },
+                      child: Text("Add"),
+                    ),
+                    RaisedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      child: Text("Cancel"),
+                    ),
+                  ],
+                ),
+              ],
             ),
-          ),
-          Divider(height: 2.0),
-          ButtonBar(
-            alignment: MainAxisAlignment.spaceAround,
-            children: [
-              RaisedButton(
-                onPressed: () async {
-                  if (_formKey.currentState.validate()){
-                    FlashCard card = FlashCard(
-                      await DBProvider.db.getNewRow("card"),
-                      frontTextController.text,
-                      backTextController.text,
-                    );
-                    Navigator.of(context).pop(card);
-                  }
-                },
-                child: Text("Add"),
-              ),
-              RaisedButton(
-                onPressed: () => Navigator.of(context).pop(),
-                child: Text("Cancel"),
-              ),
-            ],
-          ),
+          )
         ],
       ),
     );

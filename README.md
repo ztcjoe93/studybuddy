@@ -1,10 +1,10 @@
 # Study Buddy
 
-Convenience application where flash cards are used for memorization.
+Simple convenience application built in Flutter where flash cards are used for revision.
 
 ## Environment
 
-- Flutter 1.20.3
+- Flutter 1.22.4
 - Android Studio 4.0
 
 ## Packages
@@ -15,20 +15,22 @@ Convenience application where flash cards are used for memorization.
 - charts_flutter ^0.9.0 (native Dart-based data visualization library)
 - shared_preferences (persistence storage for options)
 - sqflite ^1.3.0 (database)
-- faker ^1.2.1 (testing purposes)
+- animations ^1.1.2
+- flutter_launcher_icons ^0.8.0
+- image: ^2.1.19
 
 ## Features
 
 - [x] Decks to collate cards for revision
-- [x] Tagging for decks for filtering purposes
+- [x] Tagging for decks
 - [x] Revision sessions for deck and card scoring
-- [x] Performance measurement for each card
-- [x] Performance measurement for each deck
+- [x] Performance measurement for cards
+- [x] Performance measurement for decks
 - [x] Allow users to set their own performance thresholds
+- [x] Dark mode
+- [x] Frontend design and animations
 
 ## In progress
-- [ ] Dark mode
-- [ ] Frontend design and animations
 - [ ] Input-verification for revision sessions
 - [ ] Push notifications for options
 

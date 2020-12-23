@@ -124,9 +124,7 @@ class _CardsManagementState extends State<CardsManagement> {
                                         content: RichText(
                                             text: TextSpan(
                                               text: "Do you wish to delete this deck?\n\n",
-                                              style: TextStyle(
-                                                fontSize: Theme.of(context).textTheme.bodyText1.fontSize * 1.05,
-                                              ),
+                                              style: Theme.of(context).textTheme.bodyText1,
                                               children: [
                                                 TextSpan(
                                                   text: "* Note that all related results will be removed",
@@ -176,6 +174,7 @@ class _CardsManagementState extends State<CardsManagement> {
                                 controller: _scrollController,
                                 itemBuilder: (BuildContext context, int index) =>
                                     Card(
+                                      semanticContainer: true,
                                       margin: EdgeInsets.only(
                                         top: 5.0,
                                         bottom: 5.0,

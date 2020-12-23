@@ -8,6 +8,9 @@ ThemeData lightTheme = ThemeData(
   primaryColorDark: Color(0xFF9ea7aa),
   appBarTheme: AppBarTheme(
     textTheme: TextTheme(
+      bodyText1: TextStyle(
+        color: Colors.black,
+      ),
       headline4: TextStyle(
         color: Colors.black,
       ),
