@@ -55,7 +55,7 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     final _darkMode = prefs.getBool('darkMode') ?? false;
     final _lowerLimit = prefs.getInt('lowerLimit') ?? 50;
     final _upperLimit = prefs.getInt('upperLimit') ?? 75;
-    final _revisionStyle = prefs.getString('revisionStyle') ?? 'flip';
+    final _revisionStyle = prefs.getString('revisionStyle') ?? 'standard';
 
     Provider.of<OverallState>(context, listen: false).setOptions(_darkMode, _lowerLimit, _upperLimit, _revisionStyle);
 

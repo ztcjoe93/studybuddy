@@ -2,9 +2,10 @@ import 'package:animations/animations.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
-import 'package:studybuddy/Revision/RevisionSession.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
 
 import '../Providers/DecksState.dart';
+import 'RevisionSession.dart';
 
 class Revision extends StatefulWidget {
   @override
@@ -30,8 +31,9 @@ class _RevisionState extends State<Revision> {
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.025),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(Provider.of<OverallState>(context, listen: true).revision),
               Container(
                 width: MediaQuery.of(context).size.width * 0.35,
                 padding: EdgeInsets.symmetric(
@@ -133,7 +135,8 @@ class _RevisionState extends State<Revision> {
                                   );
                                 },
                                 openBuilder: (context, action){
-                                  return RevisionSession(availableDecks[index]);
+                                  var revisionStyle = Provider.of<OverallState>(context, listen:true).revision;
+                                  return RevisionSession(availableDecks[index], revisionStyle);
                                 },
                               ),
                             ),

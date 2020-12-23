@@ -184,7 +184,7 @@ class _OptionsState extends State<Options> {
                             children: [
                               RadioListTile<String>(
                                 title: Text('Standard'),
-                                value: "flip",
+                                value: "standard",
                                 groupValue: _revisionStyle,
                                 onChanged: (String value){
                                   setState(() {
