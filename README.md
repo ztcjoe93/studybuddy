@@ -29,9 +29,10 @@ Simple convenience application built in Flutter where flash cards are used for r
 - [x] Allow users to set their own performance thresholds
 - [x] Dark mode
 - [x] Frontend design and animations
+- [x] Standard/Input-style revision modes
+- [x] Changelogs
 
 ## In progress
-- [ ] Input-verification for revision sessions
 - [ ] Push notifications for options
 
 ## Licensing

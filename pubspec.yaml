@@ -19,6 +19,7 @@ dependencies:
   animations: ^1.1.2
   flutter_launcher_icons: ^0.8.0
   image: ^2.1.19
+  flutter_markdown: ^0.5.1
 
 dev_dependencies:
   flutter_test:
@@ -35,6 +36,7 @@ flutter:
   uses-material-design: true
   assets:
     - assets/
+    - logs/
   fonts:
     - family: Langar
       fonts:
