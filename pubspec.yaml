@@ -20,6 +20,8 @@ dependencies:
   flutter_launcher_icons: ^0.8.0
   image: ^2.1.19
   flutter_markdown: ^0.5.1
+  flutter_local_notifications: ^3.0.2
+  rxdart: ^0.25.0
 
 dev_dependencies:
   flutter_test:

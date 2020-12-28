@@ -1,10 +1,15 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 import 'package:studybuddy/Widgets/SplashScreen.dart';
+import 'package:rxdart/subjects.dart';
+import 'package:timezone/data/latest.dart' as tz;
+import 'package:timezone/timezone.dart' as tz;
 
 import 'Database.dart';
 import 'Deck/DeckManagement.dart';
@@ -15,10 +20,63 @@ import 'Providers/DecksState.dart';
 import 'Revision/Revision.dart';
 import 'Stats/Stats.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+/// Streams are created so that app can respond to notification-related events
+/// since the plugin is initialised in the `main` function
+final BehaviorSubject<ReceivedNotification> didReceiveLocalNotificationSubject =
+  BehaviorSubject<ReceivedNotification>();
+
+final BehaviorSubject<String> selectNotificationSubject =
+  BehaviorSubject<String>();
+
+const MethodChannel platform =
+  MethodChannel('ztcjoe93.studybuddy');
+
+class ReceivedNotification {
+  ReceivedNotification({
+    @required this.id,
+    @required this.title,
+    @required this.body,
+    @required this.payload,
+  });
+
+  final int id;
+  final String title;
+  final String body;
+  final String payload;
+}
+
+Future<void> _configureLocalTimeZone() async {
+  tz.initializeTimeZones();
+  final String timeZoneName = await platform.invokeMethod('getTimeZoneName');
+  tz.setLocalLocation(tz.getLocation(timeZoneName));
+}
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   var p = await SharedPreferences.getInstance();
-  var x = p.getBool('darkMode');
+  var x = p.getBool('darkMode') ?? false;
+  await _configureLocalTimeZone();
+
+  final NotificationAppLaunchDetails notificationAppLaunchDetails =
+    await flutterLocalNotificationsPlugin.getNotificationAppLaunchDetails();
+
+  const AndroidInitializationSettings initializationSettingsAndroid =
+    AndroidInitializationSettings('app_icon');
+
+  final InitializationSettings initializationSettings = InitializationSettings(
+    android: initializationSettingsAndroid,
+  );
+
+  await flutterLocalNotificationsPlugin.initialize(initializationSettings,
+      onSelectNotification: (String payload) async {
+        if (payload != null) {
+          debugPrint('notification payload: $payload');
+        }
+        selectNotificationSubject.add(payload);
+      });
   runApp(
     MultiProvider(
       providers: [
@@ -50,14 +108,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
     "STATISTICS", "OPTIONS",
   ];
 
+
   initializeAll() async{
     final prefs = await SharedPreferences.getInstance();
-    final _darkMode = prefs.getBool('darkMode') ?? false;
-    final _lowerLimit = prefs.getInt('lowerLimit') ?? 50;
-    final _upperLimit = prefs.getInt('upperLimit') ?? 75;
-    final _revisionStyle = prefs.getString('revisionStyle') ?? 'standard';
 
-    Provider.of<OverallState>(context, listen: false).setOptions(_darkMode, _lowerLimit, _upperLimit, _revisionStyle);
+    Provider.of<OverallState>(context, listen: false).getValuesFromPreferences();
+    Provider.of<OverallState>(context, listen: false).setOptions();
 
     await DBProvider.db.initializeDatabase();
     Provider.of<DecksState>(context, listen:false).loadFromDatabase();
@@ -87,8 +143,10 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
         theme: lightTheme,
         darkTheme: darkTheme,
         themeMode: _ready
-            ? Provider.of<OverallState>(context, listen: false).brightness ? ThemeMode.dark : ThemeMode.light
-            : widget.t ? ThemeMode.dark : ThemeMode.light,
+            ? Provider.of<OverallState>(context, listen: true).darkMode
+              ? ThemeMode.dark : ThemeMode.light
+            : widget.t
+              ? ThemeMode.dark : ThemeMode.light,
         home: _ready
             ? Scaffold(
           appBar: AppBar(
@@ -105,18 +163,12 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               DeckManagement(),
               Revision(),
               Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
-              Options(),
+              Options(flutterLocalNotificationsPlugin),
             ],
             index: _selectedIdx,
           ),
           bottomNavigationBar: BottomNavigationBar(
             items: [
-              /*
-              BottomNavigationBarItem(
-                icon: Icon(Icons.home),
-                label: "Home",
-              ),
-               */
               BottomNavigationBarItem(
                 icon: Icon(Icons.layers),
                 label: "Decks",

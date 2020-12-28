@@ -14,10 +14,11 @@ Simple convenience application built in Flutter where flash cards are used for r
 - intl ^0.16.1 (date/time formatting and parsing)
 - charts_flutter ^0.9.0 (native Dart-based data visualization library)
 - shared_preferences (persistence storage for options)
-- sqflite ^1.3.0 (database)
-- animations ^1.1.2
-- flutter_launcher_icons ^0.8.0
-- image: ^2.1.19
+- sqflite ^1.3.0 (persistence storage for cards/decks/results)
+- animations ^1.1.2 (front-end animations/transitions)
+- flutter_launcher_icons ^0.8.0 (app icon generation purposes)
+- image: ^2.1.19 (launcher_icon dependency)
+- flutter_markdown: ^0.5.1 (markdown parser for changelog)
 
 ## Features
 

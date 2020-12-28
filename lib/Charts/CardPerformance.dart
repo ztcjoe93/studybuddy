@@ -167,7 +167,7 @@ class _CardPerformanceState extends State<CardPerformance> {
             charts.ArcLabelDecorator(
               outsideLabelStyleSpec: charts.TextStyleSpec(
                 color: charts.ColorUtil.fromDartColor(
-                  Provider.of<OverallState>(context, listen:false).brightness
+                  Provider.of<OverallState>(context, listen:false).darkMode
                     ? Colors.white : Colors.black,
                 ),
                 fontSize: 12,

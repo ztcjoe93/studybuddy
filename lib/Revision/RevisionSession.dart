@@ -80,7 +80,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
     );
 
     // shuffle cards for deck
-    fieldColor = Provider.of<OverallState>(context, listen:false).brightness
+    fieldColor = Provider.of<OverallState>(context, listen:false).darkMode
       ? Colors.grey.shade800 : Colors.grey.shade200;
     cards = widget.deck.cards;
     cards.shuffle();

@@ -175,7 +175,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                     behaviorPosition: charts.BehaviorPosition.top,
                     titleOutsideJustification: charts.OutsideJustification.start,
                     titleStyleSpec: charts.TextStyleSpec(
-                      color: Provider.of<OverallState>(context, listen: false).brightness
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
                           ? charts.MaterialPalette.white : charts.MaterialPalette.black,
                       fontSize: 14,
                     ),
@@ -185,7 +185,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                     behaviorPosition: charts.BehaviorPosition.bottom,
                     titleOutsideJustification: charts.OutsideJustification.endDrawArea,
                     titleStyleSpec: charts.TextStyleSpec(
-                      color: Provider.of<OverallState>(context, listen: false).brightness
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
                           ? charts.MaterialPalette.white : charts.MaterialPalette.black,
                       fontSize: 14,
                     ),
@@ -198,7 +198,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                       color: charts.MaterialPalette.gray.shade300,
                     ),
                     labelStyle: charts.TextStyleSpec(
-                      color: Provider.of<OverallState>(context, listen: false).brightness
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
                           ? charts.MaterialPalette.white : charts.MaterialPalette.black,
                     ),
                   ),
@@ -217,7 +217,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                 domainAxis: charts.EndPointsTimeAxisSpec(
                   renderSpec: charts.GridlineRendererSpec(
                     labelStyle: charts.TextStyleSpec(
-                      color: Provider.of<OverallState>(context, listen: false).brightness
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
                         ? charts.MaterialPalette.white : charts.MaterialPalette.black,
                     ),
                   ),
