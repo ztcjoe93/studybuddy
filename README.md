@@ -19,6 +19,8 @@ Simple convenience application built in Flutter where flash cards are used for r
 - flutter_launcher_icons ^0.8.0 (app icon generation purposes)
 - image: ^2.1.19 (launcher_icon dependency)
 - flutter_markdown: ^0.5.1 (markdown parser for changelog)
+- flutter_local_notifications: ^3.0.2 (local push notifications for reminder)
+- rxdart: ^0.25.0 (dart streams - for local_notif)
 
 ## Features
 
@@ -32,9 +34,10 @@ Simple convenience application built in Flutter where flash cards are used for r
 - [x] Frontend design and animations
 - [x] Standard/Input-style revision modes
 - [x] Changelogs
+- [x] Local push notifications for reminder
 
 ## In progress
-- [ ] Push notifications for options
+- [ ] Alignment of all widgets across different screen sizes 
 
 ## Licensing
 

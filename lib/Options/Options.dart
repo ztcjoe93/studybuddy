@@ -215,6 +215,7 @@ class _OptionsState extends State<Options> {
                  showDialog(
                    context: context,
                    builder: (BuildContext context) {
+                     var prov = Provider.of<OverallState>(context, listen:true);
                      return StatefulBuilder(
                        builder: (context, state) => SimpleDialog(
                          children: [
@@ -223,22 +224,22 @@ class _OptionsState extends State<Options> {
                               RadioListTile<String>(
                                 title: Text('Standard'),
                                 value: "standard",
-                                groupValue: _revisionStyle,
+                                groupValue: prov.revisionStyle,
                                 onChanged: (String value){
                                   setState(() {
-                                    _revisionStyle = value;
-                                    updatePreferences();
+                                    prov.revisionStyle = value;
+                                    prov.setOptions();
                                   });
                                 },
                               ),
                               RadioListTile<String>(
                                 title: Text('Input-based'),
                                 value: "input",
-                                groupValue: _revisionStyle,
+                                groupValue: prov.revisionStyle,
                                 onChanged: (String value){
                                   setState(() {
-                                    _revisionStyle = value;
-                                    updatePreferences();
+                                    prov.revisionStyle = value;
+                                    prov.setOptions();
                                   });
                                 },
                               ),

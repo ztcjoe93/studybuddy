@@ -36,7 +36,13 @@ class _RevisionState extends State<Revision> {
             children: [
               Padding(
                 padding: const EdgeInsets.only(left: 24.0),
-                child: Text("Revision mode: ${firstUpper(Provider.of<OverallState>(context, listen: true).revisionStyle)}"),
+                child: Text(
+                  "Revision mode: "
+                  "${firstUpper(Provider.of<OverallState>(context, listen: true).revisionStyle)}",
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
               Container(
                 width: MediaQuery.of(context).size.width * 0.35,
