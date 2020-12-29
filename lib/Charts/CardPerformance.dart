@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Utilities.dart';
 
 class CardPerformance extends StatefulWidget {
-  final List<Result> results;
+  List<Result> results;
   String data;
 
   CardPerformance(this.results, this.data);
@@ -16,8 +17,7 @@ class CardPerformance extends StatefulWidget {
 
 class _CardPerformanceState extends State<CardPerformance> {
   List<dynamic> consolidatedList = [];
-
-  final consolidatedResults = Map();
+  var consolidatedResults = Map();
 
   bool _sorted = false;
   int _selectedCol;
@@ -45,16 +45,18 @@ class _CardPerformanceState extends State<CardPerformance> {
       consolidatedResults[key]['%'] = 100 * (value['score']/value['count']);
     });
 
-    if (consolidatedList.length == 0) {
-      consolidatedList = consolidatedResults.entries.map((r) =>
-      {
-        'front': r.key,
-        'back': r.value['back'],
-        '%': r.value['%'],
-        'score': r.value['score'],
-        'tries': r.value['count'],
-      }
-      ).toList();
+    if (consolidatedList.length >= 0) {
+      setState(() {
+        consolidatedList = consolidatedResults.entries.map((r) =>
+        {
+          'front': r.key,
+          'back': r.value['back'],
+          '%': r.value['%'],
+          'score': r.value['score'],
+          'tries': r.value['count'],
+        }
+        ).toList();
+      });
     }
   }
 
@@ -75,47 +77,6 @@ class _CardPerformanceState extends State<CardPerformance> {
         consolidatedList.sort((a, b) => a[key].compareTo(b[key]));
       }
     });
-  }
-
-  generateListTable(context){
-    //return Text("test");
-    return ListView.builder(
-      itemCount: consolidatedList.length,
-      itemBuilder: (BuildContext context, int index){
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 16.0),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                flex: 1,
-                child: Text("${consolidatedList[index]['front']}"),
-              ),
-              Expanded(
-                flex: 1,
-                child: Text("${consolidatedList[index]['back']}"),
-              ),
-              Expanded(
-                flex: 2,
-                child: Center(
-                  child: Text(
-                    "${consolidatedList[index]['%'].toStringAsFixed(2)}",
-                  ),
-                ),
-              ),
-              Expanded(
-                flex: 1,
-                child: Center(child: Text("${consolidatedList[index]['score']}")),
-              ),
-              Expanded(
-                flex: 1,
-                child: Center(child: Text("${consolidatedList[index]['tries']}")),
-              ),
-             ],
-          ),
-        );
-      },
-    );
   }
 
   generateChart(data){
@@ -145,10 +106,10 @@ class _CardPerformanceState extends State<CardPerformance> {
         id: 'Card Performance',
         colorFn: (dynamic datum, _) => charts.ColorUtil.fromDartColor(
           datum['domain'] == "Great"
-              ? Colors.lightGreen.withOpacity(0.5)
+              ? Colors.lightGreen[300]
               : datum['domain'] == "Good"
-                ? Colors.yellow.withOpacity(0.5)
-                : Colors.redAccent.withOpacity(0.5)
+                ? Colors.amber[300]
+                : Colors.red[300]
         ),
         domainFn: (dynamic datum, _) => datum['domain'],
         measureFn: (dynamic datum, _) => datum['count'],
@@ -162,6 +123,22 @@ class _CardPerformanceState extends State<CardPerformance> {
   }
 
   @override
+  void didUpdateWidget(covariant CardPerformance oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.results.length != oldWidget.results.length){
+      setState(() {
+        oldWidget.results = widget.results;
+        consolidate(context);
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     consolidate(context);
@@ -169,10 +146,12 @@ class _CardPerformanceState extends State<CardPerformance> {
 
   @override
   Widget build(BuildContext context) {
+    // https://github.com/google/charts/issues/277
+    // check charts_flutter/base_chart_state.dart line 72
     if (widget.data == "chart") {
       return charts.PieChart(
         generateChart(consolidatedResults),
-        animate: false,
+        animate: true,
         // https://google.github.io/charts/flutter/example/legends/datum_legend_options
         behaviors: [
           charts.DatumLegend(
@@ -180,29 +159,28 @@ class _CardPerformanceState extends State<CardPerformance> {
             insideJustification: charts.InsideJustification.topEnd,
             horizontalFirst: false,
             desiredMaxRows: 3,
-            cellPadding: EdgeInsets.all(4.0),
+            cellPadding: EdgeInsets.all(2.0),
+            entryTextStyle: charts.TextStyleSpec(
+              fontSize: mqsWidth(context, 0.035).toInt(),
+            )
           ),
         ],
         //defaultInteractions: true,
         defaultRenderer: charts.ArcRendererConfig(
-            arcRendererDecorators: [charts.ArcLabelDecorator()]
+          arcRendererDecorators: [
+            charts.ArcLabelDecorator(
+              outsideLabelStyleSpec: charts.TextStyleSpec(
+                color: charts.ColorUtil.fromDartColor(
+                  Provider.of<OverallState>(context, listen:false).darkMode
+                    ? Colors.white : Colors.black,
+                ),
+                //resize chart labels to cater to smaller screen sized devices
+                fontSize: mqsWidth(context, 0.025).toInt(),
+              ),
+            )
+          ],
+          arcWidth: mqsWidth(context, 0.04).toInt(),
         ),
-        /* for interaction with PieChart
-        selectionModels: [
-          charts.SelectionModelConfig(
-            type: charts.SelectionModelType.info,
-            // check for relevant `domain` key in selectedDatum to filter
-            changedListener: (model){
-              try {
-                _selected = model.selectedDatum.first.datum['domain'];
-                return _selected;
-              } catch(e){
-                print("Tapped on outside of pie chart range.");
-              }
-            },
-          ),
-        ],
-         */
       );
     } else if (widget.data == "list") {
       return Column(
@@ -214,102 +192,47 @@ class _CardPerformanceState extends State<CardPerformance> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "front", 0);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Front"),
-                            if (_selectedCol == 0)
-                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "back", 1);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Back"),
-                            if (_selectedCol == 1)
-                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "%", 2);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Performance (%)"),
-                            if (_selectedCol == 2)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                  for(final i in [
+                    ['front', 0],
+                    ['back', 1],
+                    ['%', 2],
+                    ['score', 3],
+                    ['tries', 4],
+                  ])
+                    Expanded(
+                      flex: 1,
+                      child: InkWell(
+                        highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        onTap: () => sortFunction(_sorted, i[0], i[1]),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: FittedBox(
+                                  child: Text(
+                                    firstUpper(i[0]),
+                                    style: TextStyle(
+                                      fontSize: mqsWidth(context, 0.035)
+                                    )
+                                  ),
+                                ),
                               ),
-                          ],
-                        ),
-                      ),
+                              if(_selectedCol == i[1])
+                                FittedBox(
+                                  child: Icon(
+                                    _sorted
+                                      ? Icons.arrow_drop_down
+                                      : Icons.arrow_drop_up,
+                                  )
+                                )
+                            ],
+                          )
+                        )
+                      )
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "score", 3);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Score"),
-                            if (_selectedCol == 3)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                       sortFunction(_sorted, "tries", 4);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Tries"),
-                            if (_selectedCol == 4)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -325,7 +248,39 @@ class _CardPerformanceState extends State<CardPerformance> {
               ),
               child: Padding(
                 padding: EdgeInsets.all(8.0),
-               child: generateListTable(context),
+               child: ListView.builder(
+                 itemCount: consolidatedList.length,
+                 itemBuilder: (context, index){
+                   return Padding(
+                     padding: EdgeInsets.symmetric(vertical: 16.0),
+                     child: Row(
+                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                       children: [
+                         for(final s in [
+                           "${consolidatedList[index]['front']}",
+                           "${consolidatedList[index]['back']}",
+                           "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                           "${consolidatedList[index]['score']}",
+                           "${consolidatedList[index]['tries']}",
+                         ])
+                           Expanded(
+                             flex: 1,
+                             child: Padding(
+                               padding: EdgeInsets.only(right: 10.0),
+                               child: Center(
+                                 child: Text(
+                                   s,
+                                   textAlign: TextAlign.center,
+                                   style: TextStyle(fontSize: mqsWidth(context, 0.035)),
+                                 ),
+                               ),
+                             ),
+                           ),
+                       ],
+                     )
+                   );
+                 }
+               ),
               ),
             ),
           ),

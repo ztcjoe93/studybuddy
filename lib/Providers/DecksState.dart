@@ -7,11 +7,17 @@ import '../Database.dart';
 class DecksState extends ChangeNotifier{
   List<Deck> decks = [];
 
-  List<DropdownMenuItem> get tagFilters{
+  List<DropdownMenuItem>  tagFilters({bool emptyIncluded}){
     List<String> tags = [];
     for (var deck in decks){
       if(!tags.contains(deck.tag) && deck.tag != ""){
-        tags.add(deck.tag);
+        if (!emptyIncluded){
+          if(deck.cards.length > 0){
+            tags.add(deck.tag);
+          }
+        } else {
+          tags.add(deck.tag);
+        }
       }
     }
 
@@ -23,24 +29,46 @@ class DecksState extends ChangeNotifier{
     ).toList();
   }
 
-  void loadFromDatabase() async {
-    var _decks = await DBProvider.db.decks;
-    var cards = await DBProvider.db.cards;
+  List<String> get tags{
+    List<String> tags = [];
+    for (var deck in decks){
+      if(!tags.contains(deck.tag) && deck.tag != ""){
+        tags.add(deck.tag);
+      }
+    }
 
-    decks = _decks.map<Deck>((deck) =>
-        Deck(
-          deck['deck_id'],
-          deck['deck_name'],
-          deck['deck_tag'],
-         cards
-              .where(
-                  (card) => card['deck_id'] == deck['deck_id'])
-              .toList()
-              .map<FlashCard>(
-                  (filter) => FlashCard(filter['card_id'], filter['front'], filter['back']))
-              .toList(),
-        )
-    ).toList();
+    return tags;
+  }
+
+  void loadFromDatabase() async {
+    var _decks = Map.fromIterable(await DBProvider.db.decks,
+      key: (obj) => obj['deck_id'],
+      value: (obj) => obj,
+    );
+    var _cQuery = await DBProvider.db.cards;
+
+    Map<int, List<dynamic>> _cards = Map();
+    for(dynamic c in _cQuery){
+      if(_cards.containsKey(c['deck_id'])){
+        _cards[c['deck_id']].add(c);
+      } else {
+        _cards[c['deck_id']] = [c];
+      }
+    }
+
+    decks = _decks.keys.map((k) {
+      return Deck(
+        _decks[k]['deck_id'],
+        _decks[k]['deck_name'],
+        _decks[k]['deck_tag'],
+        // check for empty list
+        _cards[_decks[k]['deck_id']] == null
+          ? List<FlashCard>()
+          : _cards[_decks[k]['deck_id']].map<FlashCard>(
+                (f) => FlashCard(f['card_id'], f['front'], f['back'])
+            ).toList(),
+      );
+    }).toList();
 
     notifyListeners();
   }
@@ -82,6 +110,12 @@ class DecksState extends ChangeNotifier{
   }
 
   Deck getDeckFromId(int id) => decks.firstWhere((d) => d.id == id);
+
+  void remove(int deckId) {
+    decks.removeWhere((d) => d.id == deckId);
+    DBProvider.db.delete("deck", "deck_id = ?", [deckId]);
+    notifyListeners();
+  }
 
   void removeCardFromId(int deckId, int cardId){
     decks.firstWhere((d) => d.id == deckId).cards.removeWhere((c) => c.id == cardId);

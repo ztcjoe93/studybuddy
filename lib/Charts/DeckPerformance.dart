@@ -1,11 +1,14 @@
 import 'package:charts_flutter/flutter.dart' as charts;
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Utilities.dart';
 
 import '../Objects/objects.dart';
 
 class DeckPerformance extends StatefulWidget {
-  final List<Result> results;
+  List<Result> results;
   String data;
 
   DeckPerformance(this.results, this.data);
@@ -19,6 +22,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   bool _chartGenerated = false;
 
   consolidate(String type) async {
+    widget.results.sort((a, b) => a.isoTimestamp.compareTo(b.isoTimestamp));
     consolidatedList = [];
 
     widget.results.forEach((result) {
@@ -66,7 +70,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   }
 
   generateListTable(){
-    return ListView.builder(
+    return ListView.separated(
       itemCount: consolidatedList.length,
       itemBuilder: (BuildContext context, int index){
         return InkWell(
@@ -75,22 +79,49 @@ class _DeckPerformanceState extends State<DeckPerformance> {
               context: context,
               builder: (BuildContext context) =>
                 SimpleDialog(
-                  title: Text("${DateFormat.yMd().add_jm().format(consolidatedList[index].session)}"),
+                  title: Text(
+                    "${DateFormat.yMd().add_jm().format(consolidatedList[index].session)}",
+                    style: TextStyle(
+                      fontSize: mqsWidth(context, 0.05),
+                    ),
+                  ),
                   children: [
                     Padding(
                       padding: EdgeInsets.all(16.0),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Performance: ${consolidatedList[index].performance.toStringAsFixed(2)}%"),
-                          Text("No. of Cards: ${consolidatedList[index].totalCards}"),
+                          Text(
+                            "Performance: ${consolidatedList[index].performance.toStringAsFixed(2)}%",
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.035),
+                            ),
+                          ),
+                          Text(
+                            "No. of Cards: ${consolidatedList[index].totalCards}",
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.035),
+                            ),
+                          ),
                           SizedBox(height: 16.0),
                           for (var c in consolidatedList[index].cards)
                             Row(
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                Expanded(child: Text("${c.card.front}")),
-                                Text(c.score ? "◎" : "✘"),
+                                Expanded(
+                                  child: Text(
+                                    "${c.card.front}",
+                                    style: TextStyle(
+                                      fontSize: mqsWidth(context, 0.035),
+                                    ),
+                                  ),
+                                ),
+                                Text(
+                                  c.score ? "◎" : "✘",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
                               ],
                             ),
                         ],
@@ -101,31 +132,52 @@ class _DeckPerformanceState extends State<DeckPerformance> {
             },
           child: Padding(
               padding: const EdgeInsets.symmetric(vertical: 16.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              child: Column(
                 children: [
-                  Expanded(
-                    flex: 3,
-                    child: Text(
-                        "${DateFormat.yMd()
-                            .add_jm()
-                            .format(consolidatedList[index].session)
-                        }"
+                  Padding(
+                    padding: EdgeInsets.only(right: 16.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        FittedBox(
+                          child: Text(
+                            "${DateFormat.yMd()
+                                .add_jm()
+                                .format(consolidatedList[index].session)
+                            }",
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.035),
+                            ),
+                          ),
+                        ),
+                        FittedBox(
+                          child: Center(
+                            child: Text(
+                              "${consolidatedList[index].performance.toStringAsFixed(2)}",
+                              style: TextStyle(
+                                fontSize: mqsWidth(context, 0.035),
+                              ),
+                            ),
+                          ),
+                        ),
+                        FittedBox(
+                          child: Text(
+                            "${consolidatedList[index].totalCards}",
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.035),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                    flex: 2,
-                    child: Text("${consolidatedList[index].performance.toStringAsFixed(2)}"),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: Text("${consolidatedList[index].totalCards}"),
-                  ),
+                  //const Divider(height: 16.0, thickness: 1.0),
                 ],
               ),
             ),
         );
       },
+      separatorBuilder: (BuildContext context, int index) => const Divider(),
     );
   }
 
@@ -136,6 +188,7 @@ class _DeckPerformanceState extends State<DeckPerformance> {
     return [
       charts.Series<dynamic, DateTime>(
         id: 'Deck Performance',
+        colorFn: (_, __) => charts.ColorUtil.fromDartColor(Colors.blueGrey[200]),
         domainFn: (dynamic datum, _) => datum["session"],
         measureFn: (dynamic datum, _) => datum["performance"],
         data: data,
@@ -146,7 +199,6 @@ class _DeckPerformanceState extends State<DeckPerformance> {
   @override
   void initState() {
     super.initState();
-    widget.results.sort((a, b) => a.isoTimestamp.compareTo(b.isoTimestamp));
   }
 
   @override
@@ -159,34 +211,69 @@ class _DeckPerformanceState extends State<DeckPerformance> {
             ?  charts.TimeSeriesChart(
                 snapshot.data,
                 animate: false,
+                defaultInteractions: false,
                 behaviors: [
                   // setting axis labels using charttitle
                   charts.ChartTitle(
                     "%",
                     behaviorPosition: charts.BehaviorPosition.top,
                     titleOutsideJustification: charts.OutsideJustification.start,
+                    titleStyleSpec: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                      fontSize: mqsWidth(context, 0.025).toInt(),
+                    ),
                   ),
                   charts.ChartTitle(
                     "Date",
                     behaviorPosition: charts.BehaviorPosition.bottom,
                     titleOutsideJustification: charts.OutsideJustification.endDrawArea,
+                    titleStyleSpec: charts.TextStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                      fontSize: mqsWidth(context, 0.025).toInt(),
+                    ),
                   ),
                 ],
                 // y-axis formatting
                 primaryMeasureAxis: charts.NumericAxisSpec(
-                    tickProviderSpec: charts.StaticNumericTickProviderSpec(
-                        [
-                          charts.TickSpec(0),
-                          charts.TickSpec(25),
-                          charts.TickSpec(50),
-                          charts.TickSpec(75),
-                          charts.TickSpec(100),
-                        ]
-                    )
+                  renderSpec: charts.GridlineRendererSpec(
+                    lineStyle: charts.LineStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: true).darkMode
+                          ? charts.MaterialPalette.white.darker.darker.darker
+                          : charts.MaterialPalette.gray.shade300,
+                    ),
+                    labelStyle: charts.TextStyleSpec(
+                      fontSize: mqsWidth(context, 0.025).toInt(),
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
+                          ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                    ),
+                  ),
+                  tickProviderSpec: charts.StaticNumericTickProviderSpec(
+                      [
+                        charts.TickSpec(0),
+                        charts.TickSpec(25),
+                        charts.TickSpec(50),
+                        charts.TickSpec(75),
+                        charts.TickSpec(100),
+                      ]
+                  ),
                 ),
 
                 //custom measure axis (increment by day)
                 domainAxis: charts.EndPointsTimeAxisSpec(
+                  renderSpec: charts.GridlineRendererSpec(
+                    lineStyle: charts.LineStyleSpec(
+                      color: Provider.of<OverallState>(context, listen: true).darkMode
+                        ? charts.MaterialPalette.white.darker.darker.darker
+                        : charts.MaterialPalette.gray.shade300,
+                    ),
+                    labelStyle: charts.TextStyleSpec(
+                      fontSize: mqsWidth(context, 0.025).toInt(),
+                      color: Provider.of<OverallState>(context, listen: false).darkMode
+                        ? charts.MaterialPalette.white : charts.MaterialPalette.black,
+                    ),
+                  ),
                   tickFormatterSpec: charts.AutoDateTimeTickFormatterSpec(
                     day: charts.TimeFormatterSpec(
                         format: 'dd/MM', transitionFormat: 'dd/MM'
@@ -204,25 +291,37 @@ class _DeckPerformanceState extends State<DeckPerformance> {
       return FutureBuilder(
         future: consolidate("list"),
         builder: (BuildContext context, AsyncSnapshot snapshot){
-          return snapshot.hasData
-              ? Column(
+          if (snapshot.hasData) {
+            return Column(
                   children: [
                     Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Expanded(
-                            flex: 3,
-                            child: Text("Date/time"),
+                          FittedBox(
+                            child: Text(
+                              "Date/time",
+                              style: TextStyle(
+                                fontSize: mqsWidth(context, 0.035)
+                              ),
+                            ),
                           ),
-                          Expanded(
-                            flex: 2,
-                            child: Text("Performance (%)"),
+                          FittedBox(
+                              child: Text(
+                                "Performance (%)",
+                                style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035)
+                                ),
+                              )
                           ),
-                          Expanded(
-                            flex: 1,
-                            child: Text("Cards"),
+                          FittedBox(
+                              child: Text(
+                                "Cards",
+                                style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035)
+                                ),
+                              ),
                           ),
                         ],
                       ),
@@ -246,8 +345,10 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                       ),
                     ),
                   ],
-                )
-              : Center(child: CircularProgressIndicator());
+                );
+          } else {
+            return Center(child: CircularProgressIndicator());
+          }
         },
       );
     }

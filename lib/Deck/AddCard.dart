@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:studybuddy/Providers/DecksState.dart';
 
 import '../Database.dart';
 import '../Objects/objects.dart';
@@ -13,129 +15,154 @@ class AddCard extends StatefulWidget {
 }
 
 class _AddCardState extends State<AddCard> {
+  List<FlashCard> fcList;
+  final _formKey = GlobalKey<FormState>();
   TextEditingController frontTextController = TextEditingController();
   TextEditingController backTextController = TextEditingController();
-
-  FocusNode frontNode = FocusNode();
-  FocusNode backNode= FocusNode();
-
-  bool _emptyFront = false;
-  bool _emptyBack= false;
-
-  PageController pageController = PageController(
-    initialPage: 0,
-  );
 
   @override
   void dispose() {
     frontTextController.dispose();
     backTextController.dispose();
-    pageController.dispose();
     super.dispose();
   }
 
   @override
+  void initState() {
+    super.initState();
+    fcList = Provider.of<DecksState>(context, listen: false).getDeckFromId(widget.deckId).cards;
+  }
+
+  _fieldValidator(String value, bool front){
+    // check if it's empty, then check for duplicates
+    if (value.isEmpty){
+      return 'This field is empty, please enter something here.';
+    } else if (value.isNotEmpty){
+      if (front && fcList.firstWhere((e)=>e.front==frontTextController.text,orElse:()=>null) != null){
+        return 'A card with this text exists, please use some other text.';
+      }
+    }
+    return null;
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      child: GestureDetector(
-        onTap: () {
-          FocusManager.instance.primaryFocus.unfocus();
-        },
-        child: Scaffold(
-          body: Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: MediaQuery.of(context).size.height * 0.05,
-              horizontal: MediaQuery.of(context).size.width * 0.05,
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.05,
+          horizontal: MediaQuery.of(context).size.width * 0.05,
+        ),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Add a card",
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headline4.fontSize,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-            child: ListView(
+            Divider(height: 20.0),
+            Expanded(
+              child: ListView(
+                children: [
+                  Form(
+                    key: _formKey,
+                    child: Column(
+                      children: [
+                        // alignment to prevent clipping of textfield label
+                        Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                    "FRONT",
+                                    style: TextStyle(
+                                      fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                      fontWeight: FontWeight.bold,
+                                    )
+                                ),
+                              ),
+                              TextFormField(
+                                controller: frontTextController,
+                                decoration: InputDecoration(
+                                  border: InputBorder.none,
+                                  filled: true,
+                                  fillColor: Theme.of(context).brightness == Brightness.light
+                                      ? Colors.grey.shade200
+                                      : Colors.grey.shade600,
+                                  hintText: "Enter text for the front side of your card here!",
+                                ),
+                                validator: (value) => _fieldValidator(value, true),
+                                minLines: 3,
+                                maxLines: 3,
+                              ),
+                            ],
+                          ),
+                        ),
+                        Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                  "BACK",
+                                  style: TextStyle(
+                                    fontSize: Theme.of(context).textTheme.headline6.fontSize,
+                                    fontWeight: FontWeight.bold,
+                                  )
+                              ),
+                            ),
+                            TextFormField(
+                              controller: backTextController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                filled: true,
+                                fillColor: Theme.of(context).brightness == Brightness.light
+                                    ? Colors.grey.shade200
+                                    : Colors.grey.shade600,
+                                hintText: "Enter text for the back side of your card here!",
+                              ),
+                              validator: (value) => _fieldValidator(value, false),
+                              minLines: 5,
+                              maxLines: 5,
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Divider(height: 2.0),
+            ButtonBar(
+              alignment: MainAxisAlignment.spaceAround,
               children: [
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.25,
-                  ),
-                  child: PageView(
-                    controller: pageController,
-                    pageSnapping: true,
-                    onPageChanged: (int) => FocusManager.instance.primaryFocus.unfocus(),
-                    children: [
-                      // alignment to prevent clipping of textfield label
-                      Align(
-                        alignment: Alignment.center,
-                        child: TextField(
-                          controller: frontTextController,
-                          focusNode: frontNode,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Front",
-                            errorText: _emptyFront ? "This field is empty" : null,
-                          ),
-                          minLines: 5,
-                          maxLines: 5,
-                        ),
-                      ),
-                      Align(
-                        alignment: Alignment.center,
-                        child: TextField(
-                          controller: backTextController,
-                          focusNode: backNode,
-                          decoration: InputDecoration(
-                            border: OutlineInputBorder(),
-                            labelText: "Back",
-                            errorText: _emptyBack ? "This field is empty" : null,
-                          ),
-                          minLines: 5,
-                          maxLines: 5,
-                        ),
-                      )
-                    ],
-                  ),
+                RaisedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState.validate()){
+                      FlashCard card = FlashCard(
+                        await DBProvider.db.getNewRow("card"),
+                        frontTextController.text,
+                        backTextController.text,
+                      );
+                      Navigator.of(context).pop(card);
+                    }
+                  },
+                  child: Text("Add"),
                 ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.arrow_left),
-                    Text(" Swipe to change side "),
-                    Icon(Icons.arrow_right),
-                  ],
-                ),
-                ButtonBar(
-                  alignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    RaisedButton(
-                      onPressed: () async {
-                        _emptyFront = frontTextController.text.isEmpty
-                            ? true : false;
-                        _emptyBack = backTextController.text.isEmpty
-                            ? true : false;
-                        if (_emptyBack || _emptyFront) {
-                          // jump to relevant side with focus
-                          if(_emptyFront){
-                            pageController.jumpToPage(0);
-                            frontNode.requestFocus();
-                          } else if (_emptyBack){
-                            pageController.jumpToPage(1);
-                            backNode.requestFocus();
-                          }
-                        } else {
-                          FlashCard card = FlashCard(
-                            await DBProvider.db.getNewRow("card"),
-                            frontTextController.text,
-                            backTextController.text,
-                          );
-                          Navigator.of(context).pop(card);
-                        }
-                      },
-                      child: Text("Add"),
-                    ),
-                    RaisedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text("Cancel"),
-                    ),
-                  ],
+                RaisedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancel"),
                 ),
               ],
-            ),
-          ),
+            )
+          ],
         ),
       ),
     );

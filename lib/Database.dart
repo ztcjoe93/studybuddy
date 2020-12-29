@@ -60,6 +60,7 @@ class DBProvider {
 
   initializeDatabase() async {
     if (database == null){
+      print("Initializing database...");
       database = await openDatabase(
         join(await getDatabasesPath(), "study_buddy.db"),
         // create relevant databases if it's an initial launch
@@ -69,6 +70,7 @@ class DBProvider {
         version: 1,
       );
     }
+    print("Initialization completed.");
     return database;
   }
 
