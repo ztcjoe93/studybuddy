@@ -10,6 +10,7 @@ import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
 import '../LDTheme.dart';
+import 'Licenses.dart';
 
 class Options extends StatefulWidget {
   FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -255,26 +256,6 @@ class _OptionsState extends State<Options> {
             ),
             Divider(),
             ListTile(
-              title: Text("Changelog"),
-              subtitle: Text("Check the latest changes to the application here"),
-              onTap: () => Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (_, __, ___) => Changelog(),
-                    transitionsBuilder: (ctx, anim, sAnim, child) {
-                      var begin = Offset(1.0, 0.0);
-                      var end = Offset.zero;
-                      var curve = Curves.ease;
-
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-
-                      return SlideTransition(position: anim.drive(tween), child: child);
-                    }
-                  )
-              ),
-            ),
-            Divider(),
-            ListTile(
               title: Text('Push notifications'),
               subtitle: Text('Set a reminder for a revision session'),
               onTap: () {
@@ -287,6 +268,45 @@ class _OptionsState extends State<Options> {
                   }
                 );
               },
+            ),
+            Divider(),
+            ListTile(
+              title: Text("Changelog"),
+              subtitle: Text("Check the latest changes to the application here"),
+              onTap: () => Navigator.of(context).push(
+                  PageRouteBuilder(
+                      pageBuilder: (_, __, ___) => Changelog(),
+                      transitionsBuilder: (ctx, anim, sAnim, child) {
+                        var begin = Offset(1.0, 0.0);
+                        var end = Offset.zero;
+                        var curve = Curves.ease;
+
+                        var tween = Tween(begin: begin, end: end)
+                            .chain(CurveTween(curve: curve));
+
+                        return SlideTransition(position: anim.drive(tween), child: child);
+                      }
+                  )
+              ),
+            ),
+            Divider(),
+            ListTile(
+              title: Text("Licenses"),
+              onTap: () => Navigator.of(context).push(
+                PageRouteBuilder(
+                    pageBuilder: (_, __, ___) => Licenses(),
+                    transitionsBuilder: (ctx, anim, sAnim, child) {
+                      var begin = Offset(1.0, 0.0);
+                      var end = Offset.zero;
+                      var curve = Curves.ease;
+
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+
+                      return SlideTransition(position: anim.drive(tween), child: child);
+                    }
+                )
+              ),
             ),
             /*
             Divider(),
