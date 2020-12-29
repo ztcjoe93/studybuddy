@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/Database.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Utilities.dart';
 import 'package:studybuddy/Widgets/LoadingBlocks.dart';
 
 import '../Objects/objects.dart';
@@ -90,7 +91,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
   }
 
   Future<Widget> session(List<FlashCard> cards, int index, List<CardResult> cardResults,
-      Deck deck) async {
+      Deck deck, double width, double height) async {
     if (index == cards.length){
       int score = 0;
 
@@ -105,155 +106,178 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
         cardResults
       );
 
-      return LoadingBlocks(rawScore: [score, cardResults.length], finalResult: finalResult);
+      return LoadingBlocks(
+        rawScore: [score, cardResults.length],
+        finalResult: finalResult,
+        width: width,
+        height: height,
+      );
     } else {
       if(widget.revisionStyle == "standard"){
         return Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Expanded(
-              flex: 8,
-              child: AnimatedBuilder(
-                  animation: _controller,
-                  builder: (context, child){
-                    return Transform(
-                      transform: Matrix4.rotationY((1 - _controller.value) * pi / 2),
-                      alignment: Alignment.center,
-                      child: GestureDetector(
-                        onHorizontalDragEnd: (details) async {
-                          if (details.primaryVelocity != 0){
-                            if (!_flipped) {
-                              await _controller.reverse();
+              child: FractionallySizedBox(
+                heightFactor: 0.75,
+                child: AnimatedBuilder(
+                    animation: _controller,
+                    builder: (context, child){
+                      return Transform(
+                        transform: Matrix4.rotationY((1 - _controller.value) * pi / 2),
+                        alignment: Alignment.center,
+                        child: GestureDetector(
+                          onHorizontalDragEnd: (details) async {
+                            if (details.primaryVelocity != 0){
+                              if (!_flipped) {
+                                await _controller.reverse();
+                                setState(() {
+                                  display = cards[_index].back;
+                                  topDisplay = "BACK";
+                                });
+                                await _controller.forward();
+                              } else {
+                                await _controller.reverse();
+                                setState(() {
+                                  display = cards[_index].front;
+                                  topDisplay = "FRONT";
+                                });
+                                await _controller.forward();
+                              }
                               setState(() {
-                                display = cards[_index].back;
-                                topDisplay = "BACK";
+                                _flipped = !_flipped;
+                                _revealed = true;
                               });
-                              await _controller.forward();
-                            } else {
-                              await _controller.reverse();
-                              setState(() {
-                                display = cards[_index].front;
-                                topDisplay = "FRONT";
-                              });
-                              await _controller.forward();
                             }
-                            setState(() {
-                              _flipped = !_flipped;
-                              _revealed = true;
-                            });
-                          }
-                        },
-                        child: Center(
-                          child: Card(
-                            child: Container(
-                              height: 400,
-                              width: 300,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      topDisplay,
-                                      style: Theme.of(context).textTheme.headline4,
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                                      child: Text(
-                                        display,
-                                        textAlign: TextAlign.center,
-                                        style: Theme.of(context).textTheme.headline6,
-                                        overflow: TextOverflow.visible,
+                          },
+                          child: Center(
+                            child: Card(
+                              child: Container(
+                                height: mqsHeight(context, 0.65),
+                                width: mqsWidth(context, 0.6),
+                                child: Padding(
+                                  padding: EdgeInsets.symmetric(
+                                    vertical: mqsHeight(context, 0.02),
+                                    horizontal: mqsWidth(context, 0.02),
+                                  ),
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      FittedBox(
+                                        child: Text(
+                                          topDisplay,
+                                          style: Theme.of(context).textTheme.headline4,
+                                        ),
                                       ),
-                                    ),
-                                    Text("Swipe left or right to flip to the other side"),
-                                  ],
+                                      Expanded(
+                                        child: Padding(
+                                          padding: const EdgeInsets.all(8.0),
+                                          child: Center(
+                                            child: ListView(
+                                              shrinkWrap: true,
+                                              children: [
+                                                Center(
+                                                  child: Text(
+                                                    display,
+                                                    textAlign: TextAlign.center,
+                                                    style: Theme.of(context).textTheme.headline6,
+                                                    overflow: TextOverflow.visible,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      FittedBox(child: Text("Swipe left or right to flip to the other side")),
+                                    ],
+                                  ),
                                 ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    );
-                  }
-              ),
-            ),
-            Expanded(
-              flex: 1,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  for(int i=0; i < cards.length; i++)
-                    Container(
-                      width: _index == i ? 10.0 : 6.0,
-                      height: _index == i ? 10.0 : 6.0,
-                      margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _index == i ? Colors.blueGrey: Colors.grey,
-                      ),
-                    )
-                ],
-              ),
-            ),
-            // tick and cross confirmation
-            Expanded(
-              flex: 1,
-              child: _revealed
-                  ? Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      ClipOval(
-                        child: Material(
-                          color: Colors.lightGreenAccent,
-                          child: InkWell(
-                            splashColor: Colors.lightGreen[200],
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.15,
-                              height: MediaQuery.of(context).size.width * 0.15,
-                              child: Icon(
-                                Icons.check,
-                                color: Colors.white,
-                              ),
-                            ),
-                            onTap: () async => recordResult(true),
-                          ),
-                        ),
-                      ),
-                      ClipOval(
-                        child: Material(
-                          color: Colors.redAccent,
-                          child: InkWell(
-                            splashColor: Colors.redAccent[200],
-                            child: SizedBox(
-                              width: MediaQuery.of(context).size.width * 0.15,
-                              height: MediaQuery.of(context).size.width * 0.15,
-                              child: Icon(
-                                Icons.close,
-                                color: Colors.white,
-                              ),
-                            ),
-                            onTap: () async => recordResult(false),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
-              )
-                  : Container(),
-            ),
-            Expanded(
-              flex: 1,
-              child: Align(
-                alignment: Alignment.bottomCenter,
-                child: RaisedButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    child: Text("Cancel revision")
+                      );
+                    }
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Container(
+                constraints: BoxConstraints(
+                  maxHeight: mqsHeight(context, 0.2),
+                ),
+                child: Column(
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for(int i=0; i < cards.length; i++)
+                          Container(
+                            width: _index == i ? 10.0 : 6.0,
+                            height: _index == i ? 10.0 : 6.0,
+                            margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _index == i ? Colors.blueGrey: Colors.grey,
+                            ),
+                          )
+                      ],
+                    ),
+                    // tick and cross confirmation
+                    _revealed
+                        ? Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            ClipOval(
+                              child: Material(
+                                color: Colors.lightGreenAccent,
+                                child: InkWell(
+                                  splashColor: Colors.lightGreen[200],
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.15,
+                                    height: MediaQuery.of(context).size.width * 0.15,
+                                    child: Icon(
+                                      Icons.check,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onTap: () async => recordResult(true),
+                                ),
+                              ),
+                            ),
+                            ClipOval(
+                              child: Material(
+                                color: Colors.redAccent,
+                                child: InkWell(
+                                  splashColor: Colors.redAccent[200],
+                                  child: SizedBox(
+                                    width: MediaQuery.of(context).size.width * 0.15,
+                                    height: MediaQuery.of(context).size.width * 0.15,
+                                    child: Icon(
+                                      Icons.close,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  onTap: () async => recordResult(false),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    )
+                        : Container(),
+                  ],
+                ),
+              ),
+            ),
+            RaisedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: Text("Cancel revision")
             ),
           ],
         );
@@ -266,8 +290,8 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
               children: [
                 Card(
                   child: Container(
-                    height: 200,
-                    width: 400,
+                    height: mqsHeight(context, 0.2),
+                    width: mqsWidth(context, 0.8),
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
                       child: Column(
@@ -277,13 +301,17 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                             "FRONT",
                             style: Theme.of(context).textTheme.headline4,
                           ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                            child: Text(
-                              display,
-                              textAlign: TextAlign.center,
-                              style: Theme.of(context).textTheme.headline6,
-                              overflow: TextOverflow.visible,
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                              child: SingleChildScrollView(
+                                child: Text(
+                                  display,
+                                  textAlign: TextAlign.center,
+                                  style: Theme.of(context).textTheme.headline6,
+                                  overflow: TextOverflow.visible,
+                                ),
+                              ),
                             ),
                           ),
                           SizedBox(),
@@ -309,12 +337,11 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                 SizedBox(height: 16.0),
                 Card(
                   child: Container(
-                    height: 100,
-                    width: 400,
+                    height: mqsHeight(context, 0.1),
+                    width: mqsWidth(context, 0.8),
                     child: Padding(
                       padding: EdgeInsets.symmetric(vertical: MediaQuery.of(context).size.height * 0.02),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
+                      child: ListView(
                         children: [
                           Padding(
                             padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -371,9 +398,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
               ],
             ),
             RaisedButton(
-              onPressed: (){
-                Navigator.of(context).pop();
-              },
+              onPressed: () => Navigator.of(context).pop(),
               child: Text("Return"),
             ),
           ]
@@ -400,7 +425,7 @@ class _RevisionSessionState extends State<RevisionSession> with TickerProviderSt
                 vertical: MediaQuery.of(context).size.height * 0.05,
               ),
               child: FutureBuilder<Widget>(
-                future: session(cards, _index, cardResults, widget.deck),
+                future: session(cards, _index, cardResults, widget.deck, mqsWidth(context, 1), mqsHeight(context, 1)),
                 builder: (BuildContext context, AsyncSnapshot<Widget> snapshot){
                   if(snapshot.hasData){
                     return snapshot.data;

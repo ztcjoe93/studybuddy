@@ -29,7 +29,7 @@ Simple convenience application built in Flutter where flash cards are used for r
 - [x] Revision sessions for deck and card scoring
 - [x] Performance measurement for cards
 - [x] Performance measurement for decks
-- [x] Allow users to set their own performance thresholds
+- [x] Setting of performance thresholds
 - [x] Dark mode
 - [x] Frontend design and animations
 - [x] Standard/Input-style revision modes
@@ -37,7 +37,6 @@ Simple convenience application built in Flutter where flash cards are used for r
 - [x] Local push notifications for reminder
 
 ## In progress
-- [ ] Alignment of all widgets across different screen sizes 
 
 ## Licensing
 

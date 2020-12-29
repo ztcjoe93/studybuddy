@@ -4,6 +4,7 @@ import 'package:studybuddy/Deck/CardsManagement.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Utilities.dart';
 
 import '../Providers/DecksState.dart';
 import 'AddDeck.dart';
@@ -59,11 +60,7 @@ class _DeckManagementState extends State<DeckManagement> {
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
       child: Column(
         children: [
-          ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height * 0.05,
-            ),
-          ),
+          SizedBox(height: mqsHeight(context, 0.025)),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -72,8 +69,8 @@ class _DeckManagementState extends State<DeckManagement> {
                 icon: Icon(Icons.library_add),
               ),
               Container(
-                width: MediaQuery.of(context).size.width * 0.35,
-                padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                width: mqsWidth(context, 0.35),
+                padding: EdgeInsets.symmetric(horizontal: mqsWidth(context, 0.05)),
                 decoration: BoxDecoration(
                   color: Theme.of(context).brightness == Brightness.dark
                       ? Colors.white.withOpacity(0.08)
@@ -106,155 +103,158 @@ class _DeckManagementState extends State<DeckManagement> {
               ),
             ],
           ),
-          SizedBox(height: 8.0),
-          Container(
-            decoration: BoxDecoration(
-              border: Border.all(
+          SizedBox(height: mqsHeight(context, 0.025)),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: const Color(0x7Acfd8dc),
+                  width: 1,
+                ),
+                borderRadius: BorderRadius.circular(12),
                 color: const Color(0x7Acfd8dc),
-                width: 1,
               ),
-              borderRadius: BorderRadius.circular(12),
-              color: const Color(0x7Acfd8dc),
-            ),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(context).size.height * 0.6,
-              ),
-              child: Consumer<DecksState>(
-                builder: (context, provider, child) {
-                  if (_filter == "All"){
-                    return Scrollbar(
-                      isAlwaysShown: true,
-                      controller: _scrollController,
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        itemCount: provider.decks.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          Deck targetDeck = provider.decks[index];
-                          return Card(
-                            margin: EdgeInsets.only(
-                              top: 5.0,
-                              bottom: 5.0,
-                              left: 5.0,
-                              right: 15.0,
-                            ),
-                            child: ListTile(
-                              onTap: () async {
-                                final result = await Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    pageBuilder: (_, __, ___) =>
-                                        CardsManagement(targetDeck.id),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      var begin = Offset(1.0, 0.0);
-                                      var end = Offset.zero;
-                                      var curve = Curves.ease;
-
-                                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                                      return SlideTransition(
-                                        position: animation.drive(tween),
-                                        child: child,
-                                      );
-                                    },
-                                    transitionDuration: Duration(milliseconds: 200),
-                                  ),
-                                );
-
-                                if (result == false) {
-                                  // prevent CardsManagement widget from being deleted before transition is complete
-                                  Future.delayed(Duration(milliseconds: 350), (){
-                                    Provider.of<OverallState>(context, listen: false)
-                                        .deckHasBeenChanged(false);
-                                    Provider.of<DecksState>(context, listen: false)
-                                        .remove(targetDeck.id);
-                                    Provider.of<ResultsState>(context, listen: false)
-                                        .remove(targetDeck.id);
-                                    print("Deletion complete");
-                                  });
-                                }
-                              },
-                              title: Text(
-                                "${targetDeck.name}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text("${targetDeck.tag}"),
-                            ),
-                          );
-                        },
-                        //separatorBuilder: (BuildContext context, int index) => Divider(),
-                      ),
-                    );
-                  } else {
-                    String _selectedFilter = _filter == "None" ? "" : _filter;
-                    List<Deck> filtered = provider.decks.where((deck) => deck.tag == _selectedFilter).toList();
-                    return Container(
-                      child: Scrollbar(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.6,
+                ),
+                child: Consumer<DecksState>(
+                  builder: (context, provider, child) {
+                    if (_filter == "All"){
+                      return Scrollbar(
                         isAlwaysShown: true,
                         controller: _scrollController,
                         child: ListView.builder(
                           controller: _scrollController,
-                          itemBuilder: (BuildContext context, int index) => Card(
-                            margin: EdgeInsets.only(
-                              top: 5.0,
-                              bottom: 5.0,
-                              left: 5.0,
-                              right: 15.0,
-                            ),
-                            child: ListTile(
-                              onTap: () async {
-                                _filter = 'All';
-                                final result = await Navigator.of(context).push(
-                                  PageRouteBuilder(
-                                    pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
-                                    transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                                      var begin = Offset(1.0, 0.0);
-                                      var end = Offset.zero;
-                                      var curve = Curves.ease;
-
-                                      var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
-
-                                      return SlideTransition(
-                                        position: animation.drive(tween),
-                                        child: child,
-                                      );
-                                    },
-                                    transitionDuration: Duration(milliseconds: 200),
-                                  ),
-                                );
-
-                                if (result == false){
-                                  Future.delayed(Duration(milliseconds: 350), (){
-                                    Provider.of<OverallState>(context, listen: false)
-                                        .deckHasBeenChanged(false);
-                                    Provider.of<DecksState>(context, listen: false)
-                                        .remove(filtered[index].id);
-                                    Provider.of<ResultsState>(context, listen: false)
-                                        .remove(filtered[index].id);
-                                    print("Deletion complete");
-                                  });
-                                }
-                              },
-                              title: Text(
-                                "${filtered[index].name}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          itemCount: provider.decks.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            Deck targetDeck = provider.decks[index];
+                            return Card(
+                              margin: EdgeInsets.only(
+                                top: 5.0,
+                                bottom: 5.0,
+                                left: 5.0,
+                                right: 15.0,
                               ),
-                              subtitle: Text("${filtered[index].tag}"),
-                            ),
-                          ),
+                              child: ListTile(
+                                onTap: () async {
+                                  final result = await Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (_, __, ___) =>
+                                          CardsManagement(targetDeck.id),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        var begin = Offset(1.0, 0.0);
+                                        var end = Offset.zero;
+                                        var curve = Curves.ease;
+
+                                        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                                        return SlideTransition(
+                                          position: animation.drive(tween),
+                                          child: child,
+                                        );
+                                      },
+                                      transitionDuration: Duration(milliseconds: 200),
+                                    ),
+                                  );
+
+                                  if (result == false) {
+                                    // prevent CardsManagement widget from being deleted before transition is complete
+                                    Future.delayed(Duration(milliseconds: 350), (){
+                                      Provider.of<OverallState>(context, listen: false)
+                                          .deckHasBeenChanged(false);
+                                      Provider.of<DecksState>(context, listen: false)
+                                          .remove(targetDeck.id);
+                                      Provider.of<ResultsState>(context, listen: false)
+                                          .remove(targetDeck.id);
+                                      print("Deletion complete");
+                                    });
+                                  }
+                                },
+                                title: Text(
+                                  "${targetDeck.name}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text("${targetDeck.tag}"),
+                              ),
+                            );
+                          },
                           //separatorBuilder: (BuildContext context, int index) => Divider(),
-                          itemCount: filtered.length,
                         ),
-                      ),
-                    );
+                      );
+                    } else {
+                      String _selectedFilter = _filter == "None" ? "" : _filter;
+                      List<Deck> filtered = provider.decks.where((deck) => deck.tag == _selectedFilter).toList();
+                      return Container(
+                        child: Scrollbar(
+                          isAlwaysShown: true,
+                          controller: _scrollController,
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemBuilder: (BuildContext context, int index) => Card(
+                              margin: EdgeInsets.only(
+                                top: 5.0,
+                                bottom: 5.0,
+                                left: 5.0,
+                                right: 15.0,
+                              ),
+                              child: ListTile(
+                                onTap: () async {
+                                  _filter = 'All';
+                                  final result = await Navigator.of(context).push(
+                                    PageRouteBuilder(
+                                      pageBuilder: (_, __, ___) => CardsManagement(filtered[index].id),
+                                      transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                        var begin = Offset(1.0, 0.0);
+                                        var end = Offset.zero;
+                                        var curve = Curves.ease;
+
+                                        var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+
+                                        return SlideTransition(
+                                          position: animation.drive(tween),
+                                          child: child,
+                                        );
+                                      },
+                                      transitionDuration: Duration(milliseconds: 200),
+                                    ),
+                                  );
+
+                                  if (result == false){
+                                    Future.delayed(Duration(milliseconds: 350), (){
+                                      Provider.of<OverallState>(context, listen: false)
+                                          .deckHasBeenChanged(false);
+                                      Provider.of<DecksState>(context, listen: false)
+                                          .remove(filtered[index].id);
+                                      Provider.of<ResultsState>(context, listen: false)
+                                          .remove(filtered[index].id);
+                                      print("Deletion complete");
+                                    });
+                                  }
+                                },
+                                title: Text(
+                                  "${filtered[index].name}",
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                subtitle: Text("${filtered[index].tag}"),
+                              ),
+                            ),
+                            //separatorBuilder: (BuildContext context, int index) => Divider(),
+                            itemCount: filtered.length,
+                          ),
+                        ),
+                      );
+                    }
                   }
-                }
+                ),
               ),
             ),
           ),
+          SizedBox(height: mqsHeight(context, 0.025)),
         ],
       ),
     );

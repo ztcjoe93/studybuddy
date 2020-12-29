@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:studybuddy/Options/Changelog.dart';
 import 'package:studybuddy/Options/PushNotifications.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Utilities.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
@@ -80,11 +81,11 @@ class _OptionsState extends State<Options> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return ListView(
       children: [
         Column(
           children: [
+            SizedBox(height: mqsHeight(context, 0.025)),
             SwitchListTile(
               title: Text("Dark mode"),
               subtitle: Text("Toggle between light and dark mode"),
@@ -111,13 +112,13 @@ class _OptionsState extends State<Options> {
                         builder: (context, state) => SimpleDialog(
                           children: [
                             Padding(
-                              padding: const EdgeInsets.all(8.0),
+                              padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Column(
                                 children: [
                                   Row(
                                     mainAxisSize: MainAxisSize.max,
                                     children: [
-                                      Text("${_upperLimit.round().toString()}"),
+                                       Text("${_upperLimit.round().toString()}"),
                                       Expanded(
                                         child: SliderTheme(
                                           data: greatSlider,
@@ -287,6 +288,7 @@ class _OptionsState extends State<Options> {
                 );
               },
             ),
+            /*
             Divider(),
             ListTile(
               title: Text('debug'),
@@ -307,6 +309,7 @@ class _OptionsState extends State<Options> {
                 print(prov.scheduledMin);
               },
             ),
+             */
           ],
         ),
         Padding(

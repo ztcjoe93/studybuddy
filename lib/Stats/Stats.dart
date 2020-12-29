@@ -1,5 +1,6 @@
 import 'dart:collection';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Charts/CardPerformance.dart';
@@ -7,6 +8,7 @@ import 'package:studybuddy/Charts/DeckPerformance.dart';
 import 'package:studybuddy/Providers/DecksState.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Utilities.dart';
 
 class Stats extends StatefulWidget {
   bool state;
@@ -62,17 +64,16 @@ class _StatsState extends State<Stats> {
             Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text("Card performance"),
+                Text(
+                    "Card performance",
+                  style: TextStyle(
+                    fontSize: mqsWidth(context, 0.05),
+                  ),
+                ),
                 ConstrainedBox(
                   constraints: BoxConstraints(
-                    minHeight: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.25,
-                    maxHeight: MediaQuery
-                        .of(context)
-                        .size
-                        .height * 0.25,
+                    minHeight: mqsHeight(context, 0.25),
+                    maxHeight: mqsHeight(context, 0.25),
                   ),
                   child: CardPerformance(
                     Provider
@@ -97,39 +98,62 @@ class _StatsState extends State<Stats> {
                   padding: const EdgeInsets.only(top: 8.0),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    mainAxisSize: MainAxisSize.max,
                     children: [
-                      FlatButton(
-                        onPressed: () =>
-                            pageController.animateToPage(2,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.show_chart),
-                            ),
-                            Text("Deck performances"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              pageController.animateToPage(2,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.show_chart),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Deck performances",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      FlatButton(
-                        onPressed: () =>
-                            pageController.animateToPage(1,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.layers),
-                            ),
-                            Text("Deck selection"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              pageController.animateToPage(1,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.layers),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Deck selection",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -139,37 +163,28 @@ class _StatsState extends State<Stats> {
             ),
             Column(
               children: [
-                Container(
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minHeight: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.05,
-                      maxHeight: MediaQuery
-                          .of(context)
-                          .size
-                          .height * 0.065,
-                    ),
-                    child: Consumer<ResultsState>(
-                      builder: (context, provider, child) {
-                        String _selection = _selectedDeck == null
-                            ? "No deck"
-                            : Provider
-                            .of<DecksState>(context, listen: true)
-                            .getDeckFromId(_selectedDeck)
-                            .name;
-                        return Center(
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 8.0),
+                  child: Consumer<ResultsState>(
+                    builder: (context, provider, child) {
+                      String _selection = _selectedDeck == null
+                          ? "No deck"
+                          : Provider
+                          .of<DecksState>(context, listen: true)
+                          .getDeckFromId(_selectedDeck)
+                          .name;
+                      return Center(
+                        child: FittedBox(
                           child: Text(
                             "$_selection is selected",
-                            style: Theme
-                                .of(context)
-                                .textTheme
-                                .headline5,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.07),
+                            ),
                           ),
-                        );
-                      },
-                    ),
+                        ),
+                      );
+                    },
                   ),
                 ),
                 Expanded(
@@ -195,17 +210,19 @@ class _StatsState extends State<Stats> {
                             itemBuilder: (BuildContext context, int index) =>
                                 Padding(
                                   padding: EdgeInsets.only(
-                                    top: 4.0,
-                                    left: 5.0,
-                                    right: 5.0,
+                                    top: mqsHeight(context, 0.01),
+                                    left: mqsWidth(context, 0.01),
+                                    right: mqsWidth(context, 0.01),
                                   ),
                                   child: Container(
                                     decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(12),
                                       color: resultSet[index] == _selectedDeck
                                           ? Colors.blueGrey[300]
                                           : Colors.transparent,
                                     ),
                                     child: ListTile(
+                                      dense: true,
                                       onTap: () {
                                         setState(() {
                                           _selectedDeck =
@@ -220,6 +237,7 @@ class _StatsState extends State<Stats> {
                                             .getDeckFromId(resultSet[index])
                                             .name,
                                         style: TextStyle(
+                                          fontSize: mqsWidth(context, 0.035),
                                           color: _selectedDeck ==
                                               resultSet[index]
                                               ? Colors.white : Colors.black
@@ -239,41 +257,62 @@ class _StatsState extends State<Stats> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      FlatButton(
-                        // disable navigation button if no deck is selected
-                        onPressed: _selectedDeck == null ? null
-                            : () =>
-                            pageController.animateToPage(0,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.pie_chart),
-                            ),
-                            Text("Card performances"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          // disable navigation button if no deck is selected
+                          onPressed: _selectedDeck == null ? null
+                              : () =>
+                              pageController.animateToPage(0,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.pie_chart),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Card performances",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      FlatButton(
-                        onPressed: _selectedDeck == null ? null
-                            : () =>
-                            pageController.animateToPage(2,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.show_chart),
-                            ),
-                            Text("Deck performances"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: _selectedDeck == null ? null
+                              : () =>
+                              pageController.animateToPage(2,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.show_chart),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Deck performances",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ],
@@ -320,38 +359,60 @@ class _StatsState extends State<Stats> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      FlatButton(
-                        onPressed: () =>
-                            pageController.animateToPage(1,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.layers),
-                            ),
-                            Text("Return to deck selection"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              pageController.animateToPage(1,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.layers),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Return to deck selection",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                      FlatButton(
-                        onPressed: () =>
-                            pageController.animateToPage(0,
-                              duration: Duration(milliseconds: 200),
-                              curve: Curves.easeIn,
-                            ),
-                        child: Column(
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0),
-                              child: Icon(Icons.pie_chart),
-                            ),
-                            Text("Card performance"),
-                          ],
+                      Expanded(
+                        child: FlatButton(
+                          onPressed: () =>
+                              pageController.animateToPage(0,
+                                duration: Duration(milliseconds: 200),
+                                curve: Curves.easeIn,
+                              ),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.max,
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0),
+                                child: Icon(Icons.pie_chart),
+                              ),
+                              FittedBox(
+                                child: Text(
+                                  "Card performance",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       )
                     ],

@@ -4,13 +4,17 @@ import 'package:studybuddy/Charts/CardPerformance.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
 import '../FadeIn.dart';
+import '../Utilities.dart';
 
 
 class LoadingBlocks extends StatefulWidget {
   List<int> rawScore;
   Result finalResult;
+  double width;
+  double height;
 
-  LoadingBlocks({@required this.rawScore, @required this.finalResult});
+  LoadingBlocks({@required this.rawScore, @required this.finalResult,
+    @required this.height, @required this.width});
 
   @override
   _LoadingBlocksState createState() => _LoadingBlocksState();
@@ -19,6 +23,7 @@ class LoadingBlocks extends StatefulWidget {
 class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProviderStateMixin{
   int score;
   bool _results = false;
+  bool _initialized = false;
   List<List<Widget>> data = [
     List<Widget>(),
     List<Widget>(),
@@ -49,9 +54,12 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
       if (x < score) {
         row.add(
             Container(
-              width: 10.0,
-              height: 10.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+              width: widget.width * 0.025,
+              height: widget.height * 0.025,
+              margin: EdgeInsets.symmetric(
+                  vertical: widget.height * 0.005,
+                  horizontal: widget.width * 0.005,
+              ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.lightGreen,
@@ -61,9 +69,12 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
       } else {
         row.add(
             Container(
-              width: 10.0,
-              height: 10.0,
-              margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 2.0),
+              width: widget.width * 0.025,
+              height: widget.height * 0.025,
+              margin: EdgeInsets.symmetric(
+                vertical: widget.height * 0.005,
+                horizontal: widget.width * 0.005,
+              ),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: Colors.redAccent,
@@ -118,8 +129,8 @@ class _LoadingBlocksState extends State<LoadingBlocks> with SingleTickerProvider
             for(int i=0; i < 4; i++)
               Center(
                 child: SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.04,
-                  width: MediaQuery.of(context).size.width * 0.8,
+                  height: mqsHeight(context, 0.04),
+                  width: mqsWidth(context, 0.9),
                   child: AnimatedList(
                     scrollDirection: Axis.horizontal,
                     key: _listKeys[i],

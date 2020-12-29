@@ -47,36 +47,32 @@ class _AddCardState extends State<AddCard> {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.symmetric(
-        vertical: MediaQuery.of(context).size.height * 0.05,
-        horizontal: MediaQuery.of(context).size.width * 0.05,
-      ),
-      child: Column(
-        children: [
-          Expanded(
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Add a card",
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.headline4.fontSize,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+    return Scaffold(
+      body: Padding(
+        padding: EdgeInsets.symmetric(
+          vertical: MediaQuery.of(context).size.height * 0.05,
+          horizontal: MediaQuery.of(context).size.width * 0.05,
+        ),
+        child: Column(
+          children: [
+            Align(
+              alignment: Alignment.centerLeft,
+              child: Text(
+                "Add a card",
+                style: TextStyle(
+                  fontSize: Theme.of(context).textTheme.headline4.fontSize,
+                  fontWeight: FontWeight.bold,
                 ),
-                ConstrainedBox(
-                  constraints: BoxConstraints(
-                    maxHeight: MediaQuery.of(context).size.height * 0.425,
-                  ),
-                  child: Form(
+              ),
+            ),
+            Divider(height: 20.0),
+            Expanded(
+              child: ListView(
+                children: [
+                  Form(
                     key: _formKey,
                     child: Column(
                       children: [
-                        SizedBox(height: 24.0),
-                        Divider(height: 2.0),
                         // alignment to prevent clipping of textfield label
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16.0),
@@ -140,34 +136,34 @@ class _AddCardState extends State<AddCard> {
                       ],
                     ),
                   ),
+                ],
+              ),
+            ),
+            Divider(height: 2.0),
+            ButtonBar(
+              alignment: MainAxisAlignment.spaceAround,
+              children: [
+                RaisedButton(
+                  onPressed: () async {
+                    if (_formKey.currentState.validate()){
+                      FlashCard card = FlashCard(
+                        await DBProvider.db.getNewRow("card"),
+                        frontTextController.text,
+                        backTextController.text,
+                      );
+                      Navigator.of(context).pop(card);
+                    }
+                  },
+                  child: Text("Add"),
                 ),
-                Divider(height: 2.0),
-                ButtonBar(
-                  alignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    RaisedButton(
-                      onPressed: () async {
-                        if (_formKey.currentState.validate()){
-                          FlashCard card = FlashCard(
-                            await DBProvider.db.getNewRow("card"),
-                            frontTextController.text,
-                            backTextController.text,
-                          );
-                          Navigator.of(context).pop(card);
-                        }
-                      },
-                      child: Text("Add"),
-                    ),
-                    RaisedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      child: Text("Cancel"),
-                    ),
-                  ],
+                RaisedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text("Cancel"),
                 ),
               ],
-            ),
-          )
-        ],
+            )
+          ],
+        ),
       ),
     );
   }

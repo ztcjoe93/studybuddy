@@ -48,7 +48,7 @@ ThemeData lightTheme = ThemeData(
     unselectedItemColor: Colors.black.withOpacity(0.4),
   ),
   accentColor: Color(0xFF9ea7aa),
-  fontFamily: 'Roboto',
+  fontFamily: 'Manrope',
 );
 
 // dark theme guidelines https://material.io/design/color/dark-theme.html
@@ -87,7 +87,7 @@ ThemeData darkTheme= ThemeData(
       ),
     ),
   ),
-  fontFamily: 'Roboto',
+  fontFamily: 'Manrope',
   buttonColor: Colors.blueGrey,
   buttonBarTheme: ButtonBarThemeData(
     buttonTextTheme: ButtonTextTheme.normal,

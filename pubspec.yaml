@@ -43,3 +43,8 @@ flutter:
     - family: Langar
       fonts:
         - asset: fonts/Langar-Regular.ttf
+    - family: Manrope
+      fonts:
+        - asset: fonts/Manrope-Regular.ttf
+        - asset: fonts/Manrope-Bold.ttf
+          weight: 700

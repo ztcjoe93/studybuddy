@@ -149,53 +149,52 @@ class _MainAppState extends State<MainApp> with SingleTickerProviderStateMixin {
               ? ThemeMode.dark : ThemeMode.light,
         home: _ready
             ? Scaffold(
-          appBar: AppBar(
-            title: Text(
-              categories[_selectedIdx],
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          body: IndexedStack(
-            children: [
-              //HomePage(),
-              DeckManagement(),
-              Revision(),
-              Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
-              Options(flutterLocalNotificationsPlugin),
-            ],
-            index: _selectedIdx,
-          ),
-          bottomNavigationBar: BottomNavigationBar(
-            items: [
-              BottomNavigationBarItem(
-                icon: Icon(Icons.layers),
-                label: "Decks",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.assignment),
-                label: "Revision",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.equalizer),
-                label: "Statistics",
-              ),
-              BottomNavigationBarItem(
-                icon: Icon(Icons.settings),
-                label: "Options",
-              ),
-            ],
-            currentIndex: _selectedIdx,
-            showUnselectedLabels: true,
-            type: BottomNavigationBarType.fixed,
-            selectedIconTheme: IconThemeData(size: 30.0),
-            onTap: (ind) => setState((){
-              _selectedIdx = ind;
-            }
-            ),
-          ),
-        )
+                appBar: AppBar(
+                    title: Text(
+                      categories[_selectedIdx],
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                ),
+                body: IndexedStack(
+                    children: [
+                      DeckManagement(),
+                      Revision(),
+                      Stats(state: Provider.of<OverallState>(context, listen: true).deckChange),
+                      Options(flutterLocalNotificationsPlugin),
+                    ],
+                    index: _selectedIdx,
+                ),
+                bottomNavigationBar: BottomNavigationBar(
+                    items: [
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.layers),
+                        label: "Decks",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.assignment),
+                        label: "Revision",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.equalizer),
+                        label: "Statistics",
+                      ),
+                      BottomNavigationBarItem(
+                        icon: Icon(Icons.settings),
+                        label: "Options",
+                      ),
+                    ],
+                    currentIndex: _selectedIdx,
+                    showUnselectedLabels: true,
+                    type: BottomNavigationBarType.fixed,
+                    selectedIconTheme: IconThemeData(size: 30.0),
+                    onTap: (ind) => setState((){
+                      _selectedIdx = ind;
+                    }
+                    ),
+                ),
+            )
             : Scaffold(
           body: Center(
             child: SplashScreen(),

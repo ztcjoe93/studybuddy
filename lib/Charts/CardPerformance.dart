@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Utilities.dart';
 
 class CardPerformance extends StatefulWidget {
   List<Result> results;
@@ -159,6 +160,9 @@ class _CardPerformanceState extends State<CardPerformance> {
             horizontalFirst: false,
             desiredMaxRows: 3,
             cellPadding: EdgeInsets.all(2.0),
+            entryTextStyle: charts.TextStyleSpec(
+              fontSize: mqsWidth(context, 0.035).toInt(),
+            )
           ),
         ],
         //defaultInteractions: true,
@@ -170,28 +174,13 @@ class _CardPerformanceState extends State<CardPerformance> {
                   Provider.of<OverallState>(context, listen:false).darkMode
                     ? Colors.white : Colors.black,
                 ),
-                fontSize: 12,
+                //resize chart labels to cater to smaller screen sized devices
+                fontSize: mqsWidth(context, 0.025).toInt(),
               ),
             )
           ],
-          arcWidth: 20,
+          arcWidth: mqsWidth(context, 0.04).toInt(),
         ),
-        /* for interaction with PieChart
-        selectionModels: [
-          charts.SelectionModelConfig(
-            type: charts.SelectionModelType.info,
-            // check for relevant `domain` key in selectedDatum to filter
-            changedListener: (model){
-              try {
-                _selected = model.selectedDatum.first.datum['domain'];
-                return _selected;
-              } catch(e){
-                print("Tapped on outside of pie chart range.");
-              }
-            },
-          ),
-        ],
-         */
       );
     } else if (widget.data == "list") {
       return Column(
@@ -203,102 +192,47 @@ class _CardPerformanceState extends State<CardPerformance> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "front", 0);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Front"),
-                            if (_selectedCol == 0)
-                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "back", 1);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Back"),
-                            if (_selectedCol == 1)
-                              Icon(_sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "%", 2);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Performance (%)"),
-                            if (_selectedCol == 2)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
+                  for(final i in [
+                    ['front', 0],
+                    ['back', 1],
+                    ['%', 2],
+                    ['score', 3],
+                    ['tries', 4],
+                  ])
+                    Expanded(
+                      flex: 1,
+                      child: InkWell(
+                        highlightColor: Colors.transparent,
+                        splashColor: Colors.transparent,
+                        onTap: () => sortFunction(_sorted, i[0], i[1]),
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(vertical: 8.0),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: EdgeInsets.only(left: 8.0),
+                                child: FittedBox(
+                                  child: Text(
+                                    firstUpper(i[0]),
+                                    style: TextStyle(
+                                      fontSize: mqsWidth(context, 0.035)
+                                    )
+                                  ),
+                                ),
                               ),
-                          ],
-                        ),
-                      ),
+                              if(_selectedCol == i[1])
+                                FittedBox(
+                                  child: Icon(
+                                    _sorted
+                                      ? Icons.arrow_drop_down
+                                      : Icons.arrow_drop_up,
+                                  )
+                                )
+                            ],
+                          )
+                        )
+                      )
                     ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                        sortFunction(_sorted, "score", 3);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Score"),
-                            if (_selectedCol == 3)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: InkWell(
-                      onTap: (){
-                       sortFunction(_sorted, "tries", 4);
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 8.0),
-                        child: Row(
-                          children: [
-                            Text("Tries"),
-                            if (_selectedCol == 4)
-                              Icon(
-                                _sorted ? Icons.arrow_drop_down : Icons.arrow_drop_up,
-                              ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
             ),
@@ -322,45 +256,26 @@ class _CardPerformanceState extends State<CardPerformance> {
                      child: Row(
                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                        children: [
-                         Expanded(
-                           flex: 1,
-                           child: Padding(
-                             padding: EdgeInsets.only(right: 10.0),
-                             child: Text("${consolidatedList[index]['front']}"),
-                           ),
-                         ),
-                         Expanded(
-                           flex: 1,
-                           child: Padding(
-                             padding: EdgeInsets.only(right: 10.0),
-                             child: Text("${consolidatedList[index]['back']}"),
-                           ),
-                         ),
-                         Expanded(
-                           flex: 2,
-                           child: Padding(
-                             padding: EdgeInsets.only(right: 10.0),
-                             child: Center(
-                               child: Text(
-                                 "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                         for(final s in [
+                           "${consolidatedList[index]['front']}",
+                           "${consolidatedList[index]['back']}",
+                           "${consolidatedList[index]['%'].toStringAsFixed(2)}",
+                           "${consolidatedList[index]['score']}",
+                           "${consolidatedList[index]['tries']}",
+                         ])
+                           Expanded(
+                             flex: 1,
+                             child: Padding(
+                               padding: EdgeInsets.only(right: 10.0),
+                               child: Center(
+                                 child: Text(
+                                   s,
+                                   textAlign: TextAlign.center,
+                                   style: TextStyle(fontSize: mqsWidth(context, 0.035)),
+                                 ),
                                ),
                              ),
                            ),
-                         ),
-                         Expanded(
-                           flex: 1,
-                           child: Padding(
-                             padding: EdgeInsets.only(right: 10.0),
-                             child: Center(child: Text("${consolidatedList[index]['score']}")),
-                           ),
-                         ),
-                         Expanded(
-                           flex: 1,
-                           child: Padding(
-                             padding: EdgeInsets.only(right: 10.0),
-                             child: Center(child: Text("${consolidatedList[index]['tries']}")),
-                           ),
-                         ),
                        ],
                      )
                    );

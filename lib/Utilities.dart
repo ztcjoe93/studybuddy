@@ -1,4 +1,5 @@
 import 'dart:math';
+import 'package:flutter/material.dart';
 
 ranStr(int length){
   const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890';
@@ -18,4 +19,12 @@ firstUpper(String s){
     var f = s.substring(0, 1).toUpperCase();
     return f + s.substring(1);
   }
+}
+
+mqsWidth(BuildContext context, double width){
+  return MediaQuery.of(context).size.width * width;
+}
+
+mqsHeight(BuildContext context, double height){
+  return MediaQuery.of(context).size.height * height;
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:provider/provider.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
+import 'package:studybuddy/Utilities.dart';
 import 'package:studybuddy/main.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
@@ -168,138 +169,197 @@ class _PushNotificationState extends State<PushNotification> {
             return Container(
               height: MediaQuery.of(context).size.height * 0.75,
               width: MediaQuery.of(context).size.width * 0.8,
-              child: Column(
+              child: ListView(
                 children: [
-                  Text(
-                    "Revision Scheduler",
-                    style: TextStyle(
-                      fontSize: Theme.of(context).textTheme.headline4.fontSize,
-                      fontWeight: FontWeight.bold,
+                  Center(
+                    child: Text(
+                      "Revision Scheduler",
+                      style: TextStyle(
+                        fontSize: mqsWidth(context, 0.055),
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                   SizedBox(height: 8.0),
-                  Text(
-                    "Set a reminder on a specific day and time for a revision below."
+                  FittedBox(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 8.0),
+                      child: Text(
+                        "Set a reminder on a specific day and time for a revision below."
+                      ),
+                    ),
                   ),
                   SizedBox(height: 28.0),
                   Column(
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
-                      Text("Select the day/s of the week: "),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.monday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.monday = val;
-                                  });
-                                },
-                              ),
-                              Text("Mon"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.tuesday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.tuesday = val;
-                                  });
-                                },
-                              ),
-                              Text("Tue"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.wednesday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.wednesday = val;
-                                  });
-                                },
-                              ),
-                              Text("Wed"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.thursday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.thursday = val;
-                                  });
-                                },
-                              ),
-                              Text("Thu"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.friday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.friday = val;
-                                  });
-                                },
-                              ),
-                              Text("Fri"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.saturday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.saturday = val;
-                                  });
-                                },
-                              ),
-                              Text("Sat"),
-                            ],
-                          ),
-                          Column(
-                            children: [
-                              Checkbox(
-                                value: prov.sunday,
-                                tristate: false,
-                                onChanged: (val){
-                                  setState(() {
-                                    prov.sunday = val;
-                                  });
-                                },
-                              ),
-                              Text("Sun"),
-                            ],
-                          ),
-                        ],
+                      Text(
+                        "Select the day/s of the week: ",
+                        style: TextStyle(
+                          fontSize: mqsWidth(context, 0.035),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        child: Wrap(
+                          children: [
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.monday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.monday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Mon",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.tuesday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.tuesday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Tue",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.wednesday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.wednesday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Wed",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.thursday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.thursday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Thu",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.friday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.friday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Fri",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.saturday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.saturday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Sat",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Column(
+                              children: [
+                                Checkbox(
+                                  value: prov.sunday,
+                                  tristate: false,
+                                  onChanged: (val){
+                                    setState(() {
+                                      prov.sunday = val;
+                                    });
+                                  },
+                                ),
+                                Text(
+                                  "Sun",
+                                  style: TextStyle(
+                                    fontSize: mqsWidth(context, 0.035),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ],
                   ),
                   SizedBox(height: 28.0),
                   Column(
                     children: [
-                      Text("Select a time to set the reminder at:"),
+                      FittedBox(
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
+                          child: Text(
+                            "Select a time to set the reminder at:",
+                            style: TextStyle(
+                              fontSize: mqsWidth(context, 0.035),
+                            ),
+                          ),
+                        ),
+                      ),
                       IconButton(
                           icon: Icon(
                             Icons.timer_rounded,
                           ),
-                          iconSize: 50.0,
+                          iconSize: mqsWidth(context, 0.15),
                           onPressed: () async {
                             var time = await showTimePicker(context: context,
                                 initialTime: TimeOfDay(
@@ -325,12 +385,20 @@ class _PushNotificationState extends State<PushNotification> {
                   SizedBox(height: 20.0),
                   timingToCards(prov.scheduledHour, prov.scheduledMin),
                   SizedBox(height: 20.0),
-                  RaisedButton(
-                    onPressed: (){
-                      _zonedScheduleNotification();
-                      Navigator.of(context).pop();
-                    },
-                    child: Text("Save"),
+                  Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: mqsWidth(context, 0.25),
+                      ),
+                      child: RaisedButton(
+                        onPressed: (){
+                          _zonedScheduleNotification();
+                          Navigator.of(context).pop();
+                        },
+                        child: Text("Save"),
+                      ),
+                    ),
                   ),
                 ],
               ),

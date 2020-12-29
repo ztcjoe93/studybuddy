@@ -26,16 +26,18 @@ class _RevisionState extends State<Revision> {
       ),
       child: Column(
         children: [
-          Text(
-            "Select a deck to start the revision",
-            style: Theme.of(context).textTheme.headline6,
+          FittedBox(
+            child: Text(
+              "Select a deck to start the revision",
+              style: Theme.of(context).textTheme.headline6,
+            ),
           ),
           SizedBox(height: MediaQuery.of(context).size.height * 0.025),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Padding(
-                padding: const EdgeInsets.only(left: 24.0),
+              Expanded(
+                flex: 2,
                 child: Text(
                   "Revision mode: "
                   "${firstUpper(Provider.of<OverallState>(context, listen: true).revisionStyle)}",
@@ -44,42 +46,45 @@ class _RevisionState extends State<Revision> {
                   ),
                 ),
               ),
-              Container(
-                width: MediaQuery.of(context).size.width * 0.35,
-                padding: EdgeInsets.symmetric(
-                  horizontal: MediaQuery.of(context).size.width * 0.05
-                ),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).brightness == Brightness.light
-                    ? Colors.white
-                    : Colors.grey.shade800,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Consumer<DecksState>(
-                  builder: (context, deckState, child){
-                    return DropdownButton(
-                      isExpanded: true,
-                      value: _filter,
-                      icon: Icon(Icons.arrow_drop_down),
-                      underline: SizedBox(),
-                      onChanged: (val){
-                        setState(() {
-                          _filter = val;
-                        });
-                      },
-                      items: [
-                        DropdownMenuItem(
-                          value: "All",
-                          child: Text("All"),
-                        ),
-                        ...deckState.tagFilters(emptyIncluded: false),
-                        DropdownMenuItem(
-                            value: "None",
-                            child: Text("None")
-                        )
-                      ],
-                    );
-                  },
+              Expanded(
+                flex: 1,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.35,
+                  padding: EdgeInsets.symmetric(
+                    horizontal: MediaQuery.of(context).size.width * 0.05
+                  ),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context).brightness == Brightness.light
+                      ? Colors.white
+                      : Colors.grey.shade800,
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: Consumer<DecksState>(
+                    builder: (context, deckState, child){
+                      return DropdownButton(
+                        isExpanded: true,
+                        value: _filter,
+                        icon: Icon(Icons.arrow_drop_down),
+                        underline: SizedBox(),
+                        onChanged: (val){
+                          setState(() {
+                            _filter = val;
+                          });
+                        },
+                        items: [
+                          DropdownMenuItem(
+                            value: "All",
+                            child: Text("All"),
+                          ),
+                          ...deckState.tagFilters(emptyIncluded: false),
+                          DropdownMenuItem(
+                              value: "None",
+                              child: Text("None")
+                          )
+                        ],
+                      );
+                    },
+                  ),
                 ),
               ),
             ],
