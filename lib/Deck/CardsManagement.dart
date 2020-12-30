@@ -108,9 +108,22 @@ class _CardsManagementState extends State<CardsManagement> {
                       ),
                       Row(
                         children: [
+                          Text(
+                            "Cards: ${provider.getDeckFromId(widget.deckId).cards.length}"
+                            " ${provider.getDeckFromId(widget.deckId).cards.length == 20 ? "(max)" : ""}"
+                          ),
+                          SizedBox(width: MediaQuery.of(context).size.width * 0.05),
                           IconButton(
-                            onPressed: () => addCard(context),
-                            icon: Icon(Icons.library_add),
+                            highlightColor: provider.getDeckFromId(widget.deckId).cards.length >= 20
+                                ? Colors.transparent : null,
+                            splashColor: provider.getDeckFromId(widget.deckId).cards.length >= 20
+                                ? Colors.transparent : null,
+                            onPressed: () => provider.getDeckFromId(widget.deckId).cards.length >= 20
+                                ? null : addCard(context),
+                            icon: Icon(
+                              Icons.library_add,
+                              color: provider.getDeckFromId(widget.deckId).cards.length >= 20 ? Colors.grey : null,
+                            ),
                           ),
                           SizedBox(width: MediaQuery.of(context).size.width * 0.05),
                           IconButton(
