@@ -43,17 +43,15 @@ class _ChangelogState extends State<Changelog> {
                   icon: Icon(Icons.arrow_back),
                 ),
               ),
-              Expanded(
-                child: FutureBuilder(
-                  future: readChangeLog(),
-                  builder: (BuildContext context, AsyncSnapshot<String> snapshot){
-                    if (snapshot.hasData){
-                      return Markdown(data: snapshot.data);
-                    } else {
-                      return Center(child: CircularProgressIndicator());
-                    }
+              FutureBuilder(
+                future: readChangeLog(),
+                builder: (BuildContext context, AsyncSnapshot<String> snapshot){
+                  if (snapshot.hasData){
+                    return Expanded(child: Markdown(data: snapshot.data));
+                  } else {
+                    return Center(child: CircularProgressIndicator());
                   }
-                ),
+                }
               ),
             ],
           ),

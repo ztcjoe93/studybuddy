@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 import '../FadeIn.dart';
+import '../Utilities.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -86,21 +87,21 @@ class _SplashScreenState extends State<SplashScreen> with TickerProviderStateMix
                     -1.5, -1.5,
                     controllerLeft,
                   ),
-                  child: imageRotation(context, -math.pi/4, Offset(-13.0, 0.0)),
+                  child: imageRotation(context, -math.pi/4, Offset(-(mqsWidth(context, 0.028)), 0.0)),
                 ),
                 SlideTransition(
                   position: startFromOffset(
                     0, -1.5,
                     controllerMid,
                   ),
-                  child: imageRotation(context, 0, Offset(0.0, -25.0)),
+                  child: imageRotation(context, 0, Offset(0.0, -(mqsWidth(context, 0.06)))),
                 ),
                 SlideTransition(
                   position: startFromOffset(
                     1.5, -1.5,
                     controllerRight,
                   ),
-                  child: imageRotation(context, math.pi/4, Offset(13.0, 0.0)),
+                  child: imageRotation(context, math.pi/4, Offset((mqsWidth(context, 0.028)), 0.0)),
                 ),
               ],
             ),

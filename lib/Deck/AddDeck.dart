@@ -71,7 +71,7 @@ class _AddDeckState extends State<AddDeck> {
                   IconButton(
                     icon: Icon(Icons.arrow_right),
                     iconSize: 36.0,
-                    color: Colors.lightBlueAccent,
+                    color: Colors.blue[200],
                     splashColor: Colors.transparent,
                     onPressed: textController.text.isEmpty ? null : () async {
                       Provider.of<DecksState>(context, listen: false).addDeck(

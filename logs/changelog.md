@@ -1,4 +1,8 @@
-# Changelog  
+# __Changelog__
+
+## 0.9.1
+- Set deck limit to 20
+- Fixed alignment issues with Deck performance statistics
 
 ## 0.9.0
 - Base application created.

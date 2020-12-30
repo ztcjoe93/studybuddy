@@ -78,6 +78,15 @@ class ResultsState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void removeCard(int deckId, int cardId){
+    List<Result> targetResults = results.where((r) => (r.deckId == deckId));
+    for(int i=0; i < targetResults.length; i++){
+      targetResults[i].results.removeWhere((cr) => (cr.id == cardId));
+    }
+    DBProvider.db.delete('result', 'card_id = ?', [cardId]);
+    notifyListeners();
+  }
+
   void remove(int deckId){
     results.removeWhere((r) => r.deckId == deckId);
     DBProvider.db.delete('result', 'deck_id = ?', [deckId]);

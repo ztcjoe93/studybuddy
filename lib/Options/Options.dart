@@ -336,7 +336,7 @@ class _OptionsState extends State<Options> {
           padding: const EdgeInsets.all(26.0),
           child: Center(
               child: Text(
-                  "StudyBuddy version 0.9.0",
+                  "StudyBuddy version 0.9.1",
                 style: TextStyle(
                   color: Colors.blueGrey,
                 )

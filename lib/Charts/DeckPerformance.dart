@@ -139,7 +139,8 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        FittedBox(
+                        Expanded(
+                          flex: 2,
                           child: Text(
                             "${DateFormat.yMd()
                                 .add_jm()
@@ -150,22 +151,19 @@ class _DeckPerformanceState extends State<DeckPerformance> {
                             ),
                           ),
                         ),
-                        FittedBox(
-                          child: Center(
-                            child: Text(
-                              "${consolidatedList[index].performance.toStringAsFixed(2)}",
-                              style: TextStyle(
-                                fontSize: mqsWidth(context, 0.035),
-                              ),
-                            ),
-                          ),
-                        ),
-                        FittedBox(
+                        Expanded(
+                          flex: 2,
                           child: Text(
-                            "${consolidatedList[index].totalCards}",
+                            "${consolidatedList[index].performance.toStringAsFixed(2)}",
                             style: TextStyle(
                               fontSize: mqsWidth(context, 0.035),
                             ),
+                          ),
+                        ),
+                        Text(
+                          "${consolidatedList[index].totalCards}",
+                          style: TextStyle(
+                            fontSize: mqsWidth(context, 0.035),
                           ),
                         ),
                       ],
