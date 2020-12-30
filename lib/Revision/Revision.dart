@@ -17,6 +17,12 @@ class _RevisionState extends State<Revision> {
   String _filter = "All";
   ScrollController _scrollController = ScrollController();
 
+  changeFilter(String val){
+    setState(() {
+      _filter = val;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -61,6 +67,7 @@ class _RevisionState extends State<Revision> {
                   ),
                   child: Consumer<DecksState>(
                     builder: (context, deckState, child){
+                      // change filter to "All" if the tag no longer exists
                       return DropdownButton(
                         isExpanded: true,
                         value: _filter,
