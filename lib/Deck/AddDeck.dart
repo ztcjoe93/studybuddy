@@ -17,6 +17,8 @@ class _AddDeckState extends State<AddDeck> {
   final textController = TextEditingController();
   final tagController = TextEditingController();
   final _scrollViewController = ScrollController();
+
+  final _deckFormKey = GlobalKey<FormState>();
   String _tag ;
 
   @override
@@ -24,6 +26,17 @@ class _AddDeckState extends State<AddDeck> {
     textController.dispose();
     tagController.dispose();
     super.dispose();
+  }
+
+  _fieldValidator(String value){
+    // check if it's empty, then check for duplicates
+    if (value.isEmpty){
+      return 'This field is empty, please enter something here.';
+    } else if (value.isNotEmpty){
+      if (Provider.of<DecksState>(context, listen: false).decks.firstWhere((e)=>e.name==textController.text, orElse: ()=>null) != null)
+        return 'A deck with this name exists, please use some other name.';
+      }
+    return null;
   }
 
   @override
@@ -74,15 +87,17 @@ class _AddDeckState extends State<AddDeck> {
                     color: Colors.blue[200],
                     splashColor: Colors.transparent,
                     onPressed: textController.text.isEmpty ? null : () async {
-                      Provider.of<DecksState>(context, listen: false).addDeck(
-                          Deck(
-                            await DBProvider.db.getNewRow("deck"),
-                            textController.text,
-                            tagController.text,
-                            [],
-                          )
-                      );
-                      Navigator.of(context).pop("${textController.text}");
+                      if(_deckFormKey.currentState.validate()) {
+                        Provider.of<DecksState>(context, listen: false).addDeck(
+                            Deck(
+                              await DBProvider.db.getNewRow("deck"),
+                              textController.text,
+                              tagController.text,
+                              [],
+                            )
+                        );
+                        Navigator.of(context).pop("${textController.text}");
+                      }
                     },
                   ),
                 ],
@@ -90,125 +105,129 @@ class _AddDeckState extends State<AddDeck> {
               Expanded(
                 child: ListView(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    "DECK NAME",
-                                    style: TextStyle(
-                                      fontSize: mqsWidth(context, 0.05),
-                                      fontWeight: FontWeight.bold,
+                    Form(
+                      key: _deckFormKey,
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: MediaQuery.of(context).size.width * 0.05),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      "DECK NAME",
+                                      style: TextStyle(
+                                        fontSize: mqsWidth(context, 0.05),
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
-                                ),
-                                TextField(
-                                  controller: textController,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    filled: true,
-                                    fillColor: Theme.of(context).brightness == Brightness.light
-                                        ? Colors.grey.shade200
-                                        : Colors.grey.shade800,
-                                    hintText: "Enter a name for your deck here!",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Padding(
-                            padding: EdgeInsets.only(bottom: 16.0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    "TAG NAME (optional)",
-                                    style: TextStyle(
-                                      fontSize: mqsWidth(context, 0.05),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                TextField(
-                                  controller: tagController,
-                                  decoration: InputDecoration(
-                                    border: InputBorder.none,
-                                    filled: true,
-                                    fillColor: Theme.of(context).brightness == Brightness.light
-                                        ? Colors.grey.shade200
-                                        : Colors.grey.shade800,
-                                    hintText: "You can enter a tag to associate your deck here!",
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              Padding(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Align(
-                                  alignment: Alignment.centerLeft,
-                                  child: Text(
-                                    "EXISTING TAGS",
-                                    style: TextStyle(
-                                      fontSize: mqsWidth(context, 0.05),
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Align(
-                                alignment: Alignment.centerLeft,
-                                child: Consumer<DecksState>(
-                                  builder: (context, deckState, child) => Container(
-                                    decoration: BoxDecoration(
-                                      color: Theme.of(context).brightness == Brightness.light
+                                  TextFormField(
+                                    controller: textController,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      filled: true,
+                                      fillColor: Theme.of(context).brightness == Brightness.light
                                           ? Colors.grey.shade200
                                           : Colors.grey.shade800,
-                                      borderRadius: BorderRadius.circular(8.0),
+                                      hintText: "Enter a name for your deck here!",
                                     ),
-                                    width: MediaQuery.of(context).size.width * 0.35,
-                                    child: ButtonTheme(
-                                      alignedDropdown: true,
-                                      child: Padding(
-                                        padding: EdgeInsets.only(left: 16.0, right: 8.0),
-                                        child: DropdownButton(
-                                          isExpanded: true,
-                                          value: _tag,
-                                          icon: Icon(Icons.arrow_drop_down),
-                                          underline: SizedBox(),
-                                          onChanged: (val){
-                                            tagController.text = val;
-                                            setState(() {
-                                              _tag = val;
-                                            });
-                                          },
-                                          items: deckState.tagFilters(emptyIncluded: true)
-                                              .map<DropdownMenuItem<String>>((String val) =>
-                                                DropdownMenuItem(
-                                                  value: val,
-                                                  child: Text(val),
-                                                )).toList(),
+                                    validator: (val) => _fieldValidator(val),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Padding(
+                                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                                    child: Text(
+                                      "TAG NAME (optional)",
+                                      style: TextStyle(
+                                        fontSize: mqsWidth(context, 0.05),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                  TextFormField(
+                                    controller: tagController,
+                                    decoration: InputDecoration(
+                                      border: InputBorder.none,
+                                      filled: true,
+                                      fillColor: Theme.of(context).brightness == Brightness.light
+                                          ? Colors.grey.shade200
+                                          : Colors.grey.shade800,
+                                      hintText: "You can enter a tag to associate your deck here!",
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Column(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Padding(
+                                  padding: EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Align(
+                                    alignment: Alignment.centerLeft,
+                                    child: Text(
+                                      "EXISTING TAGS",
+                                      style: TextStyle(
+                                        fontSize: mqsWidth(context, 0.05),
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                Align(
+                                  alignment: Alignment.centerLeft,
+                                  child: Consumer<DecksState>(
+                                    builder: (context, deckState, child) => Container(
+                                      decoration: BoxDecoration(
+                                        color: Theme.of(context).brightness == Brightness.light
+                                            ? Colors.grey.shade200
+                                            : Colors.grey.shade800,
+                                        borderRadius: BorderRadius.circular(8.0),
+                                      ),
+                                      width: MediaQuery.of(context).size.width * 0.35,
+                                      child: ButtonTheme(
+                                        alignedDropdown: true,
+                                        child: Padding(
+                                          padding: EdgeInsets.only(left: 16.0, right: 8.0),
+                                          child: DropdownButton(
+                                            isExpanded: true,
+                                            value: _tag,
+                                            icon: Icon(Icons.arrow_drop_down),
+                                            underline: SizedBox(),
+                                            onChanged: (val){
+                                              tagController.text = val;
+                                              setState(() {
+                                                _tag = val;
+                                              });
+                                            },
+                                            items: deckState.tagFilters(emptyIncluded: true)
+                                                .map<DropdownMenuItem<String>>((String val) =>
+                                                  DropdownMenuItem(
+                                                    value: val,
+                                                    child: Text(val),
+                                                  )).toList(),
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

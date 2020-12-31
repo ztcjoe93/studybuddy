@@ -16,7 +16,7 @@ class AddCard extends StatefulWidget {
 
 class _AddCardState extends State<AddCard> {
   List<FlashCard> fcList;
-  final _formKey = GlobalKey<FormState>();
+  final _cardFormKey = GlobalKey<FormState>();
   TextEditingController frontTextController = TextEditingController();
   TextEditingController backTextController = TextEditingController();
 
@@ -70,7 +70,7 @@ class _AddCardState extends State<AddCard> {
               child: ListView(
                 children: [
                   Form(
-                    key: _formKey,
+                    key: _cardFormKey,
                     child: Column(
                       children: [
                         // alignment to prevent clipping of textfield label
@@ -145,7 +145,7 @@ class _AddCardState extends State<AddCard> {
               children: [
                 RaisedButton(
                   onPressed: () async {
-                    if (_formKey.currentState.validate()){
+                    if (_cardFormKey.currentState.validate()){
                       FlashCard card = FlashCard(
                         await DBProvider.db.getNewRow("card"),
                         frontTextController.text,
