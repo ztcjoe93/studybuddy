@@ -8,20 +8,14 @@ import '../Utilities.dart';
 import '../Providers/DecksState.dart';
 import 'RevisionSession.dart';
 
+
 class Revision extends StatefulWidget {
   @override
   _RevisionState createState() => _RevisionState();
 }
 
 class _RevisionState extends State<Revision> {
-  String _filter = "All";
   ScrollController _scrollController = ScrollController();
-
-  changeFilter(String val){
-    setState(() {
-      _filter = val;
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -67,15 +61,22 @@ class _RevisionState extends State<Revision> {
                   ),
                   child: Consumer<DecksState>(
                     builder: (context, deckState, child){
-                      // change filter to "All" if the tag no longer exists
+                      var additionalItems = deckState.tagFilters(emptyIncluded: false)
+                        .map<DropdownMenuItem<String>>((String val) =>
+                          DropdownMenuItem(
+                            value: val,
+                            child: Text(val),
+                          )
+                      ).toList();
+                      var prov = Provider.of<OverallState>(context, listen: true);
                       return DropdownButton(
                         isExpanded: true,
-                        value: _filter,
+                        value: prov.revisionFilter,
                         icon: Icon(Icons.arrow_drop_down),
                         underline: SizedBox(),
                         onChanged: (val){
                           setState(() {
-                            _filter = val;
+                            prov.revisionFilter= val;
                           });
                         },
                         items: [
@@ -83,7 +84,7 @@ class _RevisionState extends State<Revision> {
                             value: "All",
                             child: Text("All"),
                           ),
-                          ...deckState.tagFilters(emptyIncluded: false),
+                          ...additionalItems,
                           DropdownMenuItem(
                               value: "None",
                               child: Text("None")
@@ -114,57 +115,64 @@ class _RevisionState extends State<Revision> {
                     builder: (context, provider, child) {
                       List<Deck> availableDecks = [];
 
-                      if(_filter == "All") {
+                      var prov = Provider.of<OverallState>(context, listen: true);
+                      if(prov.revisionFilter == "All") {
                         availableDecks = provider.decks
                             .where((d) => d.cards.length != 0)
                             .toList();
-                      } else if (_filter == "None"){
+                      } else if (prov.revisionFilter == "None"){
                         availableDecks = provider.decks
                             .where((d) => d.tag == "" && d.cards.length > 0)
                             .toList();
                       } else {
                         availableDecks = provider.decks
-                            .where((d) => d.tag == _filter && d.cards.length>0)
+                            .where((d) => d.tag == prov.revisionFilter && d.cards.length>0)
                             .toList();
                       }
-                      return Scrollbar(
-                        isAlwaysShown: true,
-                        controller: _scrollController,
-                        child: ListView.builder(
+                      if(availableDecks.isEmpty){
+                        return Center(
+                          child: Text("Empty"),
+                        );
+                      } else {
+                        return Scrollbar(
+                          isAlwaysShown: true,
                           controller: _scrollController,
-                          itemCount: availableDecks.length,
-                          itemBuilder: (BuildContext context, int index) =>
-                            Padding(
-                              padding: const EdgeInsets.only(
-                                top: 5.0,
-                                left: 5.0,
-                                bottom: 8.0,
-                                right: 15.0,
-                              ),
-                              child: OpenContainer(
-                                closedColor: Theme.of(context).brightness == Brightness.light
-                                  ? Colors.white
-                                  : Colors.grey.shade800,
-                                closedBuilder: (context, action){
-                                  return ListTile(
-                                    title: Text(
-                                      "${availableDecks[index].name}",
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Text("${availableDecks[index].tag}"),
-                                  );
-                                },
-                                openBuilder: (context, action){
-                                  var revisionStyle = Provider.of<OverallState>(context, listen:true).revisionStyle;
-                                  return RevisionSession(availableDecks[index], revisionStyle);
-                                },
-                              ),
-                            ),
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            itemCount: availableDecks.length,
+                            itemBuilder: (BuildContext context, int index) =>
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 5.0,
+                                    left: 5.0,
+                                    bottom: 8.0,
+                                    right: 15.0,
+                                  ),
+                                  child: OpenContainer(
+                                    closedColor: Theme.of(context).brightness == Brightness.light
+                                        ? Colors.white
+                                        : Colors.grey.shade800,
+                                    closedBuilder: (context, action){
+                                      return ListTile(
+                                        title: Text(
+                                          "${availableDecks[index].name}",
+                                          style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                        subtitle: Text("${availableDecks[index].tag}"),
+                                      );
+                                    },
+                                    openBuilder: (context, action){
+                                      var revisionStyle = Provider.of<OverallState>(context, listen:true).revisionStyle;
+                                      return RevisionSession(availableDecks[index], revisionStyle);
+                                    },
+                                  ),
+                                ),
                           ),
-                        );}
-                      ),
+                        );
+                      }
+                    }),
               ),
             )
             ),

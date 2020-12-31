@@ -7,6 +7,7 @@ class OverallState extends ChangeNotifier{
   int lowerLimit;
   int upperLimit;
   bool deckChange = false;
+  String revisionFilter = "All";
 
   bool monday;
   bool tuesday;

@@ -194,7 +194,12 @@ class _AddDeckState extends State<AddDeck> {
                                               _tag = val;
                                             });
                                           },
-                                          items: deckState.tagFilters(emptyIncluded: true),
+                                          items: deckState.tagFilters(emptyIncluded: true)
+                                              .map<DropdownMenuItem<String>>((String val) =>
+                                                DropdownMenuItem(
+                                                  value: val,
+                                                  child: Text(val),
+                                                )).toList(),
                                         ),
                                       ),
                                     ),

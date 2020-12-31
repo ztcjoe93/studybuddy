@@ -4,6 +4,7 @@ import 'package:studybuddy/Deck/CardsManagement.dart';
 import 'package:studybuddy/Objects/objects.dart';
 import 'package:studybuddy/Providers/OverallState.dart';
 import 'package:studybuddy/Providers/ResultsState.dart';
+import 'package:studybuddy/Revision/Revision.dart';
 import 'package:studybuddy/Utilities.dart';
 
 import '../Providers/DecksState.dart';
@@ -89,14 +90,23 @@ class _DeckManagementState extends State<DeckManagement> {
                           _filter = val;
                         });
                       },
-                      items: [DropdownMenuItem(
-                        value: "All",
-                        child: Text("All"),
-                      ), ...deckState.tagFilters(emptyIncluded: true),
-                      DropdownMenuItem(
-                        value: "None",
-                        child: Text("None")
-                      )],
+                      items: [
+                        DropdownMenuItem(
+                          value: "All",
+                          child: Text("All"),
+                        ),
+                        ...deckState.tagFilters(emptyIncluded: true)
+                            .map<DropdownMenuItem<String>>((String val) =>
+                              DropdownMenuItem(
+                                value: val,
+                                child: Text(val),
+                              )
+                            ).toList(),
+                        DropdownMenuItem(
+                            value: "None",
+                            child: Text("None")
+                        )
+                      ],
                     );
                   },
                 ),
@@ -170,6 +180,11 @@ class _DeckManagementState extends State<DeckManagement> {
                                             .deckHasBeenChanged(false);
                                         Provider.of<DecksState>(context, listen: false)
                                             .remove(targetDeck.id);
+                                        // change filter to all to prevent error on missing dropdown item
+                                        if(!Provider.of<DecksState>(context, listen: false).tags.contains(targetDeck.tag)){
+                                          Provider.of<OverallState>(context, listen: false)
+                                              .revisionFilter = "All";
+                                        }
                                         Provider.of<ResultsState>(context, listen: false)
                                             .remove(targetDeck.id);
                                         print("Deletion complete");
